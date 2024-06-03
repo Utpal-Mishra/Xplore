@@ -15,8 +15,8 @@ import json # library to handle JSON files
 from pandas import json_normalize # tranform JSON file into a pandas dataframe
 
 # Matplotlib and associated plotting modules
-import matplotlib.cm as cm
-import matplotlib.colors as colors
+# import matplotlib.cm as cm
+# import matplotlib.colors as colors
 import matplotlib.pyplot as plt # plotting library
 import plotly.express as px  # plotting library
 
