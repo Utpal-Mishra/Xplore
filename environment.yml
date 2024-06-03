@@ -1,0 +1,13 @@
+name: stats
+dependencies:
+  - python
+  - numpy
+  - pandas
+  - seaborn
+  - matlplotlib
+  - plotly
+  - time
+  - streamlit
+  - datetime
+  - sys
+  - requests
