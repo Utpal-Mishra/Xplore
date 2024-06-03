@@ -11,3 +11,7 @@ dependencies:
   - datetime
   - sys
   - requests
+  - tqdm
+  - geopy
+  - googlemaps
+  - geocoder

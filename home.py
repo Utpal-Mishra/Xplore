@@ -17,7 +17,7 @@ from pandas import json_normalize # tranform JSON file into a pandas dataframe
 # Matplotlib and associated plotting modules
 # import matplotlib.cm as cm
 # import matplotlib.colors as colors
-import matplotlib.pyplot as plt # plotting library
+from matplotlib import pyplot as plt # plotting library
 import plotly.express as px  # plotting library
 
 #!conda install -c conda-forge folium=0.5.0 --yes
