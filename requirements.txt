@@ -14,7 +14,7 @@ defusedxml==0.6.0
 entrypoints==0.3
 Flask==1.1.2
 Flask-Cors==3.0.8
-folium=0.12.1
+folium==0.12.1
 geopy==2.2.0
 geocoder==1.38.1
 grpcio==1.29.0

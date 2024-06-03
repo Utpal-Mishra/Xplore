@@ -1,7 +1,6 @@
 # RESOURCES
 # 1. https://folium.streamlit.app/
 
-
 import streamlit as st
 
 import requests # library to handle requests
@@ -14,32 +13,10 @@ import json # library to handle JSON files
 # from pandas.io.json import json_normalize
 from pandas import json_normalize # tranform JSON file into a pandas dataframe
 
-# Matplotlib and associated plotting modules
-# import matplotlib.cm as cm
-# import matplotlib.colors as colors
-# import matplotlib.pyplot as plt # plotting library
-# import plotly.express as px  # plotting library
-
-# !conda install -c conda-forge folium=0.5.0 --yes
-# import folium # plotting library
-#from streamlit_folium import st_folium
-
 # !conda install -c conda-forge geopy --yes
 from geopy.geocoders import Nominatim # module to convert an address into latitude and longitude values
-# import geocoder
-
-# import googlemaps
-# from datetime import datetime
-
-# libraries for displaying images
-# from IPython.display import Image
-# from IPython.core.display import HTML
-
 
 print('Libraries imported.')
-
-# pd.set_option('display.max_columns', None)
-# pd.set_option('display.max_rows', None)
 
 def app():
     st.write("")
