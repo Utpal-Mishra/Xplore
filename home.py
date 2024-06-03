@@ -20,11 +20,11 @@ from pandas import json_normalize # tranform JSON file into a pandas dataframe
 # import matplotlib.pyplot as plt # plotting library
 # import plotly.express as px  # plotting library
 
-#!conda install -c conda-forge folium=0.5.0 --yes
+# !conda install -c conda-forge folium=0.5.0 --yes
 # import folium # plotting library
 #from streamlit_folium import st_folium
 
-#!conda install -c conda-forge geopy --yes
+# !conda install -c conda-forge geopy --yes
 from geopy.geocoders import Nominatim # module to convert an address into latitude and longitude values
 # import geocoder
 
