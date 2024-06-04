@@ -18,8 +18,6 @@ from pandas import json_normalize # tranform JSON file into a pandas dataframe
 #!conda install -c conda-forge folium=0.5.0 --yes
 import folium # plotting library
 
-from unidecode import unidecode
-
 import pandas as pd # library for data analsysis
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
@@ -51,7 +49,7 @@ def app():
     
     st.header("SO, WHAT DO WE HAVE AROUND?")
     
-    address = st.text_input("\nEnter Location (Format: City, Country or City, County, Country): ")
+    address = st.text_input("\nEnter Location: ")
     
     if address:
 
@@ -60,7 +58,7 @@ def app():
         latitude = location.latitude
         longitude = location.longitude
         
-        st.write('\nThe geograpical coordinate of {} are {}, {}.'.format(address, latitude, longitude))
+        # st.write('\nThe geograpical coordinate of {} are {}, {}.'.format(address, latitude, longitude))
         
         
         """
@@ -95,8 +93,7 @@ def app():
         
         
         LIMIT = 500
-        radius = st.text_input("\nEnter Radius (in KM): ")
-        radius *= 1000
+        radius = st.text_input("\nEnter Radius: ")
         
         if radius:
 
@@ -114,9 +111,6 @@ def app():
             data = data[['Name', 'Categories', 'Distance', 'Address', 'City', 'Latitude', 'Longitude']]
             data.sort_values(by = ['Distance'], inplace = True)
             # st.dataframe(data)
-            
-            for i in range(data.shape[0]):
-                data.Categories[i] = unidecode(data.Categories[i])
 
             st.subheader('\nTOP 10 CLOSE ATTRACTIONS')
             locations = pd.DataFrame(data.Categories.value_counts()).reset_index() # .transpose())
@@ -132,7 +126,7 @@ def app():
             
             st.subheader('\n')
             
-            category = st.text_input("\nSearch an Attaction: ")
+            category = st.text_input("\nEnter Category: ")
             # data.sort_values(by = ['Distance'], inplace = True)
             search = data[data.Categories == category]
             search.sort_values(by = ['Distance'], inplace = True)
