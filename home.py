@@ -4,64 +4,30 @@
 import streamlit as st
 
 from tqdm import tqdm
-
 import requests # library to handle requests
-import pandas as pd # library for data analsysis
 import numpy as np # library to handle data in a vectorized manner
 import random # library for random number generation
 
 #!conda install -c conda-forge geopy --yes
 from geopy.geocoders import Nominatim # module to convert an address into latitude and longitude values
 
-# libraries for displaying images
-from IPython.display import Image
-from IPython.core.display import HTML
+import json # library to handle JSON files
 
-# tranforming json file into a pandas dataframe library
-#from pandas.io.json import json_normalize
-from pandas import json_normalize
+# from pandas.io.json import json_normalize
+from pandas import json_normalize # tranform JSON file into a pandas dataframe
 
 #!conda install -c conda-forge folium=0.5.0 --yes
 import folium # plotting library
-
-import random # library for random number generation
-import numpy as np # library for vectorized computation
-import pandas as pd # library to process data as dataframes
-
-import matplotlib.pyplot as plt # plotting library
-
-from sklearn.cluster import KMeans
-#from sklearn.datasets.samples_generator import make_blobs
-
-import numpy as np # library to handle data in a vectorized manner
 
 import pandas as pd # library for data analsysis
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
 
-import json # library to handle JSON files
-
-#!conda install -c conda-forge geopy --yes # uncomment this line if you haven't completed the Foursquare API lab
-from geopy.geocoders import Nominatim # convert an address into latitude and longitude values
-
-import requests # library to handle requests
-#from pandas.io.json import json_normalize
-from pandas import json_normalize # tranform JSON file into a pandas dataframe
-
-# Matplotlib and associated plotting modules
-import matplotlib.cm as cm
-import matplotlib.colors as colors
-
-# import k-means from clustering stage
-from sklearn.cluster import KMeans
-
-#!conda install -c conda-forge folium=0.5.0 --yes # uncomment this line if you haven't completed the Foursquare API lab
-import folium # map rendering library
+# libraries for displaying images
+from IPython.display import Image
+from IPython.core.display import HTML
 
 print('Libraries imported.')
-
-pd.set_option('display.max_columns', None)
-pd.set_option('display.max_rows', None)
 
 def app():
     st.write("")
