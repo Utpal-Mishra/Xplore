@@ -22,10 +22,6 @@ import pandas as pd # library for data analsysis
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
 
-# libraries for displaying images
-from IPython.display import Image
-from IPython.core.display import HTML
-
 print('Libraries imported.')
 
 def app():
