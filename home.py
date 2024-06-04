@@ -113,7 +113,7 @@ def app():
             # st.dataframe(data)
 
             st.subheader('\nTOP 10 CLOSE ATTRACTIONS')
-            locations = pd.DataFrame(data.Categories.value_counts()).reset_index() # .transpose())
+            locations = pd.DataFrame(data.Categories.value_counts()) # .transpose())
             locations = locations.reset_index()
             locations = locations.rename(columns = {'index': 'Venue', 'Categories': 'Frequency'})
             st.dataframe(locations) 
