@@ -98,24 +98,22 @@ def app():
         url = 'https://api.foursquare.com/v2/venues/explore?&client_id={}&client_secret={}&v={}&ll={},{}&radius={}&limit={}'.format(CLIENT_ID, CLIENT_SECRET, VERSION, latitude, longitude, radius, LIMIT)
         result = requests.get(url).json()
 
-        venues = result['response']['groups'][0]['items']
-        venues = json_normalize(venues)
-        #venues.head()
-        data = pd.DataFrame(venues)
-        data.shape
-
-
+        output = result['response']['groups'][0]['items']
+        output = json_normalize(output)
+        # search.head()
+        
+        data = pd.DataFrame(output)
         data = data[['venue.name', 'venue.location.address', 'venue.location.lat', 'venue.location.lng', 'venue.location.distance', 'venue.location.city', 'venue.categories']]
         data.columns = ['Name', 'Address', 'Latitude', 'Longitude', 'Distance', 'City', 'Categories']
         data['Categories'] = data['Categories'].apply(lambda x: x[0]['name'])
         data = data[['Name', 'Categories', 'Distance', 'Address', 'City', 'Latitude', 'Longitude']]
         data.sort_values(by = ['Distance'], inplace = True)
-        #st.dataframe(data)
+        # st.dataframe(data)
 
         st.subheader('\nTOP 10 CLOSE ATTRACTIONS')
         venues = pd.DataFrame(data.Categories.value_counts()).reset_index() # .transpose())
         venues.rename(columns = {'index': 'Venue', 'Categories': 'Frequency'}, inplace = True)
-        # st.write(venues) 
+        st.dataframe(venues) 
         
         def display(data):
             for i in range(10):
