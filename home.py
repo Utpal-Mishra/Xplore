@@ -117,11 +117,11 @@ def app():
             locations = locations.rename(columns = {'Categories': 'Attractions', 'count': 'Frequency'})
             st.dataframe(locations) 
             
-            """def display(data):
+            def display(data):
                 for i in range(10):
-                    st.write(i+1, data['Venue'].iloc[i], data['Frequency'].iloc[i])
+                    st.write(i+1, data['Attractions'].iloc[i], data['Frequency'].iloc[i])
                 
-            display(locations)"""
+            display(locations)
             
             
             st.subheader('\n')
