@@ -75,7 +75,6 @@ def app():
         st.map(Map, zoom = 7.5)
         """
         
-        
         def get_category_type(row):
             try:
                 categories_list = row['categories']
@@ -118,8 +117,11 @@ def app():
         venues.rename(columns = {'index': 'Venue', 'Categories': 'Frequency'}, inplace = True)
         # st.write(venues) 
         
-        for i in range(10):
-            st.write(i+1, venues['Venue'][i], venues['Frequency'][i])
+        def display(data):
+            for i in range(10):
+                st.write(i+1, venues['Venue'][i], venues['Frequency'][i])
+            
+        display(venues)
         
         
         st.subheader('\n')
