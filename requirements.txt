@@ -1,4 +1,4 @@
-cython==0.29.14
+cython==0.29.2
 folium==0.12.1
 geopy
 h5py==2.10.0
