@@ -18,6 +18,8 @@ from pandas import json_normalize # tranform JSON file into a pandas dataframe
 #!conda install -c conda-forge folium=0.5.0 --yes
 import folium # plotting library
 
+from unidecode import unidecode
+
 import pandas as pd # library for data analsysis
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
@@ -111,11 +113,14 @@ def app():
             data = data[['Name', 'Categories', 'Distance', 'Address', 'City', 'Latitude', 'Longitude']]
             data.sort_values(by = ['Distance'], inplace = True)
             # st.dataframe(data)
+            
+            for i in range(data.shape[0]):
+                data.Categories[i] = unidecode(data.Categories[i])
 
             st.subheader('\nTOP 10 CLOSE ATTRACTIONS')
             locations = pd.DataFrame(data.Categories.value_counts()).reset_index() # .transpose())
             locations = locations.rename(columns = {'Categories': 'Attractions', 'count': 'Frequency'})
-            # st.dataframe(locations) 
+            st.dataframe(locations) 
             
             def display(data):
                 for i in range(10):
@@ -126,7 +131,7 @@ def app():
             
             st.subheader('\n')
             
-            category = st.text_input("\nEnter Category: ")
+            category = st.text_input("\nSearch an Attaction: ")
             # data.sort_values(by = ['Distance'], inplace = True)
             search = data[data.Categories == category]
             search.sort_values(by = ['Distance'], inplace = True)
