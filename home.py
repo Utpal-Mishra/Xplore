@@ -51,7 +51,7 @@ def app():
     
     st.header("SO, WHAT DO WE HAVE AROUND?")
     
-    address = st.text_input("\nEnter Location: ")
+    address = st.text_input("\nEnter Location (Format: City, Country or City, County, Country): ")
     
     if address:
 
@@ -60,7 +60,7 @@ def app():
         latitude = location.latitude
         longitude = location.longitude
         
-        # st.write('\nThe geograpical coordinate of {} are {}, {}.'.format(address, latitude, longitude))
+        st.write('\nThe geograpical coordinate of {} are {}, {}.'.format(address, latitude, longitude))
         
         
         """
@@ -95,7 +95,8 @@ def app():
         
         
         LIMIT = 500
-        radius = st.text_input("\nEnter Radius: ")
+        radius = st.text_input("\nEnter Radius (in KM): ")
+        radius *= 1000
         
         if radius:
 
@@ -120,7 +121,7 @@ def app():
             st.subheader('\nTOP 10 CLOSE ATTRACTIONS')
             locations = pd.DataFrame(data.Categories.value_counts()).reset_index() # .transpose())
             locations = locations.rename(columns = {'Categories': 'Attractions', 'count': 'Frequency'})
-            st.dataframe(locations) 
+            # st.dataframe(locations) 
             
             def display(data):
                 for i in range(10):
