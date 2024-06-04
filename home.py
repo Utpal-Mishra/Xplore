@@ -3,7 +3,6 @@
 
 import streamlit as st
 
-from tqdm import tqdm
 import requests # library to handle requests
 import numpy as np # library to handle data in a vectorized manner
 import random # library for random number generation
