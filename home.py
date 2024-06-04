@@ -115,7 +115,7 @@ def app():
             st.subheader('\nTOP 10 CLOSE ATTRACTIONS')
             locations = pd.DataFrame(data.Categories.value_counts()).reset_index() # .transpose())
             locations = locations.rename(columns = {'Categories': 'Attractions', 'count': 'Frequency'})
-            st.dataframe(locations) 
+            # st.dataframe(locations) 
             
             def display(data):
                 for i in range(10):
