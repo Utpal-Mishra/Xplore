@@ -113,15 +113,16 @@ def app():
             # st.dataframe(data)
 
             st.subheader('\nTOP 10 CLOSE ATTRACTIONS')
-            venues = pd.DataFrame(data.Categories.value_counts()).reset_index() # .transpose())
-            venues.rename(columns = {'index': 'Venue', 'Categories': 'Frequency'}, inplace = True)
-            st.dataframe(venues) 
+            locations = pd.DataFrame(data.Categories.value_counts()).reset_index() # .transpose())
+            locations = locations.reset_index()
+            locations = locations.rename(columns = {'index': 'Venue', 'Categories': 'Frequency'})
+            st.dataframe(locations) 
             
-            """def display(data):
+            def display(data):
                 for i in range(10):
-                    st.write(i+1, venues['Venue'].iloc[i], venues['Frequency'].iloc[i])
+                    st.write(i+1, data['Venue'].iloc[i], data['Frequency'].iloc[i])
                 
-            display(venues)"""
+            display(locations)
             
             
             st.subheader('\n')
