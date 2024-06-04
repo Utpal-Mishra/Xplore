@@ -115,13 +115,13 @@ def app():
             st.subheader('\nTOP 10 CLOSE ATTRACTIONS')
             venues = pd.DataFrame(data.Categories.value_counts()).reset_index() # .transpose())
             venues.rename(columns = {'index': 'Venue', 'Categories': 'Frequency'}, inplace = True)
-            # st.dataframe(venues) 
+            st.dataframe(venues) 
             
-            def display(data):
+            """def display(data):
                 for i in range(10):
                     st.write(i+1, venues['Venue'].iloc[i], venues['Frequency'].iloc[i])
                 
-            display(venues)
+            display(venues)"""
             
             
             st.subheader('\n')
