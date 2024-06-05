@@ -132,19 +132,19 @@ def app():
             locations = pd.DataFrame(data.Categories.value_counts()).reset_index() # .transpose())
             locations = locations.rename(columns = {'Categories': 'Attractions', 'count': 'Frequency'})
             locations.columns = ['Attractions', 'Frequency']
-            st.dataframe(locations) 
+            # st.dataframe(locations) 
             
-            """def display(data):
+            def display(data):
                 for i in range(10):
                     st.write(i+1, data['Attractions'].iloc[i], data['Frequency'].iloc[i])
                 
-            display(locations)"""
+            display(locations)
             
             # SECTION 6: Category Search
             
             st.subheader('\n')
             
-            category = st.text_input("\nEnter Category: ")
+            category = st.text_input("Enter Category: ")
             # data.sort_values(by = ['Distance'], inplace = True)
             search = data[data.Categories == category]
             search.sort_values(by = ['Distance'], inplace = True)
