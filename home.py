@@ -72,7 +72,7 @@ def app():
     
     # SECTION 1: Add Location
     
-    address = st.text_input("\nEnter Location (in City, County/ State, Country): ")
+    address = st.text_input("\nEnter Location (in City, Country or City, County/ State, Country): ")
     
     if address:
 
@@ -103,6 +103,7 @@ def app():
         
         LIMIT = 500
         radius = st.text_input("\nEnter Radius (in KM): ")
+        radius = int(radius)*1000
         
         if radius:
             
@@ -130,13 +131,14 @@ def app():
             st.subheader('\nTOP 10 CLOSE ATTRACTIONS')
             locations = pd.DataFrame(data.Categories.value_counts()).reset_index() # .transpose())
             locations = locations.rename(columns = {'Categories': 'Attractions', 'count': 'Frequency'})
-            # st.dataframe(locations) 
+            locations.columns = ['Attractions', 'Frequency']
+            st.dataframe(locations) 
             
-            def display(data):
+            """def display(data):
                 for i in range(10):
                     st.write(i+1, data['Attractions'].iloc[i], data['Frequency'].iloc[i])
                 
-            display(locations)
+            display(locations)"""
             
             # SECTION 6: Category Search
             
