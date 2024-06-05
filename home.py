@@ -13,6 +13,10 @@
 # 1. https://pypi.org/project/streamlit-pills/
 # 2. https://discuss.streamlit.io/t/how-to-add-a-title-text-or-few-sample-prompts-close-to-the-chat-input/64757
 
+# Standardize Text
+# 1. https://pypi.org/project/Unidecode/
+# 2. https://pypi.org/project/anyascii/0.1.6/
+
 ###############################################################################################################
 
 # LIBRARIES
@@ -28,6 +32,7 @@ import random # library for random number generation
 from geopy.geocoders import Nominatim # module to convert an address into latitude and longitude values
 
 import json # library to handle JSON files
+from unidecode import unidecode
 
 # from pandas.io.json import json_normalize
 from pandas import json_normalize # tranform JSON file into a pandas dataframe
@@ -124,7 +129,8 @@ def app():
             data = data[['venue.name', 'venue.location.address', 'venue.location.lat', 'venue.location.lng', 'venue.location.distance', 'venue.location.city', 'venue.categories']]
             data.columns = ['Name', 'Address', 'Latitude', 'Longitude', 'Distance', 'City', 'Categories']
             data['Categories'] = data['Categories'].apply(lambda x: x[0]['name'])
-            data = data[['Name', 'Categories', 'Distance', 'Address', 'City', 'Latitude', 'Longitude']]
+            data = data[['Name', 'Categories', 'Distance', 'Address', 'City', 'Latitude', 'Longitude']]         
+            data.Categories = data.Categories.str.replace('Café', 'Cafe')
             data.sort_values(by = ['Distance'], inplace = True)
             # st.dataframe(data)
 
@@ -156,7 +162,7 @@ def app():
             # st.dataframe(search)
             
             for i in range(search.shape[0]):
-                st.write(i+1, search.Name[i], search.Categories[i], search.Distance[i]/1000)
+                st.write(i+1, search.Name[i], search.Distance[i]/1000) # search.Categories[i]
             
             ###################################################################################################
             
