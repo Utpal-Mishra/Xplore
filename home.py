@@ -165,7 +165,7 @@ def app():
             map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
             # st.dataframe(map)
             
-            st.map(map, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
+            st.map(map, size = 100, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
             
             ###################################################################################################
             
