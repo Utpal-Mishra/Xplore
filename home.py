@@ -108,7 +108,7 @@ def app():
         # SECTION 2: Add Radius
         
         LIMIT = 500
-        radius = st.text_input("\nEnter Radius (in KM): ")
+        radius = st.text_input("\nEnter Radius (in KM): ", "10")
         
         if radius:
             
@@ -129,7 +129,9 @@ def app():
             data.columns = ['Name', 'Address', 'Latitude', 'Longitude', 'Distance', 'City', 'Categories']
             data['Categories'] = data['Categories'].apply(lambda x: x[0]['name'])
             data = data[['Name', 'Categories', 'Distance', 'Address', 'City', 'Latitude', 'Longitude']]         
+            data.Name = data.Name.str.replace('Café', 'Cafe')
             data.Categories = data.Categories.str.replace('Café', 'Cafe')
+            data.Categories = data.Categories.str.replace('Coffee Shop', 'Cafe')
             data.sort_values(by = ['Distance'], inplace = True)
             # st.dataframe(data)
 
