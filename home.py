@@ -1,13 +1,30 @@
 # RESOURCES
+
+# Foursquare
+# 1. https://docs.foursquare.com/developer/reference/address-directory
+# 2. https://docs.foursquare.com/developer/reference/address-form-autofill
+# 3. https://docs.foursquare.com/developer/reference/local-search-map
+
+# Folium
 # 1. https://folium.streamlit.app/
+# 2. https://realpython.com/python-folium-web-maps-from-data/
+
+# Stremlit Pills
+# 1. https://pypi.org/project/streamlit-pills/
+# 2. https://discuss.streamlit.io/t/how-to-add-a-title-text-or-few-sample-prompts-close-to-the-chat-input/64757
+
+###############################################################################################################
+
+# LIBRARIES
 
 import streamlit as st
+# st.set_page_config(layout="wide")
 
 import requests # library to handle requests
 import numpy as np # library to handle data in a vectorized manner
 import random # library for random number generation
 
-#!conda install -c conda-forge geopy --yes
+# !conda install -c conda-forge geopy --yes
 from geopy.geocoders import Nominatim # module to convert an address into latitude and longitude values
 
 import json # library to handle JSON files
@@ -15,14 +32,16 @@ import json # library to handle JSON files
 # from pandas.io.json import json_normalize
 from pandas import json_normalize # tranform JSON file into a pandas dataframe
 
-#!conda install -c conda-forge folium=0.5.0 --yes
+# !conda install -c conda-forge folium=0.5.0 --yes
 import folium # plotting library
 
 import pandas as pd # library for data analsysis
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
 
-print('Libraries imported.')
+print('Libraries Imported')
+
+###############################################################################################################
 
 def app():
     st.write("")
@@ -49,7 +68,11 @@ def app():
     
     st.header("SO, WHAT DO WE HAVE AROUND?")
     
-    address = st.text_input("\nEnter Location: ")
+    ############################################################################################################
+    
+    # SECTION 1: Add Location
+    
+    address = st.text_input("\nEnter Location (in City, County/ State, Country): ")
     
     if address:
 
@@ -59,22 +82,7 @@ def app():
         longitude = location.longitude
         
         # st.write('\nThe geograpical coordinate of {} are {}, {}.'.format(address, latitude, longitude))
-        
-        
-        """
-        Map = folium.Map(location = [latitude, longitude], zoom_start = 12, tiles = 'Stamen Terrain')
-        
-        Marker = folium.map.FeatureGroup()
-        Marker.add_child(folium.CircleMarker([latitude, longitude],
-                                                    radius = 5,
-                                                    color = 'red',
-                                                    fill_color = 'Red'))
-        Map.add_child(Marker)
-        folium.Marker([latitude, longitude], popup = address).add_to(Map)
-        
-        st.map(Map, zoom = 7.5)
-        """
-        
+               
         def get_category_type(row):
             try:
                 categories_list = row['categories']
@@ -91,11 +99,14 @@ def app():
         CLIENT_SECRET = 'JO5OD3ZLJSQSR5UAJNQXY2DJP1RTEHCQDWJAWQIM5PWTNHYR'
         VERSION = '20180604'
         
+        # SECTION 2: Add Radius
         
         LIMIT = 500
-        radius = st.text_input("\nEnter Radius: ")
+        radius = st.text_input("\nEnter Radius (in KM): ")
         
         if radius:
+            
+            # SECTION 3: Fetch Data
 
             url = 'https://api.foursquare.com/v2/venues/explore?&client_id={}&client_secret={}&v={}&ll={},{}&radius={}&limit={}'.format(CLIENT_ID, CLIENT_SECRET, VERSION, latitude, longitude, radius, LIMIT)
             result = requests.get(url).json()
@@ -104,6 +115,8 @@ def app():
             output = json_normalize(output)
             # search.head()
             
+            # SECTION 4: Create DataFrame
+            
             data = pd.DataFrame(output)
             data = data[['venue.name', 'venue.location.address', 'venue.location.lat', 'venue.location.lng', 'venue.location.distance', 'venue.location.city', 'venue.categories']]
             data.columns = ['Name', 'Address', 'Latitude', 'Longitude', 'Distance', 'City', 'Categories']
@@ -111,6 +124,8 @@ def app():
             data = data[['Name', 'Categories', 'Distance', 'Address', 'City', 'Latitude', 'Longitude']]
             data.sort_values(by = ['Distance'], inplace = True)
             # st.dataframe(data)
+
+            # SECTION 5: Closest Attractions By Categories
 
             st.subheader('\nTOP 10 CLOSE ATTRACTIONS')
             locations = pd.DataFrame(data.Categories.value_counts()).reset_index() # .transpose())
@@ -123,6 +138,7 @@ def app():
                 
             display(locations)
             
+            # SECTION 6: Category Search
             
             st.subheader('\n')
             
@@ -137,8 +153,25 @@ def app():
             for i in range(search.shape[0]):
                 st.write(i+1, search.Name[i], search.Categories[i], search.Distance[i])
             
+            ###################################################################################################
+            
+            # SECTION 7: Maps
             
             """
+            Map = folium.Map(location = [latitude, longitude], zoom_start = 12, tiles = 'Stamen Terrain')
+            
+            Marker = folium.map.FeatureGroup()
+            Marker.add_child(folium.CircleMarker([latitude, longitude],
+                                                        radius = 5,
+                                                        color = 'red',
+                                                        fill_color = 'Red'))
+            Map.add_child(Marker)
+            folium.Marker([latitude, longitude], popup = address).add_to(Map)
+            
+            st.map(Map, zoom = 7.5)
+            
+            ###################################################################################################
+        
             incidents = folium.map.FeatureGroup()
 
             for lat, lng, in zip(data.Latitude, data.Longitude):
@@ -163,10 +196,9 @@ def app():
 
             # add incidents to map
             Map.add_child(incidents)
-            """
+  
+            ###################################################################################################
             
-            
-            '''
             venues_map = folium.Map(location=[latitude, longitude], zoom_start=16) # generate map centred around the Grand Central Terminal
 
             # add a red circle marker to represent Grand Central Terminal
@@ -195,27 +227,6 @@ def app():
 
             # display map
             st.map(venues_map)
-            '''
+            """
             
-            '''
-            gmaps = googlemaps.Client(key='AIzaSyBChwx9C-o1f_BwdGU1MAmfNwzorqjUoTU')
-
-            # Geocoding an address
-            geocode_result = gmaps.geocode('1600 Amphitheatre Parkway, Mountain View, CA')
-
-            # Look up an address with reverse geocoding
-            reverse_geocode_result = gmaps.reverse_geocode((40.714224, -73.961452))
-
-            # Request directions via public transit
-            now = datetime.now()
-            directions_result = gmaps.directions("Sydney Town Hall",
-                                                "Parramatta, NSW",
-                                                mode="transit",
-                                                departure_time=now)
-
-            # Validate an address with address validation
-            addressvalidation_result =  gmaps.addressvalidation(['1600 Amphitheatre Pk'], 
-                                                                regionCode='US',
-                                                                locality='Mountain View', 
-                                                                enableUspsCass=True)
-            '''
+            ###################################################################################################
