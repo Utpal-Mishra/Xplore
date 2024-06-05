@@ -32,7 +32,6 @@ import random # library for random number generation
 from geopy.geocoders import Nominatim # module to convert an address into latitude and longitude values
 
 import json # library to handle JSON files
-from unidecode import unidecode
 
 # from pandas.io.json import json_normalize
 from pandas import json_normalize # tranform JSON file into a pandas dataframe
