@@ -34,6 +34,7 @@ from pandas import json_normalize # tranform JSON file into a pandas dataframe
 
 # !conda install -c conda-forge folium=0.5.0 --yes
 import folium # plotting library
+# from streamlit_folium import st_folium # type: ignore
 
 import pandas as pd # library for data analsysis
 pd.set_option('display.max_columns', None)
@@ -43,8 +44,9 @@ print('Libraries Imported')
 
 ###############################################################################################################
 
+# @st.cache_data
 def app():
-    st.write("")
+    
     st.write("")
     st.write("")
     
@@ -103,12 +105,12 @@ def app():
         
         LIMIT = 500
         radius = st.text_input("\nEnter Radius (in KM): ")
-        radius = int(radius)*1000
         
         if radius:
             
             # SECTION 3: Fetch Data
-
+            
+            radius = int(radius)*1000
             url = 'https://api.foursquare.com/v2/venues/explore?&client_id={}&client_secret={}&v={}&ll={},{}&radius={}&limit={}'.format(CLIENT_ID, CLIENT_SECRET, VERSION, latitude, longitude, radius, LIMIT)
             result = requests.get(url).json()
 
@@ -129,8 +131,9 @@ def app():
             # SECTION 5: Closest Attractions By Categories
 
             st.subheader('\nTOP 10 CLOSE ATTRACTIONS')
+            
             locations = pd.DataFrame(data.Categories.value_counts()).reset_index() # .transpose())
-            locations = locations.rename(columns = {'Categories': 'Attractions', 'count': 'Frequency'})
+            # locations = locations.rename(columns = {'Categories': 'Attractions', 'count': 'Frequency'})
             locations.columns = ['Attractions', 'Frequency']
             # st.dataframe(locations) 
             
@@ -142,7 +145,7 @@ def app():
             
             # SECTION 6: Category Search
             
-            st.subheader('\n')
+            st.subheader('\nCLOSE ATTRACTIONS BY A CATEGORY')
             
             category = st.text_input("Enter Category: ")
             # data.sort_values(by = ['Distance'], inplace = True)
@@ -153,11 +156,20 @@ def app():
             # st.dataframe(search)
             
             for i in range(search.shape[0]):
-                st.write(i+1, search.Name[i], search.Categories[i], search.Distance[i])
+                st.write(i+1, search.Name[i], search.Categories[i], search.Distance[i]/1000)
             
             ###################################################################################################
             
-            # SECTION 7: Maps
+            # SECTION 7: Streamlit Map
+            
+            map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
+            # st.dataframe(map)
+            
+            st.map(map, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
+            
+            ###################################################################################################
+            
+            # SECTION 7: Folium Maps
             
             """
             Map = folium.Map(location = [latitude, longitude], zoom_start = 12, tiles = 'Stamen Terrain')
@@ -170,13 +182,17 @@ def app():
             Map.add_child(Marker)
             folium.Marker([latitude, longitude], popup = address).add_to(Map)
             
-            st.map(Map, zoom = 7.5)
+            st_folium(Map) 
+            """       
             
             ###################################################################################################
         
+            """
+            Map = folium.Map(location = [latitude, longitude], zoom_start = 12, tiles = 'Stamen Terrain')
+            
             incidents = folium.map.FeatureGroup()
 
-            for lat, lng, in zip(data.Latitude, data.Longitude):
+            for lat, lng, in zip(search.Latitude, search.Longitude):
                 incidents.add_child(
                     folium.CircleMarker(
                         [lat, lng],
@@ -189,18 +205,20 @@ def app():
                 )
 
             # add pop-up text to each marker on the map
-            latitudes = list(data.Latitude)
-            longitudes = list(data.Longitude)
-            labels = list(data.Name)
+            latitudes = list(search.Latitude)
+            longitudes = list(search.Longitude)
+            labels = list(search.Name)
 
             for lat, lng, label in zip(latitudes, longitudes, labels):
                 folium.Marker([lat, lng], popup=label).add_to(Map)
 
             # add incidents to map
             Map.add_child(incidents)
-  
+            """
+             
             ###################################################################################################
             
+            """
             venues_map = folium.Map(location=[latitude, longitude], zoom_start=16) # generate map centred around the Grand Central Terminal
 
             # add a red circle marker to represent Grand Central Terminal
