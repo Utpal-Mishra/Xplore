@@ -1,5 +1,7 @@
 # RESOURCES
 
+# VERSION 1
+
 # Foursquare
 # 1. https://docs.foursquare.com/developer/reference/address-directory
 # 2. https://docs.foursquare.com/developer/reference/address-form-autofill
@@ -17,12 +19,22 @@
 # 1. https://pypi.org/project/Unidecode/
 # 2. https://pypi.org/project/anyascii/0.1.6/
 
+#--------------------------------------------------------------------------------------------------------------
+
+# VERSION 2:
+
+# Streamlit Range Slider
+# https://docs.streamlit.io/develop/api-reference/widgets/st.slider
+
+
+
 ###############################################################################################################
 
 # LIBRARIES
 
 import streamlit as st
 # st.set_page_config(layout="wide")
+from streamlit_lottie import st_lottie
 
 import requests # library to handle requests
 import numpy as np # library to handle data in a vectorized manner
@@ -71,6 +83,9 @@ def app():
     st.write("")
     st.write("")
     st.write("")
+    
+    st_lottie("https://lottie.host/f34a0bc0-4b98-4632-8684-4fbfadf0806f/8qPOuRLkVc.json")
+    # st_lottie("https://lottie.host/ca52053c-bcc2-423b-9258-1e2ebe84aa4f/vE2uf9LsAY.json")
     
     st.header("SO, WHAT DO WE HAVE AROUND?")
     
