@@ -109,8 +109,15 @@ def app():
         
         # SECTION 2: Add Radius
         
+        """
+        Version 1:
+        
         LIMIT = 500
         radius = st.text_input("\nEnter Radius (in KM): ", "10")
+        """
+        
+        LIMIT = 500
+        radius = st.slider("\nEnter Radius (in KM): ", min_value = 0, max_value = 100, value = 10)
         
         if radius:
             
@@ -118,7 +125,14 @@ def app():
             
             # SECTION 3: Fetch Data
             
+            """
+            Version 1:
+            
             radius = int(radius)*1000
+            """
+            
+            radius = radius*1000
+            
             url = 'https://api.foursquare.com/v2/venues/explore?&client_id={}&client_secret={}&v={}&ll={},{}&radius={}&limit={}'.format(CLIENT_ID, CLIENT_SECRET, VERSION, latitude, longitude, radius, LIMIT)
             result = requests.get(url).json()
 
