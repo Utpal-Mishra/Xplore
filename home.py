@@ -105,12 +105,16 @@ def app():
         CLIENT_SECRET = 'JO5OD3ZLJSQSR5UAJNQXY2DJP1RTEHCQDWJAWQIM5PWTNHYR'
         VERSION = '20180604'
         
+        ############################################################################################################
+        
         # SECTION 2: Add Radius
         
         LIMIT = 500
         radius = st.text_input("\nEnter Radius (in KM): ", "10")
         
         if radius:
+            
+            ###################################################################################################
             
             # SECTION 3: Fetch Data
             
@@ -121,6 +125,8 @@ def app():
             output = result['response']['groups'][0]['items']
             output = json_normalize(output)
             # search.head()
+            
+            ###################################################################################################
             
             # SECTION 4: Create DataFrame
             
@@ -134,6 +140,8 @@ def app():
             data.Categories = data.Categories.str.replace('Coffee Shop', 'Cafe')
             data.sort_values(by = ['Distance'], inplace = True)
             # st.dataframe(data)
+            
+            ###################################################################################################
 
             # SECTION 5: Closest Attractions By Categories
 
@@ -149,6 +157,8 @@ def app():
                     st.write(i+1, data['Attractions'].iloc[i], data['Frequency'].iloc[i])
                 
             display(locations)
+            
+            ###################################################################################################
             
             # SECTION 6: Category Search
             
@@ -176,7 +186,7 @@ def app():
             
             ###################################################################################################
             
-            # SECTION 7: Folium Maps
+            # SECTION 8: Folium Maps
             
             """
             Map = folium.Map(location = [latitude, longitude], zoom_start = 12, tiles = 'Stamen Terrain')
