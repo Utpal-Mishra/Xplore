@@ -60,8 +60,6 @@ import pandas as pd # library for data analsysis
 pd.set_option('display.max_columns', None) # Version 1
 pd.set_option('display.max_rows', None) # Version 1
 
-import time
-
 print('Libraries Imported')
 
 ###############################################################################################################

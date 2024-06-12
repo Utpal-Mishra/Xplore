@@ -1,4 +1,3 @@
 geopy
 folium
-time
 streamlit_lottie
