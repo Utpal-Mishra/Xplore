@@ -30,7 +30,8 @@
 # https://lottiefiles.com/animations/gradient-loader-02-juQh1tTYA0
 # https://lottie.host/bfc80cbd-79f1-4d62-ad2d-89f4e9f3278d/Z1fopF3tEc.json
 
-
+# Select Box
+# https://docs.streamlit.io/develop/api-reference/widgets/st.selectbox
 
 ###############################################################################################################
 
