@@ -218,7 +218,10 @@ def app():
             
             # Version 2 -------------------------------------------------------------------------------------------
         
-            category = st.selectbox("How would you like to be contacted?", tuple(list(locations['Attractions'][:10])))
+            category = st.selectbox("How would you like to be contacted?", 
+                                    tuple(list(locations['Attractions'][:10])),
+                                    index=None,
+                                    placeholder="Select Attraction Category")
         
             # ---------------------------------------------------------------------------------------------------------
              
