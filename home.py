@@ -26,35 +26,41 @@
 # Streamlit Range Slider
 # https://docs.streamlit.io/develop/api-reference/widgets/st.slider
 
+# Gradient Animation
+# https://lottiefiles.com/animations/gradient-loader-02-juQh1tTYA0
+# https://lottie.host/bfc80cbd-79f1-4d62-ad2d-89f4e9f3278d/Z1fopF3tEc.json
+
 
 
 ###############################################################################################################
 
 # LIBRARIES
 
-import streamlit as st
+import streamlit as st # Version 1
 # st.set_page_config(layout="wide")
-from streamlit_lottie import st_lottie
+from streamlit_lottie import st_lottie # Version 2
 
-import requests # library to handle requests
-import numpy as np # library to handle data in a vectorized manner
-import random # library for random number generation
+import requests # library to handle requests # Version 1
+import numpy as np # library to handle data in a vectorized manner # Version 1
+import random # library for random number generation # Version 1
 
 # !conda install -c conda-forge geopy --yes
-from geopy.geocoders import Nominatim # module to convert an address into latitude and longitude values
+from geopy.geocoders import Nominatim # module to convert an address into latitude and longitude values # Version 1
 
 import json # library to handle JSON files
 
 # from pandas.io.json import json_normalize
-from pandas import json_normalize # tranform JSON file into a pandas dataframe
+from pandas import json_normalize # tranform JSON file into a pandas dataframe # Version 1
 
 # !conda install -c conda-forge folium=0.5.0 --yes
-import folium # plotting library
+import folium # plotting library # Version 1
 # from streamlit_folium import st_folium # type: ignore
 
 import pandas as pd # library for data analsysis
-pd.set_option('display.max_columns', None)
-pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None) # Version 1
+pd.set_option('display.max_rows', None) # Version 1
+
+import time
 
 print('Libraries Imported')
 
@@ -62,7 +68,7 @@ print('Libraries Imported')
 
 # @st.cache_data
 def app():
-    
+        
     st.write("")
     st.write("")
     
@@ -76,7 +82,8 @@ def app():
     </style>
     '''
     
-    st.markdown(background, unsafe_allow_html=True)"""
+    st.markdown(background, unsafe_allow_html=True)
+    """
     
     st.title("XPLORE")
     
@@ -84,9 +91,13 @@ def app():
     st.write("")
     st.write("")
     
+    # Version 2 -----------------------------------------------------------------------------------------------
+    
     st_lottie("https://lottie.host/f34a0bc0-4b98-4632-8684-4fbfadf0806f/8qPOuRLkVc.json")
     # st_lottie("https://lottie.host/ca52053c-bcc2-423b-9258-1e2ebe84aa4f/vE2uf9LsAY.json")
     
+    # ---------------------------------------------------------------------------------------------------------   
+
     st.header("SO, WHAT DO WE HAVE AROUND?")
     
     ############################################################################################################
@@ -120,19 +131,25 @@ def app():
         CLIENT_SECRET = 'JO5OD3ZLJSQSR5UAJNQXY2DJP1RTEHCQDWJAWQIM5PWTNHYR'
         VERSION = '20180604'
         
-        ############################################################################################################
+        #######################################################################################################
         
         # SECTION 2: Add Radius
         
         """
-        Version 1:
+        # Version 1 -------------------------------------------------------------------------------------------
         
         LIMIT = 500
         radius = st.text_input("\nEnter Radius (in KM): ", "10")
+        
+        # -----------------------------------------------------------------------------------------------------
         """
+        
+        # Version 2 -------------------------------------------------------------------------------------------
         
         LIMIT = 500
         radius = st.slider("\nEnter Radius (in KM): ", min_value = 0, max_value = 100, value = 10)
+        
+        # -----------------------------------------------------------------------------------------------------
         
         if radius:
             
@@ -141,9 +158,11 @@ def app():
             # SECTION 3: Fetch Data
             
             """
-            Version 1:
+            Version 1 -----------------------------------------------------------------------------------------
             
             radius = int(radius)*1000
+            
+            # -------------------------------------------------------------------------------------------------
             """
             
             radius = radius*1000
@@ -186,14 +205,25 @@ def app():
                     st.write(i+1, data['Attractions'].iloc[i], data['Frequency'].iloc[i])
                 
             display(locations)
-            
+                        
             ###################################################################################################
             
             # SECTION 6: Category Search
             
             st.subheader('\nCLOSE ATTRACTIONS BY A CATEGORY')
             
+            """
+            # Version 1 -------------------------------------------------------------------------------------------
+            
             category = st.text_input("Enter Category: ")
+            """
+            
+            # Version 2 -------------------------------------------------------------------------------------------
+        
+            category = st.selectbox("How would you like to be contacted?", tuple(list(locations['Attractions'][:10])))
+        
+            # ---------------------------------------------------------------------------------------------------------
+             
             # data.sort_values(by = ['Distance'], inplace = True)
             search = data[data.Categories == category]
             search.sort_values(by = ['Distance'], inplace = True)
