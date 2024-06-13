@@ -135,7 +135,7 @@ def app():
         
         g = geocoder.ip('me')
         st.write(g.latlng)
-        st.write(geolocator.reverse(g.latlng[0], g.latlng[1]))
+        st.write(geolocator.reverse(g.latlng))
         
         # st.write('\nThe geograpical coordinate of {} are {}, {}.'.format(address, latitude, longitude))
                
