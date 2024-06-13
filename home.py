@@ -1,4 +1,5 @@
 # RESOURCES
+# https://docs.streamlit.io/develop/api-reference
 
 # VERSION 1
 
@@ -35,6 +36,10 @@
 
 # Toast
 # https://docs.streamlit.io/develop/api-reference/status/st.toast
+# https://fonts.google.com/icons?icon.set=Material+Symbols&icon.style=Outlined
+
+# Geolocation
+# https://pypi.org/project/streamlit-geolocation/
 
 ###############################################################################################################
 
@@ -43,6 +48,8 @@
 import streamlit as st # Version 1
 # st.set_page_config(layout="wide")
 from streamlit_lottie import st_lottie # Version 2
+from streamlit_geolocation import streamlit_geolocation # Version 2
+
 
 import requests # library to handle requests # Version 1
 import numpy as np # library to handle data in a vectorized manner # Version 1
@@ -64,13 +71,13 @@ import pandas as pd # library for data analsysis
 pd.set_option('display.max_columns', None) # Version 1
 pd.set_option('display.max_rows', None) # Version 1
 
-import time
+import time # Version 2
 
 print('Libraries Imported')
 
 ###############################################################################################################
 
-st.toast('Welcome to XPLORE!', icon='🎉')
+st.toast('Welcome to XPLORE!', icon='🎉') # icon='😍')
     
 time.sleep(1.5)
 
@@ -119,6 +126,9 @@ def app():
     # SECTION 1: Add Location
     
     address = st.text_input("\nEnter Location (in City, Country or City, County/ State, Country): ")
+    
+    location = streamlit_geolocation()
+    st.write(location)
     
     if address:
 
