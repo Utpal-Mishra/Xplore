@@ -48,8 +48,6 @@
 import streamlit as st # Version 1
 # st.set_page_config(layout="wide")
 from streamlit_lottie import st_lottie # Version 2
-from streamlit_geolocation import streamlit_geolocation # Version 2
-
 
 import requests # library to handle requests # Version 1
 import numpy as np # library to handle data in a vectorized manner # Version 1
@@ -57,6 +55,7 @@ import random # library for random number generation # Version 1
 
 # !conda install -c conda-forge geopy --yes
 from geopy.geocoders import Nominatim # module to convert an address into latitude and longitude values # Version 1
+import geocoder
 
 import json # library to handle JSON files
 
@@ -86,6 +85,9 @@ time.sleep(1.5)
 # @st.cache_data(experimental_allow_widgets=True)
 def app():
     
+    g = geocoder.ip('me')
+    print(g.latlng)
+
     st.write("")
     st.write("")
     

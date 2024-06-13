@@ -1,4 +1,4 @@
 geopy
 folium
+geocoder
 streamlit_lottie
-streamlit_geolocation
