@@ -255,32 +255,30 @@ def app():
         
             # ---------------------------------------------------------------------------------------------------------
              
-            # data.sort_values(by = ['Distance'], inplace = True)
-            search = data[data.Categories == category]
-            search.sort_values(by = ['Distance'], inplace = True)
-            search = search.reset_index()
-            search = search.drop('index', axis = 1)   
-            # st.dataframe(search)
-            
-            time.sleep(1)
-            
-            def result(dt):
-            
-                for i in range(dt.shape[0]):
-                    st.write(i+1, dt.Name[i], dt.Distance[i]/1000) # search.Categories[i]
+            if category:
+                
+                # data.sort_values(by = ['Distance'], inplace = True)
+                search = data[data.Categories == category]
+                search.sort_values(by = ['Distance'], inplace = True)
+                search = search.reset_index()
+                search = search.drop('index', axis = 1)   
+                # st.dataframe(search)
+                
+                time.sleep(1)
+                
+                for i in range(search.shape[0]):
+                    st.write(i+1, search.Name[i], search.Distance[i]/1000) # search.Categories[i]
                 
                 ###################################################################################################
                 
                 # SECTION 7: Streamlit Map
                 
-                map = dt.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
+                map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
                 # st.dataframe(map)
                 
                 st.map(map, size = 200, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
-            
-            result(search)
-            
-            ###################################################################################################
+                
+                ###################################################################################################
             
             # SECTION 8: Folium Maps
             
