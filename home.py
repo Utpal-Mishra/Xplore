@@ -133,9 +133,11 @@ def app():
         latitude = location.latitude
         longitude = location.longitude
         
+        """
         g = geocoder.ip('me')
         st.write(g.latlng)
         st.write(geolocator.reverse(g.latlng))
+        """
         
         # st.write('\nThe geograpical coordinate of {} are {}, {}.'.format(address, latitude, longitude))
                
@@ -268,8 +270,11 @@ def app():
             ###################################################################################################
             
             # SECTION 7: Streamlit Map
+            if search:
+                map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
+            else:
+                map = locations.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
             
-            map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
             # st.dataframe(map)
             
             st.map(map, size = 200, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
