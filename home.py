@@ -84,7 +84,7 @@ print('Libraries Imported')
 
 ###############################################################################################################
 
-st.toast('Welcome to XPLORE!', icon='🎉') # icon='😍')
+st.toast('Welcome to XPLORE!!!', icon='🎉') # icon='😍')
     
 time.sleep(1.5)
 
@@ -164,9 +164,9 @@ def app():
                 return categories_list[0]['name']
             
             
-        CLIENT_ID = 'BF0HGS24CHNDJE2XJ5QH5H0UFDUTIGYZ0Y4JJCREDG0Z0PE4'
+        CLIENT_ID     = 'BF0HGS24CHNDJE2XJ5QH5H0UFDUTIGYZ0Y4JJCREDG0Z0PE4'
         CLIENT_SECRET = 'JO5OD3ZLJSQSR5UAJNQXY2DJP1RTEHCQDWJAWQIM5PWTNHYR'
-        VERSION = '20180604'
+        VERSION       = '20180604'
         
         #######################################################################################################
         
@@ -183,14 +183,15 @@ def app():
         
         # Version 2 -------------------------------------------------------------------------------------------
         
-        LIMIT = 500
-        radius = st.slider("\nEnter Radius (in KM): ", min_value = 0, max_value = 100, value = 10)
+        LIMIT    = 500
+        distance = st.slider("\nEnter Radius (in KM): ", min_value = 0, max_value = 100, value = 10)
+        distance *= 1000 # in Meters
         
         # -----------------------------------------------------------------------------------------------------
         
-        if radius == 0:
+        if distance == 0:
             
-            st.warning('Data Warning', icon="⚠️")
+            st.warning('WARNING: Invalid Distance', icon="⚠️")
         
         else:
             
@@ -205,178 +206,187 @@ def app():
             
             # -------------------------------------------------------------------------------------------------
             """
+            radius = 100 # in KM
+            radius *= 1000 # in Meters
             
-            radius = radius*1000
-            
-            url = 'https://api.foursquare.com/v2/venues/explore?&client_id={}&client_secret={}&v={}&ll={},{}&radius={}&limit={}'.format(CLIENT_ID, CLIENT_SECRET, VERSION, latitude, longitude, radius, LIMIT)
+            url    = 'https://api.foursquare.com/v2/venues/explore?&client_id={}&client_secret={}&v={}&ll={},{}&radius={}&limit={}'.format(CLIENT_ID, CLIENT_SECRET, VERSION, latitude, longitude, radius, LIMIT)
             result = requests.get(url).json()
 
             output = result['response']['groups'][0]['items']
             output = json_normalize(output)
-            # search.head()
+            # output.head()
                         
             ###################################################################################################
             
             # SECTION 4: Create DataFrame
             
-            data = pd.DataFrame(output)
-            data = data[['venue.name', 'venue.location.address', 'venue.location.lat', 'venue.location.lng', 'venue.location.distance', 'venue.location.city', 'venue.categories']]
-            data.columns = ['Name', 'Address', 'Latitude', 'Longitude', 'Distance', 'City', 'Categories']
+            data               = pd.DataFrame(output)
+            data               = data[['venue.name', 'venue.location.address', 'venue.location.lat', 'venue.location.lng', 'venue.location.distance', 'venue.location.city', 'venue.categories']]
+            data.columns       = ['Name', 'Address', 'Latitude', 'Longitude', 'Distance', 'City', 'Categories']
             data['Categories'] = data['Categories'].apply(lambda x: x[0]['name'])
-            data = data[['Name', 'Categories', 'Distance', 'Address', 'City', 'Latitude', 'Longitude']]         
-            data.Name = data.Name.str.replace('Café', 'Cafe')
-            data.Categories = data.Categories.str.replace('Café', 'Cafe')
-            data.Categories = data.Categories.str.replace('Coffee Shop', 'Cafe')
-            data.sort_values(by = ['Distance'], inplace = True)
-            # st.dataframe(data)
+            data               = data[['Name', 'Categories', 'Distance', 'Address', 'City', 'Latitude', 'Longitude']]   
+            data               = data.sort_values(by = ['Distance'])
             
+            data.Name          = data.Name.str.replace('Café', 'Cafe')
+            data.Categories    = data.Categories.str.replace('Café', 'Cafe')            
+            
+            # st.dataframe(data)
+                       
             ###################################################################################################
 
             # SECTION 5: Closest Attractions By Categories
-
-            st.subheader('\nTOP 10 CLOSE ATTRACTIONS')
             
-            locations = pd.DataFrame(data.Categories.value_counts()).reset_index() # .transpose())
-            # locations = locations.rename(columns = {'Categories': 'Attractions', 'count': 'Frequency'})
-            locations.columns = ['Attractions', 'Frequency']
-            # st.dataframe(locations) 
+            data                = pd.DataFrame(data[data.Distance <= distance])
             
-            def display(data):
-                for i in range(10):
-                    st.write(i+1, data['Attractions'].iloc[i], data['Frequency'].iloc[i])
+            if data.empty:
                 
-            display(locations)
-                        
-            st.divider()
-            
-            ###################################################################################################
-            
-            # SECTION 6: Category Search
-            
-            time.sleep(1.5)
-            
-            st.subheader('\nCLOSE ATTRACTIONS BY A CATEGORY')
-            
-            """
-            # Version 1 -------------------------------------------------------------------------------------------
-            
-            category = st.text_input("Enter Category: ")
-            """
-            
-            # Version 2 -------------------------------------------------------------------------------------------
-        
-            category = st.selectbox("Enter Category:", 
-                                    tuple(list(locations['Attractions'][:10])),
-                                    index=None,
-                                    placeholder="Select Attraction Category")
-        
-            # ---------------------------------------------------------------------------------------------------------
-             
-            if category:
+                st.warning('WARNING: Empty DataFrame', icon="⚠️")
                 
-                # data.sort_values(by = ['Distance'], inplace = True)
-                search = data[data.Categories == category]
-                search.sort_values(by = ['Distance'], inplace = True)
-                search = search.reset_index()
-                search = search.drop('index', axis = 1)   
-                # st.dataframe(search)
+            else:
+               
+                st.subheader('\nCLOSEST ATTRACTIONS')
                 
-                time.sleep(1)
+                attractions         = pd.DataFrame(data.Categories.value_counts()).reset_index() # .transpose())
+                # attractions       = locations.rename(columns = {'Categories': 'Attractions', 'count': 'Frequency'})
+                attractions.columns = ['Attractions', 'Frequency']
+                # st.dataframe(attractions) 
                 
-                for i in range(search.shape[0]):
-                    st.write(i+1, search.Name[i], search.Distance[i]/1000) # search.Categories[i]
-                
-                ###################################################################################################
-                
-                # SECTION 7: Streamlit Map
-                
-                map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
-                # st.dataframe(map)
-                
-                st.map(map, size = 200, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
-                
+                def display(dt):
+                    for i in range(min(dt.shape[0], 10)):
+                        st.write(i+1, dt['Attractions'].iloc[i], dt['Frequency'].iloc[i])
+                    
+                display(attractions)
+                            
                 st.divider()
                 
                 ###################################################################################################
+                
+                # SECTION 6: Category Search
+                
+                time.sleep(1.5)
+                
+                st.subheader('\nSEARCH ATTRACTIONS BY A CATEGORY')
+                
+                """
+                # Version 1 -------------------------------------------------------------------------------------------
+                
+                category = st.text_input("Enter Category: ")
+                """
+                
+                # Version 2 -------------------------------------------------------------------------------------------
             
-            # SECTION 8: Folium Maps
+                category = st.selectbox("Enter Category:", 
+                                        tuple(list(attractions['Attractions'][:min(attractions.shape[0], 10)])),
+                                        index=None,
+                                        placeholder="Select Attraction Category")
             
-            """
-            Map = folium.Map(location = [latitude, longitude], zoom_start = 12, tiles = 'Stamen Terrain')
-            
-            Marker = folium.map.FeatureGroup()
-            Marker.add_child(folium.CircleMarker([latitude, longitude],
-                                                        radius = 5,
-                                                        color = 'red',
-                                                        fill_color = 'Red'))
-            Map.add_child(Marker)
-            folium.Marker([latitude, longitude], popup = address).add_to(Map)
-            
-            st_folium(Map) 
-            """       
-            
-            ###################################################################################################
-        
-            """
-            Map = folium.Map(location = [latitude, longitude], zoom_start = 12, tiles = 'Stamen Terrain')
-            
-            incidents = folium.map.FeatureGroup()
+                # ---------------------------------------------------------------------------------------------------------
+                
+                if category:
+                    
+                    # data.sort_values(by = ['Distance'], inplace = True)
+                    search = data[data.Categories == category]
+                    search = search.sort_values(by = ['Distance']) #, inplace = True)
+                    search = search.reset_index()
+                    search = search.drop('index', axis = 1)   
+                    # st.dataframe(search)
+                    
+                    time.sleep(1)
+                    
+                    for i in range(search.shape[0]):
+                        st.write(i+1, search.Name[i], search.Distance[i]/1000) # search.Categories[i]
+                    
+                    ###################################################################################################
+                    
+                    # SECTION 7: Streamlit Map
+                    
+                    map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
+                    # st.dataframe(map)
+                    
+                    st.map(map, size = 200, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
+                    
+                    st.divider()
+                    
+                    ###################################################################################################
+                
+                    # SECTION 8: Folium Maps
+                    
+                    """
+                    Map = folium.Map(location = [latitude, longitude], zoom_start = 12, tiles = 'Stamen Terrain')
+                    
+                    Marker = folium.map.FeatureGroup()
+                    Marker.add_child(folium.CircleMarker([latitude, longitude],
+                                                                radius = 5,
+                                                                color = 'red',
+                                                                fill_color = 'Red'))
+                    Map.add_child(Marker)
+                    folium.Marker([latitude, longitude], popup = address).add_to(Map)
+                    
+                    st_folium(Map) 
+                    """       
+                    
+                    ###################################################################################################
+                
+                    """
+                    Map = folium.Map(location = [latitude, longitude], zoom_start = 12, tiles = 'Stamen Terrain')
+                    
+                    incidents = folium.map.FeatureGroup()
 
-            for lat, lng, in zip(search.Latitude, search.Longitude):
-                incidents.add_child(
+                    for lat, lng, in zip(search.Latitude, search.Longitude):
+                        incidents.add_child(
+                            folium.CircleMarker(
+                                [lat, lng],
+                                radius=5, # define how big you want the circle markers to be
+                                color='yellow',
+                                fill=True,
+                                fill_color='red',
+                                fill_opacity=0.6
+                            )
+                        )
+
+                    # add pop-up text to each marker on the map
+                    latitudes = list(search.Latitude)
+                    longitudes = list(search.Longitude)
+                    labels = list(search.Name)
+
+                    for lat, lng, label in zip(latitudes, longitudes, labels):
+                        folium.Marker([lat, lng], popup=label).add_to(Map)
+
+                    # add incidents to map
+                    Map.add_child(incidents)
+                    """
+                    
+                    ###################################################################################################
+                    
+                    """
+                    venues_map = folium.Map(location=[latitude, longitude], zoom_start=16) # generate map centred around the Grand Central Terminal
+
+                    # add a red circle marker to represent Grand Central Terminal
                     folium.CircleMarker(
-                        [lat, lng],
-                        radius=5, # define how big you want the circle markers to be
-                        color='yellow',
-                        fill=True,
-                        fill_color='red',
-                        fill_opacity=0.6
-                    )
-                )
+                        [latitude, longitude],
+                        radius=10,
+                        color='red',
+                        popup='Grand Central Terminal',
+                        fill = True,
+                        fill_color = 'red',
+                        fill_opacity = 0.6
+                    ).add_to(venues_map)
 
-            # add pop-up text to each marker on the map
-            latitudes = list(search.Latitude)
-            longitudes = list(search.Longitude)
-            labels = list(search.Name)
+                    # add the pizza joints as blue circle markers
+                    for lat, lng, label in zip(data.Latitude, data.Longitude, data.Categories):
+                        print(lat, lng, label)
+                        folium.CircleMarker(
+                            [lat, lng],
+                            radius=5,
+                            color='blue',
+                            popup=label,
+                            fill = True,
+                            fill_color='blue',
+                            fill_opacity=0.6
+                        ).add_to(venues_map)
 
-            for lat, lng, label in zip(latitudes, longitudes, labels):
-                folium.Marker([lat, lng], popup=label).add_to(Map)
-
-            # add incidents to map
-            Map.add_child(incidents)
-            """
-             
-            ###################################################################################################
-            
-            """
-            venues_map = folium.Map(location=[latitude, longitude], zoom_start=16) # generate map centred around the Grand Central Terminal
-
-            # add a red circle marker to represent Grand Central Terminal
-            folium.CircleMarker(
-                [latitude, longitude],
-                radius=10,
-                color='red',
-                popup='Grand Central Terminal',
-                fill = True,
-                fill_color = 'red',
-                fill_opacity = 0.6
-            ).add_to(venues_map)
-
-            # add the pizza joints as blue circle markers
-            for lat, lng, label in zip(data.Latitude, data.Longitude, data.Categories):
-                print(lat, lng, label)
-                folium.CircleMarker(
-                    [lat, lng],
-                    radius=5,
-                    color='blue',
-                    popup=label,
-                    fill = True,
-                    fill_color='blue',
-                    fill_opacity=0.6
-                ).add_to(venues_map)
-
-            # display map
-            st.map(venues_map)
-            """
-            
-            ###################################################################################################
+                    # display map
+                    st.map(venues_map)
+                    """
+                    
+                    ###################################################################################################
