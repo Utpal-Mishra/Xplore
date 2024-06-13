@@ -270,11 +270,8 @@ def app():
             ###################################################################################################
             
             # SECTION 7: Streamlit Map
-            if search:
-                map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
-            else:
-                map = locations.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
             
+            map = locations.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
             # st.dataframe(map)
             
             st.map(map, size = 200, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
