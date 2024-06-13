@@ -73,14 +73,14 @@ time.sleep(1.5)
 
 ###############################################################################################################
 
-@st.cache_data
+@st.cache_data(experimental_allow_widgets=True)
 def app():
     
     st.write("")
     st.write("")
     
     """
-    background = '''
+    backgr
     <style>
     body {
     background-image: url("https://images.unsplash.com/photo-1542281286-9e0a16bb7366");
