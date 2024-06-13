@@ -73,7 +73,7 @@ time.sleep(1.5)
 
 ###############################################################################################################
 
-@st.cache_data(experimental_allow_widgets=True)
+# @st.cache_data(experimental_allow_widgets=True)
 def app():
     
     st.write("")
