@@ -248,7 +248,7 @@ def app():
             
             # Version 2 -------------------------------------------------------------------------------------------
         
-            category = st.selectbox("How would you like to be contacted?", 
+            category = st.selectbox("Enter Category:", 
                                     tuple(list(locations['Attractions'][:10])),
                                     index=None,
                                     placeholder="Select Attraction Category")
@@ -264,17 +264,21 @@ def app():
             
             time.sleep(1)
             
-            for i in range(search.shape[0]):
-                st.write(i+1, search.Name[i], search.Distance[i]/1000) # search.Categories[i]
+            def result(dt):
             
-            ###################################################################################################
+                for i in range(dt.shape[0]):
+                    st.write(i+1, dt.Name[i], dt.Distance[i]/1000) # search.Categories[i]
+                
+                ###################################################################################################
+                
+                # SECTION 7: Streamlit Map
+                
+                map = dt.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
+                # st.dataframe(map)
+                
+                st.map(map, size = 200, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
             
-            # SECTION 7: Streamlit Map
-            
-            map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
-            # st.dataframe(map)
-            
-            st.map(map, size = 200, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
+            result(search)
             
             ###################################################################################################
             
