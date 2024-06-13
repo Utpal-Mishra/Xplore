@@ -210,9 +210,7 @@ def app():
             output = result['response']['groups'][0]['items']
             output = json_normalize(output)
             # search.head()
-            
-            st.divider()
-            
+                        
             ###################################################################################################
             
             # SECTION 4: Create DataFrame
