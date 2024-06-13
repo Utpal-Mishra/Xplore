@@ -274,14 +274,15 @@ def app():
             try:
                 if search:
                     map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
+                    st.map(map, size = 100, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
                 else:
                     map = data.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
+                    st.map(map, size = 100, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
             except:
                 st.warning('Data Warning', icon="⚠️")
                 
             # st.dataframe(map)
             
-            st.map(map, size = 100, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
             
             ###################################################################################################
             
