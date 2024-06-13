@@ -68,6 +68,9 @@ print('Libraries Imported')
 # @st.cache_data
 def app():
         
+    st.toast('Hip!')
+    st.toast('Hip!')
+    st.toast('Hooray!', icon='🎉')
     st.toast('Welcome to XPLORE!', icon='😍')
     
     st.write("")
