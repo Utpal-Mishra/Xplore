@@ -128,10 +128,7 @@ def app():
     # SECTION 1: Add Location
     
     address = st.text_input("\nEnter Location (in City, Country or City, County/ State, Country): ")
-    
-    location = streamlit_geolocation()
-    st.write(location)
-    
+        
     if address:
 
         geolocator = Nominatim(user_agent="four_square")
