@@ -85,9 +85,6 @@ time.sleep(1.5)
 # @st.cache_data(experimental_allow_widgets=True)
 def app():
     
-    g = geocoder.ip('me')
-    st.write(g.latlng)
-
     st.write("")
     st.write("")
     
@@ -135,6 +132,10 @@ def app():
         location = geolocator.geocode(address)
         latitude = location.latitude
         longitude = location.longitude
+        
+        g = geocoder.ip('me')
+        st.write(g.latlng)
+        st.write(geolocator.reverse(g.latlng[0], g.latlng[1]))
         
         # st.write('\nThe geograpical coordinate of {} are {}, {}.'.format(address, latitude, longitude))
                
