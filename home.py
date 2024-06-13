@@ -72,7 +72,7 @@ def app():
     
     st.toast('Welcome to XPLORE!', icon='🎉')
     
-    time.sleep(2)
+    time.sleep(1.5)
     
     st.write("")
     st.write("")
@@ -103,7 +103,7 @@ def app():
     st_lottie("https://lottie.host/f34a0bc0-4b98-4632-8684-4fbfadf0806f/8qPOuRLkVc.json")
     # st_lottie("https://lottie.host/ca52053c-bcc2-423b-9258-1e2ebe84aa4f/vE2uf9LsAY.json")
     
-    time.sleep(2)
+    time.sleep(1.5)
     
     # ---------------------------------------------------------------------------------------------------------   
 
@@ -243,7 +243,7 @@ def app():
             search = search.drop('index', axis = 1)   
             # st.dataframe(search)
             
-            time.sleep(2)
+            time.sleep(1.5)
             
             for i in range(search.shape[0]):
                 st.write(i+1, search.Name[i], search.Distance[i]/1000) # search.Categories[i]
