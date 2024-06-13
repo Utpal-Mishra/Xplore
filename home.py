@@ -61,6 +61,8 @@ import pandas as pd # library for data analsysis
 pd.set_option('display.max_columns', None) # Version 1
 pd.set_option('display.max_rows', None) # Version 1
 
+import time
+
 print('Libraries Imported')
 
 ###############################################################################################################
@@ -68,7 +70,8 @@ print('Libraries Imported')
 # @st.cache_data
 def app():
     
-    st.toast('Welcome to XPLORE!', icon=('😍', '🎉'))
+    st.toast('Welcome to XPLORE!', icon='🎉')
+    time.sleep(.5)
     
     st.write("")
     st.write("")
@@ -88,6 +91,8 @@ def app():
     
     st.title("XPLORE")
     
+    time.sleep(.5)
+    
     st.write("")
     st.write("")
     st.write("")
@@ -96,6 +101,8 @@ def app():
     
     st_lottie("https://lottie.host/f34a0bc0-4b98-4632-8684-4fbfadf0806f/8qPOuRLkVc.json")
     # st_lottie("https://lottie.host/ca52053c-bcc2-423b-9258-1e2ebe84aa4f/vE2uf9LsAY.json")
+    
+    time.sleep(1)
     
     # ---------------------------------------------------------------------------------------------------------   
 
