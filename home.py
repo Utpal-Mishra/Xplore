@@ -119,7 +119,7 @@ def app():
     
     # Version 2 -----------------------------------------------------------------------------------------------
     
-    st_lottie("https://lottie.host/bfc80cbd-79f1-4d62-ad2d-89f4e9f3278d/Z1fopF3tEc.json")
+    st_lottie("https://lottie.host/f34a0bc0-4b98-4632-8684-4fbfadf0806f/8qPOuRLkVc.json")
     
     time.sleep(1.5)
     
