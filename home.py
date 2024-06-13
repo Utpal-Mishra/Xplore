@@ -72,7 +72,7 @@ def app():
     
     st.toast('Welcome to XPLORE!', icon='🎉')
     
-    time.sleep(.1)
+    time.sleep(1)
     
     st.write("")
     st.write("")
