@@ -272,7 +272,7 @@ def app():
             # SECTION 7: Streamlit Map
             
             try:
-                if search:
+                if not search.empty():
                     map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
                 else:
                     map = data.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
