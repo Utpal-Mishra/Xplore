@@ -125,6 +125,7 @@ def app():
     # SECTION 1: Add Location
     
     address = st.text_input("\nEnter Location (in City, Country or City, County/ State, Country): ")
+    st.info('Input Format: City, Country or City, County/ State, Country', icon="ℹ️")
         
     if address:
 
@@ -232,6 +233,8 @@ def app():
                 
             display(locations)
                         
+            st.divider()
+            
             ###################################################################################################
             
             # SECTION 6: Category Search
@@ -277,6 +280,8 @@ def app():
                 # st.dataframe(map)
                 
                 st.map(map, size = 200, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
+                
+                st.divider()
                 
                 ###################################################################################################
             
