@@ -124,7 +124,7 @@ def app():
     
     # SECTION 1: Add Location
     
-    address = st.text_input("\nEnter Location (in City, Country or City, County/ State, Country): ")
+    address = st.text_input("\nEnter Location: ")
     st.info('Input Format: City, Country or City, County/ State, Country', icon="ℹ️")
         
     if address:
@@ -175,6 +175,7 @@ def app():
         
         LIMIT = 500
         radius = st.slider("\nEnter Radius (in KM): ", min_value = 0, max_value = 100, value = 10)
+        st.info('Input Unit: KM', icon="ℹ️")
         
         # -----------------------------------------------------------------------------------------------------
         
