@@ -33,6 +33,9 @@
 # Select Box
 # https://docs.streamlit.io/develop/api-reference/widgets/st.selectbox
 
+# Toast
+# https://docs.streamlit.io/develop/api-reference/status/st.toast
+
 ###############################################################################################################
 
 # LIBRARIES
