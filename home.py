@@ -221,6 +221,8 @@ def app():
             
             # SECTION 6: Category Search
             
+            time.sleep(1.5)
+            
             st.subheader('\nCLOSE ATTRACTIONS BY A CATEGORY')
             
             """
@@ -245,7 +247,7 @@ def app():
             search = search.drop('index', axis = 1)   
             # st.dataframe(search)
             
-            time.sleep(1.5)
+            time.sleep(1)
             
             for i in range(search.shape[0]):
                 st.write(i+1, search.Name[i], search.Distance[i]/1000) # search.Categories[i]
