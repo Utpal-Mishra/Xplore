@@ -86,7 +86,7 @@ time.sleep(1.5)
 def app():
     
     g = geocoder.ip('me')
-    print(g.latlng)
+    st.write(g.latlng)
 
     st.write("")
     st.write("")
