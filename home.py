@@ -256,22 +256,22 @@ def app():
             # ---------------------------------------------------------------------------------------------------------
              
             # data.sort_values(by = ['Distance'], inplace = True)
-            search = data[data.Categories == category]
-            search.sort_values(by = ['Distance'], inplace = True)
-            search = search.reset_index()
-            search = search.drop('index', axis = 1)   
+            data = data[data.Categories == category]
+            data.sort_values(by = ['Distance'], inplace = True)
+            data = data.reset_index()
+            data = data.drop('index', axis = 1)   
             # st.dataframe(search)
             
             time.sleep(1)
             
-            for i in range(search.shape[0]):
-                st.write(i+1, search.Name[i], search.Distance[i]/1000) # search.Categories[i]
+            for i in range(data.shape[0]):
+                st.write(i+1, data.Name[i], data.Distance[i]/1000) # search.Categories[i]
             
             ###################################################################################################
             
             # SECTION 7: Streamlit Map
             
-            map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
+            map = data.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
             # st.dataframe(map)
             
             st.map(map, size = 200, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
