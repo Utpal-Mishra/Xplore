@@ -71,7 +71,8 @@ print('Libraries Imported')
 def app():
     
     st.toast('Welcome to XPLORE!', icon='🎉')
-    time.sleep(.5)
+    
+    time.sleep(.1)
     
     st.write("")
     st.write("")
@@ -241,6 +242,8 @@ def app():
             search = search.reset_index()
             search = search.drop('index', axis = 1)   
             # st.dataframe(search)
+            
+            time.sleep(1)
             
             for i in range(search.shape[0]):
                 st.write(i+1, search.Name[i], search.Distance[i]/1000) # search.Categories[i]
