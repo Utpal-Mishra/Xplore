@@ -88,5 +88,3 @@ def app():
        P7.metric(label = "Humidity: ",  value = str(response.json()['current']["humidity"]))
        P7.metric(label = "Cloud: ",     value = str(response.json()['current']["cloud"]))
        P7.metric(label = "UV: ",        value = str(response.json()['current']["uv"]))
-       
-       

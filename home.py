@@ -49,6 +49,14 @@
 # Infomation Message
 # https://docs.streamlit.io/develop/api-reference/status/st.info
 
+#--------------------------------------------------------------------------------------------------------------
+
+# VERSION 3:
+
+# Folium
+# https://gis.stackexchange.com/questions/371628/get-coordinates-from-foliums-feature-latlngpopup-in-python
+# https://stackoverflow.com/questions/63413571/returning-latitude-longitude-values-from-folium-map-on-mouse-click-to-python-sc
+
 ###############################################################################################################
 
 # LIBRARIES
@@ -56,6 +64,7 @@
 import streamlit as st # Version 1
 # st.set_page_config(layout="wide")
 from streamlit_lottie import st_lottie # Version 2
+from streamlit_folium import folium_static
 
 import requests # library to handle requests # Version 1
 import numpy as np # library to handle data in a vectorized manner # Version 1
@@ -72,6 +81,7 @@ from pandas import json_normalize # tranform JSON file into a pandas dataframe #
 
 # !conda install -c conda-forge folium=0.5.0 --yes
 import folium # plotting library # Version 1
+from folium.plugins import MousePosition
 # from streamlit_folium import st_folium # type: ignore
 
 import pandas as pd # library for data analsysis
@@ -84,7 +94,7 @@ print('Libraries Imported')
 
 ###############################################################################################################
 
-st.toast('Welcome to XPLORE!!!', icon='🎉') # icon='😍')
+st.toast('Welcome to XPLORE!!!', icon='🎉') # icon='😍 | 🎉')
     
 time.sleep(1.5)
 
@@ -296,37 +306,82 @@ def app():
                     for i in range(search.shape[0]):
                         st.write(i+1, search.Name[i], search.Distance[i]/1000) # search.Categories[i]
                     
+                    st.divider()
+                    
                     ###################################################################################################
                     
                     # SECTION 7: Streamlit Map
                     
-                    map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
-                    # st.dataframe(map)
+                    # map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
+                     
+                    # st.map(map, size = 200, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
                     
-                    st.map(map, size = 200, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
-                    
-                    st.divider()
+                    # st.divider()
                     
                     ###################################################################################################
-                
+                                  
                     # SECTION 8: Folium Maps
                     
-                    """
-                    Map = folium.Map(location = [latitude, longitude], zoom_start = 12, tiles = 'Stamen Terrain')
+                    Map = folium.Map(location=[latitude, longitude], zoom_start = 12)
+                                        
+                    folium.TileLayer(
+                        tiles = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                        attr = 'Esri',
+                        name = 'Esri Satellite',
+                        overlay = False,
+                        control = True
+                    ).add_to(Map)
                     
-                    Marker = folium.map.FeatureGroup()
-                    Marker.add_child(folium.CircleMarker([latitude, longitude],
-                                                                radius = 5,
-                                                                color = 'red',
-                                                                fill_color = 'Red'))
-                    Map.add_child(Marker)
                     folium.Marker([latitude, longitude], popup = address).add_to(Map)
+                    MousePosition().add_to(Map)
+                    Map.add_child(folium.LatLngPopup())
                     
-                    st_folium(Map) 
-                    """       
+                    folium_static(Map, width = 700, height = 500)
+                                        
+                    ###################################################################################################
+                                        
+                    # Marker = folium.map.FeatureGroup()
+                    # Marker.add_child(folium.CircleMarker([latitude, longitude],
+                    #                                             radius = 10,
+                    #                                             color = 'red',
+                    #                                             fill_color = 'Red',
+                    #                                             popup = folium.Popup("Xplore")))
+                    # Map.add_child(Marker)
+                                        
+                    # folium.CircleMarker(
+                    #     location = [latitude, longitude],
+                    #     radius = 10000,
+                    #     fill = True,
+                    #     # popup = folium.Popup("Xplore"),
+                    # ).add_to(Map)
+                    
+                    # rad = 5000
+                    # folium.Circle(
+                    #     location = [latitude, longitude],
+                    #     radius = rad,
+                    #     color="red",
+                    #     weight = 1,
+                    #     fill_opacity = 0.2,
+                    #     opacity = 1,
+                    #     fill_color = "red",
+                    #     fill = False,  # gets overridden by fill_color
+                    #     popup = "{} Meters".format(rad), # "{} meters".format(radius),
+                    #     tooltip = "",
+                    # ).add_to(Map)
+                    
+                    # folium_static(Map, width = 700, height = 500)
                     
                     ###################################################################################################
-                
+                    
+                    # folium.plugins.LocateControl().add_to(Map)
+
+                    # # If you want get the user device position after load the map, set auto_start=True
+                    # folium.plugins.LocateControl(auto_start = True).add_to(Map)
+                    
+                    # folium_static(Map, width = 700, height = 500)
+                                                                  
+                    ###################################################################################################
+                                    
                     """
                     Map = folium.Map(location = [latitude, longitude], zoom_start = 12, tiles = 'Stamen Terrain')
                     
@@ -336,7 +391,7 @@ def app():
                         incidents.add_child(
                             folium.CircleMarker(
                                 [lat, lng],
-                                radius=5, # define how big you want the circle markers to be
+                                radius = 10, # define how big you want the circle markers to be
                                 color='yellow',
                                 fill=True,
                                 fill_color='red',
@@ -358,35 +413,4 @@ def app():
                     
                     ###################################################################################################
                     
-                    """
-                    venues_map = folium.Map(location=[latitude, longitude], zoom_start=16) # generate map centred around the Grand Central Terminal
-
-                    # add a red circle marker to represent Grand Central Terminal
-                    folium.CircleMarker(
-                        [latitude, longitude],
-                        radius=10,
-                        color='red',
-                        popup='Grand Central Terminal',
-                        fill = True,
-                        fill_color = 'red',
-                        fill_opacity = 0.6
-                    ).add_to(venues_map)
-
-                    # add the pizza joints as blue circle markers
-                    for lat, lng, label in zip(data.Latitude, data.Longitude, data.Categories):
-                        print(lat, lng, label)
-                        folium.CircleMarker(
-                            [lat, lng],
-                            radius=5,
-                            color='blue',
-                            popup=label,
-                            fill = True,
-                            fill_color='blue',
-                            fill_opacity=0.6
-                        ).add_to(venues_map)
-
-                    # display map
-                    st.map(venues_map)
-                    """
-                    
-                    ###################################################################################################
+                   
