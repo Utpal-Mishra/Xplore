@@ -310,11 +310,11 @@ def app():
                     
                     # SECTION 7: Streamlit Map
                     
-                    map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
+                    # map = search.rename(columns = {'Latitude': 'latitude', 'Longitude': 'longitude'})
                      
-                    st.map(map, size = 200, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
+                    # st.map(map, size = 200, zoom = 12) # latitude = 'latitude', longitude = 'longitude', size=100, color='#0044ff'
                     
-                    st.divider()
+                    # st.divider()
                     
                     ###################################################################################################
                     
@@ -334,7 +334,7 @@ def app():
                     MousePosition().add_to(Map)
                     Map.add_child(folium.LatLngPopup())
                     
-                    folium_static(Map, width = 700, height = 500)
+                    # folium_static(Map, width = 700, height = 500)
                                         
                     ###################################################################################################
                                         
@@ -353,21 +353,21 @@ def app():
                     #     # popup = folium.Popup("Xplore"),
                     # ).add_to(Map)
                     
-                    # rad = 5000
-                    # folium.Circle(
-                    #     location = [latitude, longitude],
-                    #     radius = rad,
-                    #     color="red",
-                    #     weight = 1,
-                    #     fill_opacity = 0.2,
-                    #     opacity = 1,
-                    #     fill_color = "red",
-                    #     fill = False,  # gets overridden by fill_color
-                    #     popup = "{} Meters".format(rad), # "{} meters".format(radius),
-                    #     tooltip = "",
-                    # ).add_to(Map)
+                    rad = 5000
+                    folium.Circle(
+                        location = [latitude, longitude],
+                        radius = rad,
+                        color="red",
+                        weight = 1,
+                        fill_opacity = 0.2,
+                        opacity = 1,
+                        fill_color = "red",
+                        fill = False,  # gets overridden by fill_color
+                        popup = "{} Meters".format(rad), # "{} meters".format(radius),
+                        tooltip = "",
+                    ).add_to(Map)
                     
-                    # folium_static(Map, width = 700, height = 500)
+                    folium_static(Map, width = 700, height = 500)
                     
                     ###################################################################################################
                     
