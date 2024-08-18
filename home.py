@@ -318,4 +318,97 @@ def app():
                     
                     ###################################################################################################
                     
+                    # SECTION 8: Folium Maps
                     
+                    Map = folium.Map(location=[latitude, longitude], zoom_start = 12)
+                                        
+                    folium.TileLayer(
+                        tiles = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                        attr = 'Esri',
+                        name = 'Esri Satellite',
+                        overlay = False,
+                        control = True
+                    ).add_to(Map)
+                    
+                    folium.Marker([latitude, longitude], popup = address).add_to(Map)
+                    MousePosition().add_to(Map)
+                    Map.add_child(folium.LatLngPopup())
+                    
+                    folium_static(Map, width = 700, height = 500)
+                                        
+                    ###################################################################################################
+                                        
+                    # Marker = folium.map.FeatureGroup()
+                    # Marker.add_child(folium.CircleMarker([latitude, longitude],
+                    #                                             radius = 10,
+                    #                                             color = 'red',
+                    #                                             fill_color = 'Red',
+                    #                                             popup = folium.Popup("Xplore")))
+                    # Map.add_child(Marker)
+                                        
+                    # folium.CircleMarker(
+                    #     location = [latitude, longitude],
+                    #     radius = 10000,
+                    #     fill = True,
+                    #     # popup = folium.Popup("Xplore"),
+                    # ).add_to(Map)
+                    
+                    # rad = 5000
+                    # folium.Circle(
+                    #     location = [latitude, longitude],
+                    #     radius = rad,
+                    #     color="red",
+                    #     weight = 1,
+                    #     fill_opacity = 0.2,
+                    #     opacity = 1,
+                    #     fill_color = "red",
+                    #     fill = False,  # gets overridden by fill_color
+                    #     popup = "{} Meters".format(rad), # "{} meters".format(radius),
+                    #     tooltip = "",
+                    # ).add_to(Map)
+                    
+                    # folium_static(Map, width = 700, height = 500)
+                    
+                    ###################################################################################################
+                    
+                    # folium.plugins.LocateControl().add_to(Map)
+
+                    # # If you want get the user device position after load the map, set auto_start=True
+                    # folium.plugins.LocateControl(auto_start = True).add_to(Map)
+                    
+                    # folium_static(Map, width = 700, height = 500)
+                                                                  
+                    ###################################################################################################
+                                    
+                    """
+                    Map = folium.Map(location = [latitude, longitude], zoom_start = 12, tiles = 'Stamen Terrain')
+                    
+                    incidents = folium.map.FeatureGroup()
+
+                    for lat, lng, in zip(search.Latitude, search.Longitude):
+                        incidents.add_child(
+                            folium.CircleMarker(
+                                [lat, lng],
+                                radius = 10, # define how big you want the circle markers to be
+                                color='yellow',
+                                fill=True,
+                                fill_color='red',
+                                fill_opacity=0.6
+                            )
+                        )
+
+                    # add pop-up text to each marker on the map
+                    latitudes = list(search.Latitude)
+                    longitudes = list(search.Longitude)
+                    labels = list(search.Name)
+
+                    for lat, lng, label in zip(latitudes, longitudes, labels):
+                        folium.Marker([lat, lng], popup=label).add_to(Map)
+
+                    # add incidents to map
+                    Map.add_child(incidents)
+                    """
+                    
+                    ###################################################################################################
+                    
+                   
