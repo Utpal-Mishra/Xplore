@@ -334,6 +334,10 @@ def app():
                     MousePosition().add_to(Map)
                     Map.add_child(folium.LatLngPopup())
                     
+                    
+                    for i in range(search.shape[0]):
+                        folium.Marker([search.Latitude[i], search.Longitude[i]], popup = search.Name[i]).add_to(Map)
+                    
                     # folium_static(Map, width = 700, height = 500)
                                         
                     ###################################################################################################
