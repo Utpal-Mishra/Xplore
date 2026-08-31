@@ -2,23 +2,38 @@
 
 XPLORE is a human-centred navigation prototype for Cork, Ireland. It goes beyond the fastest route by helping people choose journeys based on sustainability, safety, quietness, accessibility, scenery and affordability.
 
-## Included in this version
+## v0.2 Cork real-world pilot
 
-1. Experience-based routing: Greenest, Safest, Quietest, Scenic, Accessible and Budget.
-2. Community Truth Layer: verified local reports and user-submitted observations.
-3. Indoor and outdoor navigation modes.
-4. Sustainability Engine: CO2, energy, health, active minutes and carbon savings by transport mode.
-5. XPLORE Companion: conversational suggestions based on time, budget and preferences.
+The live pilot now moves beyond representative route cards toward real journey intelligence:
 
-## Run
+1. Real OpenStreetMap/Leaflet map rendering for Cork.
+2. User-submitted place search and real route geometry.
+3. Driving, cycling and walking route adapters with alternative routes.
+4. XPLORE Route Score with preference weighting.
+5. Journey Confidence shown separately from the route score.
+6. Structured "Why this route?" explanations and trade-offs.
+7. Live weather and European AQI context for the route area.
+8. Current-location capture with explicit browser consent.
 
-Open `index.html` in a browser. The prototype is dependency-light and uses representative journey data for product demonstration.
+The routing, geocoding and environmental services currently used are development adapters. XPLORE keeps scoring, confidence and explanation logic provider-independent so production infrastructure can be changed without redesigning the product.
+
+## Product direction
+
+XPLORE should answer more than "How do I get there?" It should help answer: "What is the best journey for me, given my preferences and what is happening around me right now — and why?"
+
+## Architecture and roadmap
+
+See:
+
+- `docs/XPLORE_V02_ROADMAP.md`
+- `docs/ARCHITECTURE.md`
+- `docs/ENTERPRISE_READINESS.md`
+- `docs/DATA_SOURCES.md`
 
 ## Next production steps
 
-- Connect a routing engine such as Valhalla, GraphHopper or OpenRouteService.
-- Add PostGIS-backed spatial and accessibility data.
-- Add real-time public transport and disruption feeds.
-- Validate emissions factors by geography and transport mode.
-- Add moderation, trust and expiry workflows for community reports.
-- Implement privacy-preserving location consent and storage.
+- Persist Community Truth observations with provenance, freshness, verification and expiry.
+- Add real Cork route-segment features for cycling protection, accessibility, greenery and safety.
+- Add automated routing-regression tests for representative Cork journeys.
+- Move public development adapters to governed/self-hosted/commercial production infrastructure where required.
+- Continue privacy, moderation, observability and enterprise-readiness controls.
