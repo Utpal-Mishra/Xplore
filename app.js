@@ -58,15 +58,23 @@ function healthScore(route){const mins=route.duration/60;if(state.mode==='walkin
 function contextComfort(){const w=state.lastContext?.weather;if(!w)return 76;let score=88;if((w.precipitation||0)>0.5)score-=18;if((w.wind_speed_10m||0)>30)score-=14;if((w.temperature_2m||15)<3)score-=8;return Math.max(40,score);}
 function confidence(route,index){let base=88-index*4;if(!state.lastContext?.weather)base-=4;if(!state.lastContext?.air)base-=3;return Math.max(55,Math.round(base-(route.duration/3600)*2));}
 
-function scoreRoute(route,index){
+function scoreWeights(){
+  if(state.preference==='Greenest')return {time:.20,carbon:.42,health:.18,comfort:.10,confidence:.10};
+  if(state.preference==='Healthiest')return {time:.20,carbon:.18,health:.42,comfort:.10,confidence:.10};
+  if(state.preference==='Calmest')return {time:.25,carbon:.15,health:.15,comfort:.35,confidence:.10};
+  return {time:.38,carbon:.18,health:.16,comfort:.16,confidence:.12};
+}
+
+function scoreComponents(route,index){
   const durations=state.routes.map(r=>r.duration),min=Math.min(...durations),max=Math.max(...durations);
-  const timeScore=max===min?100:100-((route.duration-min)/(max-min))*28;
-  const carbon=estimateCarbon(route),carbonScore=state.mode==='driving'?Math.max(35,100-carbon/15):100,health=healthScore(route),comfort=Math.max(40,contextComfort()-index*3),conf=confidence(route,index);
-  let weights={time:.38,carbon:.18,health:.16,comfort:.16,confidence:.12};
-  if(state.preference==='Greenest')weights={time:.20,carbon:.42,health:.18,comfort:.10,confidence:.10};
-  if(state.preference==='Healthiest')weights={time:.20,carbon:.18,health:.42,comfort:.10,confidence:.10};
-  if(state.preference==='Calmest')weights={time:.25,carbon:.15,health:.15,comfort:.35,confidence:.10};
-  return Math.round(timeScore*weights.time+carbonScore*weights.carbon+health*weights.health+comfort*weights.comfort+conf*weights.confidence);
+  const time=max===min?100:100-((route.duration-min)/(max-min))*28;
+  const carbon=estimateCarbon(route),carbonScore=state.mode==='driving'?Math.max(35,100-carbon/15):100;
+  return {time,carbon:carbonScore,health:healthScore(route),comfort:Math.max(40,contextComfort()-index*3),confidence:confidence(route,index)};
+}
+
+function scoreRoute(route,index){
+  const c=scoreComponents(route,index),w=scoreWeights();
+  return Math.round(c.time*w.time+c.carbon*w.carbon+c.health*w.health+c.comfort*w.comfort+c.confidence*w.confidence);
 }
 
 function enrichRoutes(routes){state.routes=routes;return routes.map((r,i)=>({raw:r,providerIndex:i,score:scoreRoute(r,i),confidence:confidence(r,i),carbon:estimateCarbon(r),health:healthScore(r)})).sort((a,b)=>b.score-a.score);}
@@ -90,12 +98,27 @@ function reasonsFor(r,rank){
   if(r.confidence>=85)items.push('High route confidence');if(state.preference!=='Balanced')items.push(`Optimised for ${state.preference.toLowerCase()}`);return items.slice(0,5);
 }
 
+function healthReason(r){
+  const mins=Math.round(r.raw.duration/60);
+  if(state.mode==='walking')return `Walking for about ${mins} minutes creates a strong active-travel benefit, so the health/activity score rises with useful movement time.`;
+  if(state.mode==='cycling')return `Cycling for about ${mins} minutes combines active movement with efficient travel, producing a high health/activity score.`;
+  return 'Driving involves little active movement in this pilot model, so its health/activity score stays comparatively low.';
+}
+
+function renderScoreRationale(r){
+  const c=scoreComponents(r.raw,r.providerIndex),w=scoreWeights();
+  $('healthWhy').textContent=healthReason(r);
+  $('xploreWhy').textContent=`${state.preference} mode blends five route dimensions. Health/activity is only one part of the final XPLORE score, so the two numbers are intentionally different.`;
+  const labels={time:'Time',carbon:'Carbon',health:'Health / activity',comfort:'Comfort',confidence:'Confidence'};
+  $('scoreBreakdown').innerHTML=Object.keys(labels).map(k=>`<div class="breakdown-item"><span>${labels[k]}</span><strong>${Math.round(c[k])}/100</strong><small>${Math.round(w[k]*100)}% weight</small></div>`).join('');
+}
+
 function renderRoutes(enriched){$('routeList').innerHTML=enriched.map((r,i)=>`<div class="route-option ${i===0?'active':''}" data-route="${i}"><div class="route-option-top"><h3>${i===0?'XPLORE Recommended':'Alternative '+(i+1)}</h3><span class="mini-score">${r.score}/100</span></div><div class="meta">${formatDuration(r.raw.duration)} · ${formatDistance(r.raw.distance)} · Confidence ${r.confidence}%</div></div>`).join('');document.querySelectorAll('.route-option').forEach(el=>el.onclick=()=>selectRoute(+el.dataset.route,enriched));selectRoute(0,enriched);}
 
 function selectRoute(index,enriched){
   state.activeRoute=index;document.querySelectorAll('.route-option').forEach((el,i)=>el.classList.toggle('active',i===index));state.layers.forEach((l,i)=>l.setStyle({weight:i===index?7:5,opacity:i===index?.9:.30}));
   const r=enriched[index];$('summaryTitle').textContent=index===0?'XPLORE Recommended':'Route Alternative';$('summaryMeta').textContent=`${formatDuration(r.raw.duration)} · ${formatDistance(r.raw.distance)}`;$('routeScore').textContent=r.score;$('confidenceValue').textContent=r.confidence+'%';$('co2').textContent=r.carbon<1?'0 g':Math.round(r.carbon)+' g';$('health').textContent=Math.round(r.health)+'/100';$('activeMinutes').textContent=state.mode==='driving'?'Low':formatDuration(r.raw.duration);
-  const reasons=reasonsFor(r,index);$('reasons').innerHTML=reasons.map(x=>`<span class="reason">${x}</span>`).join('');$('explainList').innerHTML=reasons.map(x=>`<li>${x}</li>`).join('');
+  const reasons=reasonsFor(r,index);$('reasons').innerHTML=reasons.map(x=>`<span class="reason">${x}</span>`).join('');$('explainList').innerHTML=reasons.map(x=>`<li>${x}</li>`).join('');renderScoreRationale(r);
 }
 
 function renderContext(ctx){
