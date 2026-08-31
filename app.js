@@ -113,7 +113,7 @@ function renderScoreRationale(r){
   $('scoreBreakdown').innerHTML=Object.keys(labels).map(k=>`<div class="breakdown-item"><span>${labels[k]}</span><strong>${Math.round(c[k])}/100</strong><small>${Math.round(w[k]*100)}% weight</small></div>`).join('');
 }
 
-function renderRoutes(enriched){$('routeList').innerHTML=enriched.map((r,i)=>`<div class="route-option ${i===0?'active':''}" data-route="${i}"><div class="route-option-top"><h3>${i===0?'XPLORE Recommended':'Alternative '+(i+1)}</h3><span class="mini-score">${r.score}/100</span></div><div class="meta">${formatDuration(r.raw.duration)} · ${formatDistance(r.raw.distance)} · Confidence ${r.confidence}%</div></div>`).join('');document.querySelectorAll('.route-option').forEach(el=>el.onclick=()=>selectRoute(+el.dataset.route,enriched));selectRoute(0,enriched);}
+function renderRoutes(enriched){$('routeList').innerHTML=enriched.map((r,i)=>`<div class="route-option ${i===0?'active':''}" data-route="${i}"><div class="route-option-top"><h3>${i===0?'XPLORE Recommended':'Alternative Route'}</h3><span class="mini-score">${r.score}/100</span></div><div class="meta">${formatDuration(r.raw.duration)} · ${formatDistance(r.raw.distance)} · Confidence ${r.confidence}%</div></div>`).join('');document.querySelectorAll('.route-option').forEach(el=>el.onclick=()=>selectRoute(+el.dataset.route,enriched));selectRoute(0,enriched);}
 
 function selectRoute(index,enriched){
   state.activeRoute=index;document.querySelectorAll('.route-option').forEach((el,i)=>el.classList.toggle('active',i===index));state.layers.forEach((l,i)=>l.setStyle({weight:i===index?7:5,opacity:i===index?.9:.30}));
