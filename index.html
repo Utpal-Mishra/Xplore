@@ -48,7 +48,7 @@
     <h2 class="section-title">Journey impact</h2>
     <div class="impact-grid">
       <div class="metric">CO₂ estimate<strong id="co2">—</strong></div>
-      <div class="metric">Health score<strong id="health">—</strong></div>
+      <div class="metric">Health / activity<strong id="health">—</strong></div>
       <div class="metric">Active time<strong id="activeMinutes">—</strong></div>
     </div>
 
@@ -83,6 +83,20 @@
 
     <h2 class="section-title">Why this route?</h2>
     <div class="card explain"><ul id="explainList"><li>XPLORE explanations will appear after routing.</li></ul></div>
+
+    <h2 class="section-title">Score rationale</h2>
+    <div class="card score-rationale-card">
+      <div class="score-rationale-row">
+        <span>Health / activity score</span>
+        <strong id="healthWhy">Run a journey to see how travel mode and active time affect this score.</strong>
+      </div>
+      <div class="score-rationale-row">
+        <span>XPLORE score</span>
+        <strong id="xploreWhy">The overall route score combines time, carbon, health/activity, comfort and confidence.</strong>
+      </div>
+      <div id="scoreBreakdown" class="score-breakdown"></div>
+      <p class="score-note">Pilot decision-support heuristics. The health/activity score is not a clinical or medical assessment.</p>
+    </div>
 
     <h2 class="section-title">Pilot boundary</h2>
     <div class="notice">This v0.2 build uses public OpenStreetMap/Nominatim/OSRM services only for low-volume development. Enterprise deployment will move geocoding, tiles and routing behind governed provider adapters or self-hosted infrastructure.</div>
