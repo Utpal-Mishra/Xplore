@@ -65,6 +65,15 @@
   <section class="map-wrap">
     <div id="map" class="map" aria-label="XPLORE route map"></div>
     <div class="map-overlay top-left map-card"><div class="pill">OpenStreetMap · Vector</div></div>
+    <div class="map-overlay top-right map-card map-layer-panel" aria-label="XPLORE map layers">
+      <div class="map-layer-heading">Map Layers</div>
+      <div class="map-layer-actions">
+        <button class="map-layer-toggle active" data-layer="green" aria-pressed="true">Green <span id="layerGreenCount">—</span></button>
+        <button class="map-layer-toggle active" data-layer="cycle" aria-pressed="true">Cycling <span id="layerCycleCount">—</span></button>
+        <button class="map-layer-toggle active" data-layer="accessibility" aria-pressed="true">Access <span id="layerAccessibilityCount">—</span></button>
+      </div>
+      <div id="mapLayerStatus" class="map-layer-status">Loads around the selected journey</div>
+    </div>
     <div class="map-overlay bottom-left map-card card">
       <div class="route-summary">
         <div><span class="eyebrow" id="summaryTitle">No route selected</span><h2 id="summaryMeta">Choose two Cork locations</h2></div>
@@ -100,12 +109,13 @@
     </div>
 
     <h2 class="section-title">Pilot Boundary</h2>
-    <div class="notice">This v0.2 build uses public OpenStreetMap/Nominatim/OSRM services only for low-volume development. Enterprise deployment will move geocoding, tiles and routing behind governed provider adapters or self-hosted infrastructure.</div>
+    <div class="notice">This v0.2 build uses public OpenStreetMap, Nominatim, OSRM, Open-Meteo and Overpass services for low-volume development. Green-space, cycling and accessibility overlays are visual context only and are not yet included in route scoring. Enterprise deployment will move these data services behind governed adapters or self-hosted infrastructure.</div>
   </aside>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
 <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js"></script>
 <script src="app.js"></script>
+<script src="map-context.js"></script>
 </body>
 </html>
