@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="navigation.css">
 </head>
 <body>
 <header class="app-header">
@@ -32,7 +33,8 @@
         <button class="secondary" id="useLocation" type="button">Use location once</button>
         <button class="secondary live-location-button" id="toggleLive" type="button" aria-pressed="false">Track live location</button>
       </div>
-      <div class="location-status" id="locationStatus"><span class="location-dot"></span><span>Live location off</span></div>
+      <div class="location-status" id="locationStatus"><span class="location-dot"></span><span>Live Location Off</span></div>
+      <div class="location-permission-help" id="locationPermissionHelp" hidden>XPLORE needs browser Location permission for live tracking.</div>
       <h2 class="section-title">Travel mode</h2>
       <div class="mode-row">
         <button class="mode active" data-mode="driving">Drive</button>
@@ -70,6 +72,23 @@
     <div id="map" class="map" aria-label="XPLORE route map"></div>
     <div class="map-overlay top-left map-card"><div class="pill">OpenStreetMap · Vector</div></div>
     <div class="map-overlay live-map-status map-card" id="liveMapStatus" hidden><span class="live-pulse"></span><span id="liveMapText">Live location</span></div>
+
+    <div class="map-overlay guidance-panel map-card" id="guidancePanel" hidden aria-live="polite">
+      <div class="guidance-top">
+        <div class="guidance-copy">
+          <div class="guidance-distance" id="guidanceDistance">—</div>
+          <div class="guidance-instruction" id="guidanceInstruction">Continue on the selected route</div>
+        </div>
+        <div class="guidance-state" id="guidanceState">Waiting for GPS…</div>
+      </div>
+      <div class="guidance-progress-track"><div class="guidance-progress-fill" id="guidanceProgressFill"></div></div>
+      <div class="guidance-meta">
+        <div class="guidance-meta-item"><span>Progress</span><strong id="guidanceProgress">0%</strong></div>
+        <div class="guidance-meta-item"><span>Remaining</span><strong id="guidanceRemaining">—</strong></div>
+        <div class="guidance-meta-item"><span>Heading</span><strong id="guidanceHeading">—</strong></div>
+      </div>
+    </div>
+
     <div class="map-overlay top-right map-card map-layer-panel" aria-label="XPLORE map layers">
       <div class="map-layer-heading">Map Layers</div>
       <div class="map-layer-actions">
@@ -79,6 +98,7 @@
       </div>
       <div id="mapLayerStatus" class="map-layer-status">Loads around the selected journey</div>
     </div>
+
     <div class="map-overlay bottom-left map-card card">
       <div class="route-summary">
         <div><span class="eyebrow" id="summaryTitle">No route selected</span><h2 id="summaryMeta">Choose two Cork locations</h2></div>
@@ -86,6 +106,10 @@
       </div>
       <div id="reasons" class="reason-list"><span class="reason">Real route geometry</span><span class="reason">Explainable scoring</span></div>
       <div class="confidence"><span>Journey confidence</span><strong id="confidenceValue">—</strong></div>
+      <div class="guidance-actions">
+        <button class="guidance-button" id="startGuidance" type="button" disabled>Start Guidance</button>
+        <button class="guidance-button voice-guidance" id="voiceGuidance" type="button" aria-pressed="false">Voice Off</button>
+      </div>
     </div>
   </section>
 
@@ -114,7 +138,7 @@
     </div>
 
     <h2 class="section-title">Pilot Boundary</h2>
-    <div class="notice">This v0.2 build uses public OpenStreetMap, Nominatim, OSRM, Open-Meteo and Overpass services for low-volume development. Live location is processed in the browser and precise coordinates are sent to route/context providers only when a journey or reroute is requested. Background GPS may be throttled by the device or browser. Enterprise deployment will move these data services behind governed adapters or self-hosted infrastructure.</div>
+    <div class="notice">This v0.2 build uses public OpenStreetMap, Nominatim, OSRM, Open-Meteo and Overpass services for low-volume development. Live location is processed in the browser and precise coordinates are sent to route/context providers only when a journey or reroute is requested. Journey guidance is an experimental browser pilot and must not be treated as safety-critical navigation. Background GPS may be throttled by the device or browser.</div>
   </aside>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -122,5 +146,6 @@
 <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js"></script>
 <script src="app.js"></script>
 <script src="map-context.js"></script>
+<script src="navigation.js"></script>
 </body>
 </html>
