@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://unpkg.com">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -63,7 +64,7 @@
 
   <section class="map-wrap">
     <div id="map" class="map" aria-label="XPLORE route map"></div>
-    <div class="map-overlay top-left map-card"><div class="pill">OpenStreetMap pilot</div></div>
+    <div class="map-overlay top-left map-card"><div class="pill">OpenStreetMap · Vector</div></div>
     <div class="map-overlay bottom-left map-card card">
       <div class="route-summary">
         <div><span class="eyebrow" id="summaryTitle">No route selected</span><h2 id="summaryMeta">Choose two Cork locations</h2></div>
@@ -103,6 +104,8 @@
   </aside>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
+<script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
