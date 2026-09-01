@@ -2,9 +2,26 @@ const CORK={lat:51.8985,lon:-8.4756};
 const state={map:null,markers:[],layers:[],routes:[],activeRoute:0,mode:'driving',preference:'Balanced',lastContext:null};
 const $=id=>document.getElementById(id);
 
+function addRasterFallback(){
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19,
+    detectRetina:true,
+    attribution:'&copy; OpenStreetMap contributors'
+  }).addTo(state.map);
+}
+
 function initMap(){
-  state.map=L.map('map',{zoomControl:true}).setView([CORK.lat,CORK.lon],13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(state.map);
+  state.map=L.map('map',{zoomControl:true,preferCanvas:true}).setView([CORK.lat,CORK.lon],13);
+  if(typeof L.maplibreGL==='function'){
+    try{
+      L.maplibreGL({style:'https://tiles.openfreemap.org/styles/dark'}).addTo(state.map);
+    }catch(error){
+      console.warn('Vector basemap unavailable; using raster fallback.',error);
+      addRasterFallback();
+    }
+  }else{
+    addRasterFallback();
+  }
 }
 
 function setStatus(msg,error=false){const el=$('status');el.textContent=msg;el.style.color=error?'#9b3535':'';}
