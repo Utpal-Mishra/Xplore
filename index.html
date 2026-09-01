@@ -28,7 +28,11 @@
     <div class="card route-form">
       <div class="field"><label for="from">Start</label><input id="from" value="Cork City Library" autocomplete="off"></div>
       <div class="field"><label for="to">Destination</label><input id="to" value="University College Cork" autocomplete="off"></div>
-      <button class="secondary" id="useLocation" type="button">Use current location</button>
+      <div class="location-actions">
+        <button class="secondary" id="useLocation" type="button">Use location once</button>
+        <button class="secondary live-location-button" id="toggleLive" type="button" aria-pressed="false">Track live location</button>
+      </div>
+      <div class="location-status" id="locationStatus"><span class="location-dot"></span><span>Live location off</span></div>
       <h2 class="section-title">Travel mode</h2>
       <div class="mode-row">
         <button class="mode active" data-mode="driving">Drive</button>
@@ -65,6 +69,7 @@
   <section class="map-wrap">
     <div id="map" class="map" aria-label="XPLORE route map"></div>
     <div class="map-overlay top-left map-card"><div class="pill">OpenStreetMap · Vector</div></div>
+    <div class="map-overlay live-map-status map-card" id="liveMapStatus" hidden><span class="live-pulse"></span><span id="liveMapText">Live location</span></div>
     <div class="map-overlay top-right map-card map-layer-panel" aria-label="XPLORE map layers">
       <div class="map-layer-heading">Map Layers</div>
       <div class="map-layer-actions">
@@ -109,7 +114,7 @@
     </div>
 
     <h2 class="section-title">Pilot Boundary</h2>
-    <div class="notice">This v0.2 build uses public OpenStreetMap, Nominatim, OSRM, Open-Meteo and Overpass services for low-volume development. Green-space, cycling and accessibility overlays are visual context only and are not yet included in route scoring. Enterprise deployment will move these data services behind governed adapters or self-hosted infrastructure.</div>
+    <div class="notice">This v0.2 build uses public OpenStreetMap, Nominatim, OSRM, Open-Meteo and Overpass services for low-volume development. Live location is processed in the browser and precise coordinates are sent to route/context providers only when a journey or reroute is requested. Background GPS may be throttled by the device or browser. Enterprise deployment will move these data services behind governed adapters or self-hosted infrastructure.</div>
   </aside>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
