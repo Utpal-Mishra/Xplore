@@ -70,6 +70,11 @@
 
   <section class="map-wrap">
     <div id="map" class="map" aria-label="XPLORE route map"></div>
+    <div id="navigationMap" class="navigation-map" hidden aria-label="XPLORE turn-by-turn navigation map"></div>
+    <div id="navigationMapControls" class="map-overlay navigation-map-controls map-card" hidden>
+      <span class="navigation-quality" id="navigationQuality">HQ Vector</span>
+      <button class="navigation-recenter" id="recenterNavigation" type="button">Recenter</button>
+    </div>
     <div class="map-overlay top-left map-card"><div class="pill">OpenStreetMap · Vector</div></div>
     <div class="map-overlay live-map-status map-card" id="liveMapStatus" hidden><span class="live-pulse"></span><span id="liveMapText">Live location</span></div>
 
@@ -85,6 +90,8 @@
       <div class="guidance-meta">
         <div class="guidance-meta-item"><span>Progress</span><strong id="guidanceProgress">0%</strong></div>
         <div class="guidance-meta-item"><span>Remaining</span><strong id="guidanceRemaining">—</strong></div>
+        <div class="guidance-meta-item"><span>ETA</span><strong id="guidanceEta">—</strong></div>
+        <div class="guidance-meta-item"><span>Speed</span><strong id="guidanceSpeed">—</strong></div>
         <div class="guidance-meta-item"><span>Heading</span><strong id="guidanceHeading">—</strong></div>
       </div>
     </div>
@@ -147,5 +154,6 @@
 <script src="app.js"></script>
 <script src="map-context.js"></script>
 <script src="navigation.js"></script>
+<script src="navigation-map.js"></script>
 </body>
 </html>
