@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="XPLORE — context-aware human-centred navigation pilot for Cork, Ireland.">
+  <meta name="description" content="XPLORE — context-aware human-centred navigation pilot across Ireland.">
   <meta name="theme-color" content="#07110d">
-  <title>XPLORE — Cork Real-World Pilot</title>
+  <title>XPLORE — Ireland Real-World Pilot</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -18,17 +18,17 @@
 <body>
 <header class="app-header">
   <div class="brand">XPLORE</div>
-  <div class="header-meta"><span class="pill">Cork v0.2</span><span class="pill dev">Development Data Adapters</span></div>
+  <div class="header-meta"><span class="pill">Ireland v0.3</span><span class="pill dev">Development Data Adapters</span></div>
 </header>
 <main class="layout">
   <aside class="left">
     <span class="eyebrow">Context-aware navigation</span>
     <h1 class="hero">Choose the journey, not just the ETA.</h1>
-    <p class="sub">XPLORE compares real route candidates and explains which one best fits your priorities.</p>
+    <p class="sub">XPLORE compares real route candidates across Ireland and explains which one best fits your priorities.</p>
 
     <div class="card route-form">
       <div class="field"><label for="from">Start</label><input id="from" value="Cork City Library" autocomplete="off"></div>
-      <div class="field"><label for="to">Destination</label><input id="to" value="University College Cork" autocomplete="off"></div>
+      <div class="field"><label for="to">Destination</label><input id="to" value="Trinity College Dublin" autocomplete="off"></div>
       <div class="location-actions">
         <button class="secondary" id="useLocation" type="button">Use location once</button>
         <button class="secondary live-location-button" id="toggleLive" type="button" aria-pressed="false">Track live location</button>
@@ -49,7 +49,7 @@
         <button class="choice" data-pref="Calmest">Calmest</button>
       </div>
       <button class="primary" id="find" type="button" style="margin-top:12px">Find real routes</button>
-      <div class="status" id="status">Ready for a Cork journey.</div>
+      <div class="status" id="status">Ready for an Ireland journey.</div>
     </div>
 
     <h2 class="section-title">Journey impact</h2>
@@ -64,18 +64,19 @@
       <div class="context"><span>Weather</span><strong id="contextWeather">Adapter next</strong></div>
       <div class="context"><span>Air quality</span><strong id="contextAQI">Adapter next</strong></div>
       <div class="context"><span>Community</span><strong id="contextCommunity">Prototype</strong></div>
+      <div class="context"><span>Network</span><strong id="contextNetwork">Ireland-wide</strong></div>
       <div class="context"><span>Freshness</span><strong id="contextFreshness">Route pending</strong></div>
     </div>
   </aside>
 
   <section class="map-wrap">
-    <div id="map" class="map" aria-label="XPLORE route map"></div>
+    <div id="map" class="map" aria-label="XPLORE Ireland route map"></div>
     <div id="navigationMap" class="navigation-map" hidden aria-label="XPLORE turn-by-turn navigation map"></div>
     <div id="navigationMapControls" class="map-overlay navigation-map-controls map-card" hidden>
       <span class="navigation-quality" id="navigationQuality">HQ Vector</span>
       <button class="navigation-recenter" id="recenterNavigation" type="button">Recenter</button>
     </div>
-    <div class="map-overlay top-left map-card"><div class="pill">OpenStreetMap · Vector</div></div>
+    <div class="map-overlay top-left map-card"><div class="pill">Ireland · OpenStreetMap Vector</div></div>
     <div class="map-overlay live-map-status map-card" id="liveMapStatus" hidden><span class="live-pulse"></span><span id="liveMapText">Live location</span></div>
 
     <div class="map-overlay guidance-panel map-card" id="guidancePanel" hidden aria-live="polite">
@@ -108,10 +109,10 @@
 
     <div class="map-overlay bottom-left map-card card">
       <div class="route-summary">
-        <div><span class="eyebrow" id="summaryTitle">No route selected</span><h2 id="summaryMeta">Choose two Cork locations</h2></div>
+        <div><span class="eyebrow" id="summaryTitle">No route selected</span><h2 id="summaryMeta">Choose two Irish locations</h2></div>
         <div class="score-badge"><span id="routeScore">—</span><small>XPLORE score</small></div>
       </div>
-      <div id="reasons" class="reason-list"><span class="reason">Real route geometry</span><span class="reason">Explainable scoring</span></div>
+      <div id="reasons" class="reason-list"><span class="reason">Ireland-wide route geometry</span><span class="reason">Explainable scoring</span></div>
       <div class="confidence"><span>Journey confidence</span><strong id="confidenceValue">—</strong></div>
       <div class="guidance-actions">
         <button class="guidance-button" id="startGuidance" type="button" disabled>Start Guidance</button>
@@ -124,7 +125,7 @@
     <span class="eyebrow">Decision layer</span>
     <h2 class="section-title">Route candidates</h2>
     <div id="routeList" class="route-list">
-      <div class="notice">Run a journey to retrieve real candidate routes. XPLORE will rank them separately from the routing provider.</div>
+      <div class="notice">Run a journey anywhere in Ireland to retrieve real candidate routes. XPLORE ranks them separately from the routing provider.</div>
     </div>
 
     <h2 class="section-title">Why this route?</h2>
@@ -145,7 +146,7 @@
     </div>
 
     <h2 class="section-title">Pilot Boundary</h2>
-    <div class="notice">This v0.2 build uses public OpenStreetMap, Nominatim, OSRM, Open-Meteo and Overpass services for low-volume development. Live location is processed in the browser and precise coordinates are sent to route/context providers only when a journey or reroute is requested. Journey guidance is an experimental browser pilot and must not be treated as safety-critical navigation. Background GPS may be throttled by the device or browser.</div>
+    <div class="notice">XPLORE v0.3 expands the development pilot across Ireland using public OpenStreetMap, Nominatim, OSRM, Open-Meteo and Overpass services at low volume. Long-distance journeys use sampled local context windows along the route rather than one oversized national query. Live location is processed in the browser and precise coordinates are sent to route/context providers only when a journey or reroute is requested. Journey guidance remains an experimental browser pilot and must not be treated as safety-critical navigation.</div>
   </aside>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -155,5 +156,6 @@
 <script src="map-context.js"></script>
 <script src="navigation.js"></script>
 <script src="navigation-map.js"></script>
+<script src="ireland-network.js"></script>
 </body>
 </html>
