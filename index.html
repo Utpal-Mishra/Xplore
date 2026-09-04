@@ -18,7 +18,7 @@
 <body>
 <header class="app-header">
   <div class="brand">XPLORE</div>
-  <div class="header-meta"><span class="pill">Ireland v0.3.2</span><span class="pill dev">Development Data Adapters</span></div>
+  <div class="header-meta"><span class="pill">Ireland v0.3.3</span><span class="pill dev">Development Data Adapters</span></div>
 </header>
 <main class="layout">
   <aside class="left">
@@ -146,7 +146,7 @@
     </div>
 
     <h2 class="section-title">Pilot Boundary</h2>
-    <div class="notice">XPLORE v0.3.2 expands the development pilot across Ireland using public development adapters. Full Eircodes are now sent first to a dedicated, rate-limited Eircode development resolver and then to an exact OpenStreetMap fallback; XPLORE still refuses fuzzy substitutions. This development resolver is not the intended production dependency: commercial-grade Eircode coverage should use an approved/licensed Eircode or GeoDirectory provider behind an XPLORE-controlled server-side API. Long-distance journeys use sampled local context windows along the route rather than one oversized national query. Live location is processed in the browser and precise coordinates are sent to route/context providers only when a journey or reroute is requested. Journey guidance remains an experimental browser pilot and must not be treated as safety-critical navigation.</div>
+    <div class="notice">XPLORE v0.3.3 uses a confirmation-first address flow across Ireland. Typed place/address text is not silently converted into a route: users explicitly request full-address suggestions and select a result before routing. Public Nominatim lookups are user-triggered and rate-limited; client-side keystroke autocomplete is intentionally not used. Full Eircodes can still use the exact development resolver chain when available, but XPLORE refuses fuzzy Eircode substitutions. Long-distance journeys use sampled local context windows along the route rather than one oversized national query. Live location is processed in the browser and precise coordinates are sent to route/context providers only when a journey or reroute is requested. Journey guidance remains an experimental browser pilot and must not be treated as safety-critical navigation.</div>
   </aside>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -156,7 +156,7 @@
 <script src="map-context.js"></script>
 <script src="navigation.js"></script>
 <script src="navigation-map.js"></script>
-<script src="ireland-network.js?v=0.3.2"></script>
-<script src="eircode-provider.js?v=0.3.2"></script>
+<script src="ireland-network.js?v=0.3.3"></script>
+<script src="eircode-provider.js?v=0.3.3"></script>
 </body>
 </html>
