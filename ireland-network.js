@@ -5,6 +5,8 @@ const IRELAND_NETWORK={
   version:'Ireland v0.3'
 };
 
+const EIRCODE_PATTERN=/^(?:[AC-FHKNPRTV-Y]\d{2}|D6W)[0-9AC-FHKNPRTV-Y]{4}$/;
+
 function isInsideIrelandBounds(location){
   return location&&location.lat>=51.25&&location.lat<=55.45&&location.lon>=-10.75&&location.lon<=-5.25;
 }
@@ -19,29 +21,77 @@ function isIrishSearchResult(item){
   return countryCode==='gb'&&region.includes('northern ireland');
 }
 
-async function irelandGeocodeRequest(query,{fallback=false}={}){
-  const q=fallback?`${query}, Ireland`:query;
-  const params=new URLSearchParams({
+function normalizeEircode(value){
+  const compact=String(value||'').toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/O/g,'0');
+  if(!EIRCODE_PATTERN.test(compact))return null;
+  return `${compact.slice(0,3)} ${compact.slice(3)}`;
+}
+
+function eircodeFromResult(item){
+  const postcode=normalizeEircode(item?.address?.postcode||'');
+  if(postcode)return postcode;
+  const display=String(item?.display_name||'').toUpperCase();
+  const match=display.match(/(?:[AC-FHKNPRTV-Y]\d{2}|D6W)\s?[0-9AC-FHKNPRTV-Y]{4}/);
+  return match?normalizeEircode(match[0]):null;
+}
+
+function exactEircodeResult(item,eircode){
+  return isIrishSearchResult(item)&&eircodeFromResult(item)===eircode;
+}
+
+async function nominatimSearch(params){
+  const base=new URLSearchParams({
     format:'jsonv2',
-    limit:'8',
-    countrycodes:'ie,gb',
+    limit:'10',
     addressdetails:'1',
     viewbox:IRELAND_NETWORK.searchViewbox,
     bounded:'1',
-    q
+    ...params
   });
-  const res=await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`,{headers:{Accept:'application/json'}});
+  const res=await fetch(`https://nominatim.openstreetmap.org/search?${base.toString()}`,{headers:{Accept:'application/json'}});
   if(!res.ok)throw new Error('Place search failed');
   return res.json();
 }
 
-// Replace the original Cork-biased search with island-wide Ireland search.
+async function resolveEircode(eircode){
+  // Structured postcode search first. For Eircodes we intentionally restrict
+  // this lookup to the Republic of Ireland; Northern Ireland uses UK postcodes.
+  let data=await nominatimSearch({countrycodes:'ie',postalcode:eircode,country:'Ireland'});
+  let result=data.find(item=>exactEircodeResult(item,eircode));
+
+  // Some OSM records are indexed better by the free-text search endpoint.
+  // We still require an exact postcode match before accepting the result.
+  if(!result){
+    data=await nominatimSearch({countrycodes:'ie',q:eircode});
+    result=data.find(item=>exactEircodeResult(item,eircode));
+  }
+  if(!result){
+    data=await nominatimSearch({countrycodes:'ie',q:`${eircode}, Ireland`});
+    result=data.find(item=>exactEircodeResult(item,eircode));
+  }
+
+  if(!result){
+    throw new Error(`Eircode ${eircode} could not be verified in the current OpenStreetMap geocoder. XPLORE will not guess another location. Please enter the full address or use live location.`);
+  }
+  return {lat:+result.lat,lon:+result.lon,name:result.display_name,eircode};
+}
+
+async function irelandGeocodeRequest(query,{fallback=false}={}){
+  const q=fallback?`${query}, Ireland`:query;
+  return nominatimSearch({countrycodes:'ie,gb',q});
+}
+
+// Island-wide address search with strict, fail-safe Eircode handling.
 geocode=async function(query){
   const coords=parseCoordinates(query);
   if(coords){
     if(!isInsideIrelandBounds(coords))throw new Error('These coordinates are outside the current Ireland pilot coverage.');
     return coords;
   }
+
+  const eircode=normalizeEircode(query);
+  if(eircode)return resolveEircode(eircode);
+
   let data=await irelandGeocodeRequest(query);
   let result=data.find(isIrishSearchResult);
   if(!result){
