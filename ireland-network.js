@@ -9,14 +9,25 @@ function isInsideIrelandBounds(location){
   return location&&location.lat>=51.25&&location.lat<=55.45&&location.lon>=-10.75&&location.lon<=-5.25;
 }
 
+function isIrishSearchResult(item){
+  const address=item?.address||{};
+  const countryCode=(address.country_code||'').toLowerCase();
+  const region=[address.state,address.region,address.county,address.country].filter(Boolean).join(' ').toLowerCase();
+  const point={lat:+item.lat,lon:+item.lon};
+  if(!isInsideIrelandBounds(point))return false;
+  if(countryCode==='ie')return true;
+  return countryCode==='gb'&&region.includes('northern ireland');
+}
+
 async function irelandGeocodeRequest(query,{fallback=false}={}){
   const q=fallback?`${query}, Ireland`:query;
   const params=new URLSearchParams({
     format:'jsonv2',
-    limit:'5',
-    countrycodes:'ie',
+    limit:'8',
+    countrycodes:'ie,gb',
     addressdetails:'1',
     viewbox:IRELAND_NETWORK.searchViewbox,
+    bounded:'1',
     q
   });
   const res=await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`,{headers:{Accept:'application/json'}});
@@ -24,7 +35,7 @@ async function irelandGeocodeRequest(query,{fallback=false}={}){
   return res.json();
 }
 
-// Replace the original Cork-biased search with Republic-of-Ireland-wide search.
+// Replace the original Cork-biased search with island-wide Ireland search.
 geocode=async function(query){
   const coords=parseCoordinates(query);
   if(coords){
@@ -32,9 +43,12 @@ geocode=async function(query){
     return coords;
   }
   let data=await irelandGeocodeRequest(query);
-  if(!data.length)data=await irelandGeocodeRequest(query,{fallback:true});
-  const result=data.find(item=>isInsideIrelandBounds({lat:+item.lat,lon:+item.lon}));
-  if(!result)throw new Error(`Could not find an Irish location for: ${query}`);
+  let result=data.find(isIrishSearchResult);
+  if(!result){
+    data=await irelandGeocodeRequest(query,{fallback:true});
+    result=data.find(isIrishSearchResult);
+  }
+  if(!result)throw new Error(`Could not find a location on the island of Ireland for: ${query}`);
   return {lat:+result.lat,lon:+result.lon,name:result.display_name};
 };
 
