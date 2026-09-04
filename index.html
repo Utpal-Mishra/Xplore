@@ -18,7 +18,7 @@
 <body>
 <header class="app-header">
   <div class="brand">XPLORE</div>
-  <div class="header-meta"><span class="pill">Ireland v0.3</span><span class="pill dev">Development Data Adapters</span></div>
+  <div class="header-meta"><span class="pill">Ireland v0.3.1</span><span class="pill dev">Development Data Adapters</span></div>
 </header>
 <main class="layout">
   <aside class="left">
@@ -146,7 +146,7 @@
     </div>
 
     <h2 class="section-title">Pilot Boundary</h2>
-    <div class="notice">XPLORE v0.3 expands the development pilot across Ireland using public OpenStreetMap, Nominatim, OSRM, Open-Meteo and Overpass services at low volume. Long-distance journeys use sampled local context windows along the route rather than one oversized national query. Live location is processed in the browser and precise coordinates are sent to route/context providers only when a journey or reroute is requested. Journey guidance remains an experimental browser pilot and must not be treated as safety-critical navigation.</div>
+    <div class="notice">XPLORE v0.3.1 expands the development pilot across Ireland using public OpenStreetMap, Nominatim, OSRM, Open-Meteo and Overpass services at low volume. Eircodes are accepted only when the geocoder returns an exact matching postcode; XPLORE will not route to a fuzzy substitute. Long-distance journeys use sampled local context windows along the route rather than one oversized national query. Live location is processed in the browser and precise coordinates are sent to route/context providers only when a journey or reroute is requested. Journey guidance remains an experimental browser pilot and must not be treated as safety-critical navigation.</div>
   </aside>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -156,6 +156,6 @@
 <script src="map-context.js"></script>
 <script src="navigation.js"></script>
 <script src="navigation-map.js"></script>
-<script src="ireland-network.js"></script>
+<script src="ireland-network.js?v=0.3.1"></script>
 </body>
 </html>
