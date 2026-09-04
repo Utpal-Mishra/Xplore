@@ -1,4 +1,4 @@
-// XPLORE Ireland v0.3.2 — development Eircode resolver chain.
+// XPLORE Ireland v0.3.3 — development Eircode resolver chain.
 // Exact Eircodes should be resolved by an Eircode-aware provider before OSM/Nominatim.
 // This public endpoint is used only as a low-volume development adapter; it is not
 // the intended production dependency. Production should use an approved/licensed
@@ -53,8 +53,20 @@ resolveEircode=async function(eircode){
     const osm=await osmExactResolveEircode(eircode);
     return {...osm,provider:'OpenStreetMap exact postcode'};
   }catch(error){
-    throw new Error(`Eircode ${eircode} could not be resolved by either XPLORE's dedicated development resolver or the exact OpenStreetMap fallback. The old route has been cleared and XPLORE will not guess another location. For production-grade Eircode coverage we need a licensed Eircode/GeoDirectory provider.`);
+    throw new Error(`Eircode ${eircode} could not be resolved by either XPLORE's dedicated development resolver or the exact OpenStreetMap fallback. The old route has been cleared and XPLORE will not guess another location. Enter a street/building and town to use the full-address suggestion flow.`);
   }
 };
 
-IRELAND_NETWORK.version='Ireland v0.3.2';
+IRELAND_NETWORK.version='Ireland v0.3.3';
+
+// Load the explicit full-address suggestion module without requiring another
+// index.html dependency. The module self-initialises whether it arrives before
+// or after DOMContentLoaded.
+(function loadAddressSearchModule(){
+  if(document.querySelector('script[data-xplore-address-search]'))return;
+  const script=document.createElement('script');
+  script.src='address-search.js?v=0.3.3';
+  script.async=false;
+  script.dataset.xploreAddressSearch='true';
+  document.head.appendChild(script);
+})();
