@@ -5,11 +5,48 @@
 
 const xploreAddressState={
   selections:{from:null,to:null},
-  searches:{from:0,to:0}
+  searches:{from:0,to:0},
+  initialised:false
 };
 
 function addressStatusElement(fieldId){return $(`${fieldId}AddressStatus`);}
 function addressSuggestionsElement(fieldId){return $(`${fieldId}Suggestions`);}
+
+function ensureAddressStyles(){
+  if(document.querySelector('link[data-xplore-address-search]'))return;
+  const link=document.createElement('link');
+  link.rel='stylesheet';link.href='address-search.css?v=0.3.3';link.dataset.xploreAddressSearch='true';
+  document.head.appendChild(link);
+}
+
+function ensureAddressFieldUI(fieldId){
+  const input=$(fieldId);if(!input)return;
+  const field=input.closest('.field');if(!field)return;
+
+  let row=input.closest('.address-input-row');
+  if(!row){
+    row=document.createElement('div');row.className='address-input-row';
+    input.parentNode.insertBefore(row,input);row.appendChild(input);
+    input.classList.add('field-input');
+
+    const button=document.createElement('button');
+    button.type='button';button.id=`${fieldId}AddressSearch`;button.className='address-search-button';
+    button.textContent='Find address';button.setAttribute('aria-label',`Find full ${fieldId==='from'?'start':'destination'} address`);
+    row.appendChild(button);
+  }
+
+  if(!addressStatusElement(fieldId)){
+    const status=document.createElement('div');status.id=`${fieldId}AddressStatus`;status.className='address-field-status';
+    status.textContent='Type a full address or request address suggestions.';
+    row.insertAdjacentElement('afterend',status);
+  }
+
+  if(!addressSuggestionsElement(fieldId)){
+    const list=document.createElement('div');list.id=`${fieldId}Suggestions`;list.className='address-suggestions';
+    list.hidden=true;list.setAttribute('role','listbox');list.setAttribute('aria-label',`${fieldId==='from'?'Start':'Destination'} address suggestions`);
+    addressStatusElement(fieldId).insertAdjacentElement('afterend',list);
+  }
+}
 
 function escapeAddressHtml(value){
   return String(value??'').replace(/[&<>'"]/g,char=>({
@@ -86,7 +123,7 @@ async function findAddressCandidates(query){
   return [...unique.values()].slice(0,6);
 }
 
-function renderAddressSuggestions(fieldId,items,query){
+function renderAddressSuggestions(fieldId,items){
   const list=addressSuggestionsElement(fieldId);if(!list)return;
   if(!items.length){
     list.innerHTML='<div class="address-suggestion-empty">No full-address matches were found. Add a street/building and town or county, then search again.</div>';
@@ -133,7 +170,7 @@ async function searchFieldAddress(fieldId,{routeIntent=false}={}){
       return confirmAddress(fieldId,resolved,{status:`Eircode ${eircode} resolved to a full address`});
     }catch(error){
       hideAddressSuggestions(fieldId);
-      setAddressFieldStatus(fieldId,'This Eircode is not available in the current resolver. Enter street/building + town to search full-address suggestions.','error');
+      setAddressFieldStatus(fieldId,'Eircode unavailable here. Enter street/building + town, then choose a full-address suggestion.','error');
       if(routeIntent)setStatus(`Eircode ${eircode} is not resolvable in the current pilot. Enter a street/building and town, then choose the full address suggestion.`,true);
       return null;
     }
@@ -148,7 +185,7 @@ async function searchFieldAddress(fieldId,{routeIntent=false}={}){
     if(items.length===1){
       return confirmAddress(fieldId,candidateFromNominatim(items[0]),{status:'One matching full address confirmed · ready to route'});
     }
-    renderAddressSuggestions(fieldId,items,query);
+    renderAddressSuggestions(fieldId,items);
     setAddressFieldStatus(fieldId,items.length?`Choose one of ${items.length} full-address matches.`:'No full-address matches found.',items.length?'normal':'error');
     if(routeIntent&&items.length)setStatus(`Choose the full ${fieldId==='from'?'Start':'Destination'} address from the suggestions, then tap Find real routes again.`);
     return null;
@@ -192,11 +229,20 @@ planJourney=async function(){
   }
 };
 
-document.addEventListener('DOMContentLoaded',()=>{
+function initXploreAddressSearch(){
+  if(xploreAddressState.initialised)return;
+  xploreAddressState.initialised=true;
+  ensureAddressStyles();
+  ['from','to'].forEach(ensureAddressFieldUI);
+
   ['from','to'].forEach(fieldId=>{
     const input=$(fieldId),button=$(`${fieldId}AddressSearch`);
-    if(button)button.addEventListener('click',()=>searchFieldAddress(fieldId));
-    if(input){
+    if(button&&!button.dataset.bound){
+      button.dataset.bound='true';
+      button.addEventListener('click',()=>searchFieldAddress(fieldId));
+    }
+    if(input&&!input.dataset.addressSearchBound){
+      input.dataset.addressSearchBound='true';
       input.addEventListener('input',()=>{
         clearAddressSelection(fieldId,{keepStatus:false});
         hideAddressSuggestions(fieldId);
@@ -216,4 +262,10 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(field&&!field.contains(event.target))hideAddressSuggestions(fieldId);
     });
   });
-});
+
+  const badge=document.querySelector('.header-meta .pill');if(badge)badge.textContent='Ireland v0.3.3';
+  if(typeof IRELAND_NETWORK!=='undefined')IRELAND_NETWORK.version='Ireland v0.3.3';
+}
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initXploreAddressSearch,{once:true});
+else initXploreAddressSearch();
