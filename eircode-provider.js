@@ -1,4 +1,4 @@
-// XPLORE Ireland v0.3.3 — development Eircode resolver chain.
+// XPLORE Ireland v0.3.4 — development Eircode resolver chain + address-search loader.
 // Exact Eircodes should be resolved by an Eircode-aware provider before OSM/Nominatim.
 // This public endpoint is used only as a low-volume development adapter; it is not
 // the intended production dependency. Production should use an approved/licensed
@@ -53,20 +53,29 @@ resolveEircode=async function(eircode){
     const osm=await osmExactResolveEircode(eircode);
     return {...osm,provider:'OpenStreetMap exact postcode'};
   }catch(error){
-    throw new Error(`Eircode ${eircode} could not be resolved by either XPLORE's dedicated development resolver or the exact OpenStreetMap fallback. The old route has been cleared and XPLORE will not guess another location. Enter a street/building and town to use the full-address suggestion flow.`);
+    throw new Error(`Eircode ${eircode} could not be resolved by either XPLORE's dedicated development resolver or the exact OpenStreetMap fallback. The old route has been cleared and XPLORE will not guess another location. For production-grade Eircode coverage we need a licensed Eircode/GeoDirectory provider.`);
   }
 };
 
-IRELAND_NETWORK.version='Ireland v0.3.3';
-
-// Load the explicit full-address suggestion module without requiring another
-// index.html dependency. The module self-initialises whether it arrives before
-// or after DOMContentLoaded.
-(function loadAddressSearchModule(){
-  if(document.querySelector('script[data-xplore-address-search]'))return;
+function loadXploreScriptOnce(src,id,onload){
+  const existing=document.getElementById(id);
+  if(existing){if(onload&&existing.dataset.loaded==='true')onload();return;}
   const script=document.createElement('script');
-  script.src='address-search.js?v=0.3.3';
-  script.async=false;
-  script.dataset.xploreAddressSearch='true';
+  script.id=id;script.src=src;script.async=false;
+  script.onload=()=>{script.dataset.loaded='true';if(onload)onload();};
+  script.onerror=()=>console.error(`Could not load ${src}`);
   document.head.appendChild(script);
-})();
+}
+
+function loadAddressSearchV034(){
+  loadXploreScriptOnce('address-search.js?v=0.3.4','xplore-address-search-script',()=>{
+    loadXploreScriptOnce('address-rescue.js?v=0.3.4','xplore-address-rescue-script');
+  });
+}
+
+IRELAND_NETWORK.version='Ireland v0.3.4';
+const versionBadge=document.querySelector('.header-meta .pill');
+if(versionBadge)versionBadge.textContent='Ireland v0.3.4';
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadAddressSearchV034,{once:true});
+else loadAddressSearchV034();
