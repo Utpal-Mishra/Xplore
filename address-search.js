@@ -9,6 +9,23 @@ const xploreAddressState={
   initialised:false
 };
 
+// Nominatim public policy caps an application at 1 request/second. Serialise all
+// lookup calls used by this browser pilot and leave a small safety margin.
+const xploreRawNominatimSearch=nominatimSearch;
+let xploreNominatimLastStartedAt=0;
+let xploreNominatimQueue=Promise.resolve();
+nominatimSearch=function(params){
+  const run=async()=>{
+    const wait=Math.max(0,1100-(Date.now()-xploreNominatimLastStartedAt));
+    if(wait)await new Promise(resolve=>window.setTimeout(resolve,wait));
+    xploreNominatimLastStartedAt=Date.now();
+    return xploreRawNominatimSearch(params);
+  };
+  const next=xploreNominatimQueue.then(run,run);
+  xploreNominatimQueue=next.catch(()=>{});
+  return next;
+};
+
 function addressStatusElement(fieldId){return $(`${fieldId}AddressStatus`);}
 function addressSuggestionsElement(fieldId){return $(`${fieldId}Suggestions`);}
 
