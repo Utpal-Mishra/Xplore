@@ -2,7 +2,7 @@ const IRELAND_NETWORK={
   center:{lat:53.38,lon:-8.05},
   bounds:[[51.25,-10.75],[55.45,-5.25]],
   searchViewbox:'-10.75,55.45,-5.25,51.25',
-  version:'Ireland v0.3'
+  version:'Ireland v0.3.1'
 };
 
 const EIRCODE_PATTERN=/^(?:[AC-FHKNPRTV-Y]\d{2}|D6W)[0-9AC-FHKNPRTV-Y]{4}$/;
@@ -22,7 +22,7 @@ function isIrishSearchResult(item){
 }
 
 function normalizeEircode(value){
-  const compact=String(value||'').toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/O/g,'0');
+  const compact=String(value||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
   if(!EIRCODE_PATTERN.test(compact))return null;
   return `${compact.slice(0,3)} ${compact.slice(3)}`;
 }
@@ -54,13 +54,10 @@ async function nominatimSearch(params){
 }
 
 async function resolveEircode(eircode){
-  // Structured postcode search first. For Eircodes we intentionally restrict
-  // this lookup to the Republic of Ireland; Northern Ireland uses UK postcodes.
+  // Eircodes are exact identifiers. Never accept a fuzzy Irish place result.
   let data=await nominatimSearch({countrycodes:'ie',postalcode:eircode,country:'Ireland'});
   let result=data.find(item=>exactEircodeResult(item,eircode));
 
-  // Some OSM records are indexed better by the free-text search endpoint.
-  // We still require an exact postcode match before accepting the result.
   if(!result){
     data=await nominatimSearch({countrycodes:'ie',q:eircode});
     result=data.find(item=>exactEircodeResult(item,eircode));
@@ -71,7 +68,7 @@ async function resolveEircode(eircode){
   }
 
   if(!result){
-    throw new Error(`Eircode ${eircode} could not be verified in the current OpenStreetMap geocoder. XPLORE will not guess another location. Please enter the full address or use live location.`);
+    throw new Error(`Eircode ${eircode} could not be verified in the current OpenStreetMap geocoder. XPLORE has cleared the old route rather than guessing another location. Please enter the full address or use a dedicated Eircode-capable provider.`);
   }
   return {lat:+result.lat,lon:+result.lon,name:result.display_name,eircode};
 }
@@ -79,6 +76,40 @@ async function resolveEircode(eircode){
 async function irelandGeocodeRequest(query,{fallback=false}={}){
   const q=fallback?`${query}, Ireland`:query;
   return nominatimSearch({countrycodes:'ie,gb',q});
+}
+
+function resetJourneyPresentation(message='Journey changed — find routes again.'){
+  if(typeof stopGuidance==='function'&&typeof navigationState!=='undefined'&&navigationState.active){
+    stopGuidance();
+  }
+  if(typeof clearMap==='function')clearMap();
+  if(typeof clearContextLayers==='function')clearContextLayers();
+
+  state.routes=[];
+  state.enrichedRoutes=[];
+  state.activeRoute=0;
+  state.lastDestination=null;
+  state.lastRoutedLivePosition=null;
+  state.lastAutoRerouteAt=0;
+
+  const routeList=$('routeList');
+  if(routeList)routeList.innerHTML='<div class="notice">Enter or confirm a destination, then find routes. XPLORE will not keep a previous route after the journey changes.</div>';
+  if($('summaryTitle'))$('summaryTitle').textContent='No route selected';
+  if($('summaryMeta'))$('summaryMeta').textContent='Choose two Irish locations';
+  if($('routeScore'))$('routeScore').textContent='—';
+  if($('confidenceValue'))$('confidenceValue').textContent='—';
+  if($('co2'))$('co2').textContent='—';
+  if($('health'))$('health').textContent='—';
+  if($('activeMinutes'))$('activeMinutes').textContent='—';
+  if($('reasons'))$('reasons').innerHTML='<span class="reason">Route pending</span>';
+  if($('explainList'))$('explainList').innerHTML='<li>Run a new journey to see route explanations.</li>';
+  if($('healthWhy'))$('healthWhy').textContent='Run a journey to see how travel mode and active time affect this score.';
+  if($('xploreWhy'))$('xploreWhy').textContent='The overall route score combines time, carbon, health/activity, comfort and confidence.';
+  if($('scoreBreakdown'))$('scoreBreakdown').innerHTML='';
+  if($('startGuidance'))$('startGuidance').disabled=true;
+  if($('mapLayerStatus'))$('mapLayerStatus').textContent='Loads around the selected journey';
+  ['layerGreenCount','layerCycleCount','layerAccessibilityCount'].forEach(id=>{if($(id))$(id).textContent='—';});
+  setStatus(message);
 }
 
 // Island-wide address search with strict, fail-safe Eircode handling.
@@ -102,21 +133,24 @@ geocode=async function(query){
   return {lat:+result.lat,lon:+result.lon,name:result.display_name};
 };
 
-// Use country-wide language and the nationwide geocoder when a journey is planned.
+// Use country-wide language and clear any previous route before resolving the new journey.
 planJourney=async function(){
   const from=$('from').value.trim(),to=$('to').value.trim();
   if((!from&&!state.liveTracking)||!to){setStatus('Enter both start and destination.',true);return;}
   if(state.liveTracking&&!state.livePosition){setStatus('Waiting for a live GPS fix before routing.',true);return;}
+
+  resetJourneyPresentation('Resolving the new Ireland journey…');
   document.body.classList.add('loading');
-  setStatus('Finding locations across Ireland…');
+  setStatus(normalizeEircode(to)?`Verifying Eircode ${normalizeEircode(to)} exactly…`:'Finding locations across Ireland…');
   try{
     const startPromise=state.liveTracking?Promise.resolve({...state.livePosition,name:'Live location'}):geocode(from);
     const [a,b]=await Promise.all([startPromise,geocode(to)]);
-    setStatus('Requesting Ireland route options and live context…');
+    setStatus(b.eircode?`Eircode ${b.eircode} verified · requesting route options…`:'Requesting Ireland route options and live context…');
     await routeBetween(a,b);
     if(state.liveTracking)renderLivePosition(state.livePosition);
   }catch(error){
     console.error(error);
+    // The presentation is already cleared, so a failed lookup cannot leave stale guidance visible.
     setStatus(error.message||'Could not calculate this Ireland journey.',true);
   }finally{
     document.body.classList.remove('loading');
@@ -202,4 +236,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   const network=document.getElementById('contextNetwork');
   if(network)network.textContent='Ireland-wide';
+
+  // Any manual journey edit invalidates the old route immediately.
+  ['from','to'].forEach(id=>{
+    const input=$(id);
+    if(!input)return;
+    input.addEventListener('input',()=>{
+      if(state.routes.length||state.enrichedRoutes.length||(typeof navigationState!=='undefined'&&navigationState.active)){
+        resetJourneyPresentation('Journey changed — tap Find real routes to calculate the new route.');
+      }
+    });
+  });
 });
