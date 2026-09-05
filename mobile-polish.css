@@ -1,0 +1,91 @@
+/* XPLORE Ireland v0.4.3 — final phone map/overlay polish. */
+@media (max-width:760px){
+  /* Give the map and the content below it two clearly separate visual sections. */
+  .map-wrap{
+    min-height:66svh;
+    height:66svh;
+    margin-bottom:12px;
+    border-bottom:1px solid rgba(82,217,141,.18);
+    box-shadow:0 10px 26px rgba(0,0,0,.16);
+  }
+  .left{padding-top:22px}
+
+  /* No decision card before a route actually exists. */
+  .map-wrap:not(.route-ready) .bottom-left{display:none}
+
+  /* Reserve a narrow attribution footer below the route sheet. */
+  .map-wrap.route-ready:not(.navigation-active) .bottom-left{
+    bottom:calc(31px + env(safe-area-inset-bottom));
+  }
+
+  .map-wrap:not(.navigation-active) .leaflet-bottom.leaflet-right{
+    right:5px;
+    bottom:4px;
+    max-width:calc(100% - 10px);
+  }
+  .map-wrap:not(.navigation-active) .leaflet-control-attribution{
+    margin:0!important;
+    padding:3px 6px!important;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:8px!important;
+    background:rgba(5,14,10,.80)!important;
+    color:#789086!important;
+    font-family:"Inter",sans-serif;
+    font-size:7px!important;
+    line-height:1.25!important;
+    box-shadow:0 4px 14px rgba(0,0,0,.18);
+    white-space:normal;
+    text-align:right;
+  }
+  .map-wrap:not(.navigation-active) .leaflet-control-attribution a{
+    color:#9bb3a7!important;
+  }
+
+  /* Base-map style is an option beside contextual layers, not another data layer. */
+  .map-style-toggle{
+    min-width:54px;
+    min-height:36px;
+    padding:6px 7px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#0a1511;
+    color:#9fb4aa;
+    font-family:"Inter Tight",sans-serif;
+    font-size:8px;
+    font-weight:650;
+    cursor:pointer;
+  }
+  .map-style-toggle span{
+    display:block;
+    margin-top:3px;
+    color:#739083;
+    font-size:9px;
+  }
+  .map-style-toggle.active{
+    border-color:rgba(82,217,141,.55);
+    background:#102a1d;
+    color:#8cefb4;
+  }
+  .map-style-toggle.active span{color:#6fe39b}
+  .map-layer-actions{flex-wrap:nowrap}
+
+  /* The initial whole-island view is now intentionally closer; keep controls compact. */
+  .map-layer-panel{box-shadow:0 8px 22px rgba(0,0,0,.20)}
+
+  /* In active Guidance the navigation dock remains the only bottom overlay. */
+  .map-wrap.navigation-active{
+    margin-bottom:12px;
+    border-bottom-color:rgba(82,217,141,.22);
+  }
+}
+
+@media (max-width:390px){
+  .map-style-toggle{min-width:48px;padding:5px 6px}
+  .map-wrap.route-ready:not(.navigation-active) .bottom-left{
+    bottom:calc(30px + env(safe-area-inset-bottom));
+  }
+  .map-wrap:not(.navigation-active) .leaflet-control-attribution{
+    font-size:6.5px!important;
+    max-width:96vw;
+  }
+}
