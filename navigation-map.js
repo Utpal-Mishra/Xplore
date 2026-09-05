@@ -5,12 +5,12 @@ const nativeNavigationMapState={
   userMarker:null,
   destinationMarker:null,
   lastBearing:0,
-  pendingSync:false
+  pendingSync:false,
+  styleKey:null
 };
 
 function xploreHighQualityPixelRatio(){
   const device=Number(window.devicePixelRatio)||1;
-  // Raise 1x displays above native resolution while capping GPU cost on dense mobile screens.
   return Math.min(Math.max(device,1.75),3);
 }
 
@@ -28,12 +28,17 @@ function tuneBrowseMapResolution(){
   });
 }
 
+function preferredNavigationStyleKey(){
+  try{return localStorage.getItem('xplore-map-style')==='color'?'color':'dark';}
+  catch(error){return 'dark';}
+}
+
+function preferredNavigationStyleUrl(key=preferredNavigationStyleKey()){
+  return key==='color'?'https://tiles.openfreemap.org/styles/bright':'https://tiles.openfreemap.org/styles/dark';
+}
+
 function lineFeature(coordinates){
-  return {
-    type:'Feature',
-    properties:{},
-    geometry:{type:'LineString',coordinates:coordinates.length>=2?coordinates:[[0,0],[0,0]]}
-  };
+  return {type:'Feature',properties:{},geometry:{type:'LineString',coordinates:coordinates.length>=2?coordinates:[[0,0],[0,0]]}};
 }
 
 function setNavSource(id,coordinates){
@@ -50,31 +55,11 @@ function addNavigationLayers(){
   map.addSource('xplore-nav-remaining',{type:'geojson',data:lineFeature([])});
   map.addSource('xplore-nav-gps-link',{type:'geojson',data:lineFeature([])});
 
-  map.addLayer({
-    id:'xplore-nav-route-casing',type:'line',source:'xplore-nav-route',
-    layout:{'line-cap':'round','line-join':'round'},
-    paint:{'line-color':'#06100c','line-width':12,'line-opacity':.92}
-  });
-  map.addLayer({
-    id:'xplore-nav-route-base',type:'line',source:'xplore-nav-route',
-    layout:{'line-cap':'round','line-join':'round'},
-    paint:{'line-color':'#60736a','line-width':7,'line-opacity':.42}
-  });
-  map.addLayer({
-    id:'xplore-nav-travelled-line',type:'line',source:'xplore-nav-travelled',
-    layout:{'line-cap':'round','line-join':'round'},
-    paint:{'line-color':'#75877e','line-width':7,'line-opacity':.48}
-  });
-  map.addLayer({
-    id:'xplore-nav-remaining-line',type:'line',source:'xplore-nav-remaining',
-    layout:{'line-cap':'round','line-join':'round'},
-    paint:{'line-color':'#5ee394','line-width':8,'line-opacity':.99}
-  });
-  map.addLayer({
-    id:'xplore-nav-gps-link-line',type:'line',source:'xplore-nav-gps-link',
-    layout:{'line-cap':'round','line-join':'round'},
-    paint:{'line-color':'#e5b85c','line-width':3,'line-opacity':.88,'line-dasharray':[1.2,1.8]}
-  });
+  map.addLayer({id:'xplore-nav-route-casing',type:'line',source:'xplore-nav-route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#06100c','line-width':12,'line-opacity':.92}});
+  map.addLayer({id:'xplore-nav-route-base',type:'line',source:'xplore-nav-route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#60736a','line-width':7,'line-opacity':.42}});
+  map.addLayer({id:'xplore-nav-travelled-line',type:'line',source:'xplore-nav-travelled',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#75877e','line-width':7,'line-opacity':.48}});
+  map.addLayer({id:'xplore-nav-remaining-line',type:'line',source:'xplore-nav-remaining',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#5ee394','line-width':8,'line-opacity':.99}});
+  map.addLayer({id:'xplore-nav-gps-link-line',type:'line',source:'xplore-nav-gps-link',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#e5b85c','line-width':3,'line-opacity':.88,'line-dasharray':[1.2,1.8]}});
 }
 
 function createUserPuck(){
@@ -126,15 +111,7 @@ function nearestNavigationRouteProjection(location,coords){
     const info=projectedSegmentInfo(location,coords[i],coords[i+1]);
     if(info.distance>=best.distance)continue;
     const t=info.t;
-    best={
-      index:i,
-      t,
-      distance:info.distance,
-      coordinate:[
-        coords[i][0]+(coords[i+1][0]-coords[i][0])*t,
-        coords[i][1]+(coords[i+1][1]-coords[i][1])*t
-      ]
-    };
+    best={index:i,t,distance:info.distance,coordinate:[coords[i][0]+(coords[i+1][0]-coords[i][0])*t,coords[i][1]+(coords[i+1][1]-coords[i][1])*t]};
   }
   return best;
 }
@@ -151,17 +128,7 @@ function navigationRouteSegments(route,location){
   const offRouteVisualThreshold=Math.max(18,accuracy*1.25);
   const gpsLink=match.distance>offRouteVisualThreshold?[[location.lon,location.lat],matched]:[];
 
-  // Important: route geometry remains on the actual routed path. The raw GPS puck
-  // stays at the device position; any meaningful separation is shown separately.
-  return {
-    full:coords,
-    travelled:[...coords.slice(0,split+1),matched],
-    remaining:[matched,...coords.slice(split+1)],
-    gpsLink,
-    progress,
-    matchDistance:match.distance,
-    matched
-  };
+  return {full:coords,travelled:[...coords.slice(0,split+1),matched],remaining:[matched,...coords.slice(split+1)],gpsLink,progress,matchDistance:match.distance,matched};
 }
 
 function updateNativeNavigationMetrics(location,route,progress){
@@ -177,10 +144,19 @@ function updateNativeNavigationMetrics(location,route,progress){
 }
 
 function navigationCameraPadding(){
-  if(window.matchMedia?.('(max-width:760px)').matches){
-    return {top:150,bottom:98,left:32,right:32};
-  }
+  if(window.matchMedia?.('(max-width:760px)').matches)return {top:150,bottom:98,left:32,right:32};
   return {top:145,bottom:190,left:45,right:45};
+}
+
+function finishNavigationStyleLoad(styleKey){
+  const map=nativeNavigationMapState.map;if(!map)return;
+  if(styleKey==='color'&&typeof applyXploreNaturalPalette==='function')applyXploreNaturalPalette(map);
+  addNavigationLayers();
+  nativeNavigationMapState.loaded=true;
+  if(nativeNavigationMapState.pendingSync&&state.livePosition){
+    nativeNavigationMapState.pendingSync=false;
+    syncNativeNavigationMap(state.livePosition,true);
+  }
 }
 
 function ensureNativeNavigationMap(location){
@@ -190,14 +166,22 @@ function ensureNativeNavigationMap(location){
   $('navigationMapControls').hidden=false;
   $('map').setAttribute('aria-hidden','true');
 
+  const desiredStyle=preferredNavigationStyleKey();
   if(nativeNavigationMapState.map){
-    nativeNavigationMapState.map.resize();
-    return nativeNavigationMapState.map;
+    const map=nativeNavigationMapState.map;
+    map.resize();
+    if(nativeNavigationMapState.styleKey!==desiredStyle){
+      nativeNavigationMapState.loaded=false;
+      nativeNavigationMapState.styleKey=desiredStyle;
+      map.setStyle(preferredNavigationStyleUrl(desiredStyle));
+      map.once('style.load',()=>finishNavigationStyleLoad(desiredStyle));
+    }
+    return map;
   }
 
   const map=new maplibregl.Map({
     container,
-    style:'https://tiles.openfreemap.org/styles/dark',
+    style:preferredNavigationStyleUrl(desiredStyle),
     center:[location.lon,location.lat],
     zoom:navigationZoom(location),
     bearing:Number.isFinite(location.heading)?location.heading:0,
@@ -210,26 +194,14 @@ function ensureNativeNavigationMap(location){
   });
   map.addControl(new maplibregl.AttributionControl({compact:true,customAttribution:'© OpenStreetMap contributors'}),'bottom-left');
   nativeNavigationMapState.map=map;
+  nativeNavigationMapState.styleKey=desiredStyle;
 
-  map.on('load',()=>{
-    nativeNavigationMapState.loaded=true;
-    addNavigationLayers();
-    if(nativeNavigationMapState.pendingSync&&state.livePosition){
-      nativeNavigationMapState.pendingSync=false;
-      syncNativeNavigationMap(state.livePosition,true);
-    }
-  });
+  map.on('load',()=>finishNavigationStyleLoad(desiredStyle));
   map.on('dragstart',event=>{
-    if(event.originalEvent){
-      nativeNavigationMapState.follow=false;
-      $('recenterNavigation').classList.add('visible');
-    }
+    if(event.originalEvent){nativeNavigationMapState.follow=false;$('recenterNavigation').classList.add('visible');}
   });
   map.on('zoomstart',event=>{
-    if(event.originalEvent){
-      nativeNavigationMapState.follow=false;
-      $('recenterNavigation').classList.add('visible');
-    }
+    if(event.originalEvent){nativeNavigationMapState.follow=false;$('recenterNavigation').classList.add('visible');}
   });
   return map;
 }
@@ -247,15 +219,13 @@ function syncNativeNavigationMap(location,forceCamera=false){
   setNavSource('xplore-nav-gps-link',segments.gpsLink);
 
   if(!nativeNavigationMapState.userMarker){
-    nativeNavigationMapState.userMarker=new maplibregl.Marker({element:createUserPuck(),anchor:'center'})
-      .setLngLat([location.lon,location.lat]).addTo(map);
+    nativeNavigationMapState.userMarker=new maplibregl.Marker({element:createUserPuck(),anchor:'center'}).setLngLat([location.lon,location.lat]).addTo(map);
   }else nativeNavigationMapState.userMarker.setLngLat([location.lon,location.lat]);
 
   const destination=segments.full[segments.full.length-1];
   if(destination){
     if(!nativeNavigationMapState.destinationMarker){
-      nativeNavigationMapState.destinationMarker=new maplibregl.Marker({element:createDestinationPuck(),anchor:'center'})
-        .setLngLat(destination).addTo(map);
+      nativeNavigationMapState.destinationMarker=new maplibregl.Marker({element:createDestinationPuck(),anchor:'center'}).setLngLat(destination).addTo(map);
     }else nativeNavigationMapState.destinationMarker.setLngLat(destination);
   }
 
@@ -266,15 +236,7 @@ function syncNativeNavigationMap(location,forceCamera=false){
   if(nativeNavigationMapState.follow||forceCamera){
     nativeNavigationMapState.follow=true;
     $('recenterNavigation').classList.remove('visible');
-    map.easeTo({
-      center:[location.lon,location.lat],
-      zoom:navigationZoom(location),
-      bearing,
-      pitch:navigationPitch(),
-      padding:navigationCameraPadding(),
-      duration:520,
-      essential:true
-    });
+    map.easeTo({center:[location.lon,location.lat],zoom:navigationZoom(location),bearing,pitch:navigationPitch(),padding:navigationCameraPadding(),duration:520,essential:true});
   }
 }
 
@@ -294,32 +256,18 @@ function hideNativeNavigationViewport(){
 }
 
 const nativeMapBaseStartGuidance=startGuidance;
-startGuidance=async function(){
-  await nativeMapBaseStartGuidance();
-  if(navigationState.active)showNativeNavigationViewport();
-};
+startGuidance=async function(){await nativeMapBaseStartGuidance();if(navigationState.active)showNativeNavigationViewport();};
 
 const nativeMapBaseStopGuidance=stopGuidance;
-stopGuidance=function(){
-  nativeMapBaseStopGuidance();
-  hideNativeNavigationViewport();
-};
+stopGuidance=function(){nativeMapBaseStopGuidance();hideNativeNavigationViewport();};
 
 const nativeMapBaseUpdateGuidance=updateGuidance;
-updateGuidance=function(location){
-  nativeMapBaseUpdateGuidance(location);
-  if(navigationState.active)syncNativeNavigationMap(location,false);
-};
+updateGuidance=function(location){nativeMapBaseUpdateGuidance(location);if(navigationState.active)syncNativeNavigationMap(location,false);};
 
 const nativeMapBaseSelectRoute=selectRoute;
-selectRoute=function(index,enriched){
-  nativeMapBaseSelectRoute(index,enriched);
-  if(navigationState.active&&state.livePosition)syncNativeNavigationMap(state.livePosition,true);
-};
+selectRoute=function(index,enriched){nativeMapBaseSelectRoute(index,enriched);if(navigationState.active&&state.livePosition)syncNativeNavigationMap(state.livePosition,true);};
 
 document.addEventListener('DOMContentLoaded',()=>{
-  // The Leaflet bridge still hosts the comparison map. Raise the internal
-  // MapLibre canvas resolution without changing route/context behavior.
   window.setTimeout(tuneBrowseMapResolution,350);
   window.addEventListener('resize',()=>window.setTimeout(tuneBrowseMapResolution,120),{passive:true});
 
