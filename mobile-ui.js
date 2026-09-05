@@ -8,9 +8,7 @@ const XPLORE_MAP_STYLES={
   color:'https://tiles.openfreemap.org/styles/liberty'
 };
 
-const xploreMobileUIState={
-  baseStyle:'dark'
-};
+const xploreMobileUIState={baseStyle:'dark'};
 
 function xploreIsPhone(){
   return window.matchMedia?.('(max-width:760px)').matches===true;
@@ -18,6 +16,15 @@ function xploreIsPhone(){
 
 function xploreMapWrap(){
   return document.querySelector('.map-wrap');
+}
+
+function loadMobilePolishStyles(){
+  if(document.querySelector('link[data-xplore-mobile-polish]'))return;
+  const link=document.createElement('link');
+  link.rel='stylesheet';
+  link.href='mobile-polish.css?v=0.4.3';
+  link.dataset.xploreMobilePolish='true';
+  document.head.appendChild(link);
 }
 
 function setRouteReady(ready){
@@ -107,8 +114,7 @@ function restoreMapStylePreference(){
 
 function compactLeafletAttribution(){
   if(state?.map?.attributionControl?.setPrefix){
-    // Leaflet is BSD licensed; retain the actual OpenFreeMap/OpenMapTiles/OSM
-    // data attribution while removing the framework branding from this tiny UI.
+    // Retain the provider/data attribution while removing Leaflet framework branding.
     state.map.attributionControl.setPrefix(false);
   }
 }
@@ -131,6 +137,7 @@ function installRouteVisibilityHooks(){
 }
 
 function activateMobileUIV043(){
+  loadMobilePolishStyles();
   installRouteVisibilityHooks();
   syncRouteReadyState();
   addMapStyleToggle();
