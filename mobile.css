@@ -1,4 +1,4 @@
-/* XPLORE Ireland v0.4.1 — phone-first responsive layer. */
+/* XPLORE Ireland v0.4.2 — phone-first responsive guidance refinement. */
 @media (max-width:760px){
   html,body{overflow-x:hidden}
   body{-webkit-tap-highlight-color:transparent}
@@ -57,7 +57,7 @@
     font-size:8px;
   }
 
-  /* Compact route result as a mobile bottom sheet. */
+  /* Compact route result as a mobile bottom sheet before guidance begins. */
   .bottom-left{
     left:10px;
     right:10px;
@@ -87,19 +87,34 @@
   .guidance-actions{grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
   .guidance-button{min-height:44px;font-size:11px}
 
-  /* Full-screen guidance: essential information only. */
+  /* Guidance is a navigation screen, not a decision dashboard. */
   .map-wrap.navigation-active .map-layer-panel,
   .map-wrap.navigation-active .live-map-status,
   .map-wrap.navigation-active .top-left{display:none!important}
+
   .map-wrap.navigation-active .bottom-left{
+    left:10px;
+    right:10px;
+    bottom:calc(10px + env(safe-area-inset-bottom));
     max-height:none;
     overflow:visible;
-    padding:9px 10px;
+    padding:6px;
+    border-radius:14px;
+    background:rgba(8,19,14,.94);
+    backdrop-filter:blur(16px);
   }
+  .map-wrap.navigation-active .bottom-left .route-summary,
   .map-wrap.navigation-active .bottom-left .reason-list,
   .map-wrap.navigation-active .bottom-left .confidence{display:none}
-  .map-wrap.navigation-active .bottom-left .route-summary h2{font-size:16px}
-  .map-wrap.navigation-active .bottom-left .score-badge{min-width:64px;padding:7px}
+  .map-wrap.navigation-active .bottom-left .guidance-actions{
+    margin-top:0;
+    gap:6px;
+  }
+  .map-wrap.navigation-active .bottom-left .guidance-button{
+    min-height:48px;
+    border-radius:10px;
+    font-size:12px;
+  }
 
   .guidance-panel{
     left:10px;
@@ -127,11 +142,45 @@
   }
   .guidance-meta-item span{font-size:7px}
   .guidance-meta-item strong{font-size:10px}
+
+  /* Recenter becomes the only persistent navigation-map utility on phones. */
   .navigation-map-controls{
-    left:10px;
-    bottom:calc(116px + env(safe-area-inset-bottom));
-    padding:6px 7px;
+    left:auto;
+    right:10px;
+    bottom:calc(76px + env(safe-area-inset-bottom));
+    padding:0;
+    border:0;
+    background:transparent;
+    box-shadow:none;
+    backdrop-filter:none;
   }
+  .navigation-quality{display:none}
+  .navigation-recenter{
+    min-height:44px;
+    padding:0 12px;
+    border-radius:999px;
+    background:rgba(8,19,14,.94);
+    border:1px solid rgba(82,217,141,.28);
+    box-shadow:0 8px 24px rgba(0,0,0,.28);
+    opacity:1;
+    font-size:10px;
+  }
+
+  /* Keep map attribution accessible without laying a white strip over controls. */
+  .map-wrap.navigation-active .maplibregl-ctrl-bottom-left{
+    left:8px;
+    bottom:calc(74px + env(safe-area-inset-bottom));
+  }
+  .map-wrap.navigation-active .maplibregl-ctrl-attrib{
+    max-width:min(74vw,290px);
+    border-radius:8px;
+    background:rgba(8,19,14,.9);
+    color:#82968c;
+    font-size:8px;
+    box-shadow:0 5px 18px rgba(0,0,0,.22);
+  }
+  .map-wrap.navigation-active .maplibregl-ctrl-attrib a{color:#a9bdb3}
+  .map-wrap.navigation-active .maplibregl-ctrl-attrib-button{opacity:.72;filter:invert(1)}
 
   /* More comfortable phone form controls. */
   .card{border-radius:15px}
@@ -164,4 +213,7 @@
   .metric{font-size:8px}
   .metric strong{font-size:13px}
   .hero{font-size:27px}
+  .map-wrap.navigation-active .bottom-left{left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom))}
+  .navigation-map-controls{right:8px;bottom:calc(72px + env(safe-area-inset-bottom))}
+  .map-wrap.navigation-active .maplibregl-ctrl-bottom-left{left:6px;bottom:calc(72px + env(safe-area-inset-bottom))}
 }
