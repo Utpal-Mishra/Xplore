@@ -18,7 +18,7 @@
 <body>
 <header class="app-header">
   <div class="brand">XPLORE</div>
-  <div class="header-meta"><span class="pill">Ireland v0.3.3</span><span class="pill dev">Development Data Adapters</span></div>
+  <div class="header-meta"><span class="pill">Ireland v0.4.0</span><span class="pill dev">Development Data Adapters</span></div>
 </header>
 <main class="layout">
   <aside class="left">
@@ -146,7 +146,7 @@
     </div>
 
     <h2 class="section-title">Pilot Boundary</h2>
-    <div class="notice">XPLORE v0.3.3 uses a confirmation-first address flow across Ireland. Typed place/address text is not silently converted into a route: users explicitly request full-address suggestions and select a result before routing. Public Nominatim lookups are user-triggered and rate-limited; client-side keystroke autocomplete is intentionally not used. Full Eircodes can still use the exact development resolver chain when available, but XPLORE refuses fuzzy Eircode substitutions. Long-distance journeys use sampled local context windows along the route rather than one oversized national query. Live location is processed in the browser and precise coordinates are sent to route/context providers only when a journey or reroute is requested. Journey guidance remains an experimental browser pilot and must not be treated as safety-critical navigation.</div>
+    <div class="notice">XPLORE v0.4.0 adds sampled Route Segment Intelligence across Ireland. Selected routes are matched against nearby OpenStreetMap road, cycling, green-space, foot/sidewalk, lighting and accessibility tags. These measurements are explicitly labelled by data confidence and are not yet included in the XPLORE Score while the matching approach is being validated. Address selection remains confirmation-first and public geocoder/context services remain low-volume development adapters. Live location is processed in the browser and precise coordinates are sent to route/context providers only when a journey or reroute is requested. Journey guidance remains an experimental browser pilot and must not be treated as safety-critical navigation.</div>
   </aside>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -156,7 +156,7 @@
 <script src="map-context.js"></script>
 <script src="navigation.js"></script>
 <script src="navigation-map.js"></script>
-<script src="ireland-network.js?v=0.3.3"></script>
-<script src="eircode-provider.js?v=0.3.3"></script>
+<script src="ireland-network.js?v=0.4.0"></script>
+<script src="eircode-provider.js?v=0.4.0"></script>
 </body>
 </html>
