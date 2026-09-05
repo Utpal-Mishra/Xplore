@@ -14,12 +14,12 @@
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="navigation.css">
-  <link rel="stylesheet" href="mobile.css?v=0.4.2">
+  <link rel="stylesheet" href="mobile.css?v=0.4.3">
 </head>
 <body>
 <header class="app-header">
   <div class="brand">XPLORE</div>
-  <div class="header-meta"><span class="pill">Ireland v0.4.2</span><span class="pill dev">Development Data Adapters</span></div>
+  <div class="header-meta"><span class="pill">Ireland v0.4.3</span><span class="pill dev">Development Data Adapters</span></div>
 </header>
 <main class="layout">
   <aside class="left">
@@ -147,7 +147,7 @@
     </div>
 
     <h2 class="section-title">Pilot Boundary</h2>
-    <div class="notice">XPLORE v0.4.2 refines phone Guidance so the live map remains the primary surface. During active navigation the pre-route XPLORE Score card is collapsed to essential Stop Guidance and Voice controls. The route line is snapped to the actual routed geometry instead of drawing a false road segment from raw GPS; meaningful GPS-to-route separation is shown independently. Map attribution remains available through a compact control rather than a full-width strip. Route Intelligence remains sampled and is not yet included in the XPLORE Score while validation continues.</div>
+    <div class="notice">XPLORE v0.4.3 further separates the phone planning map from the content below it. Before routing, the empty route-decision overlay is removed so the map stays clear; after routing, the result card sits above a compact provider attribution footer. The initial phone view starts closer to Ireland, and users can optionally switch the browse basemap between XPLORE Dark and OpenFreeMap Liberty colour styling. Route Intelligence remains sampled and is not yet included in the XPLORE Score while validation continues.</div>
   </aside>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -157,7 +157,7 @@
 <script src="map-context.js"></script>
 <script src="navigation.js"></script>
 <script src="navigation-map.js?v=0.4.2"></script>
-<script src="ireland-network.js?v=0.4.2"></script>
-<script src="eircode-provider.js?v=0.4.2"></script>
+<script src="ireland-network.js?v=0.4.3"></script>
+<script src="eircode-provider.js?v=0.4.3"></script>
 </body>
 </html>
