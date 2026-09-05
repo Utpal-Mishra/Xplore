@@ -1,4 +1,4 @@
-// XPLORE Ireland v0.4.3 — Eircode resolver + product-module loader.
+// XPLORE Ireland v0.4.4 — Eircode resolver + product-module loader.
 // Exact Eircodes should be resolved by an Eircode-aware provider before OSM/Nominatim.
 // This public endpoint is used only as a low-volume development adapter; it is not
 // the intended production dependency. Production should use an approved/licensed
@@ -17,29 +17,18 @@ async function resolveEircodeViaPublicPilotProvider(eircode){
   const timeout=window.setTimeout(()=>controller.abort(),EIRCODE_PUBLIC_PILOT_TIMEOUT_MS);
   try{
     const response=await fetch(EIRCODE_PUBLIC_PILOT_ENDPOINT,{
-      method:'POST',
-      mode:'cors',
-      headers:{'Accept':'application/json','Content-Type':'application/json'},
-      body:JSON.stringify({eircode}),
-      signal:controller.signal
+      method:'POST',mode:'cors',headers:{'Accept':'application/json','Content-Type':'application/json'},
+      body:JSON.stringify({eircode}),signal:controller.signal
     });
     if(!response.ok)return null;
     const data=await response.json();
     const returned=normalizeEircode(data?.eircode||'');
     if(returned!==eircode||!validResolvedCoordinate(data?.location))return null;
-    return {
-      lat:+data.location.lat,
-      lon:+data.location.lng,
-      name:data.formattedAddress||eircode,
-      eircode,
-      provider:'Eircode development resolver'
-    };
+    return {lat:+data.location.lat,lon:+data.location.lng,name:data.formattedAddress||eircode,eircode,provider:'Eircode development resolver'};
   }catch(error){
     console.warn('Dedicated Eircode development resolver unavailable; falling back to exact OSM lookup.',error);
     return null;
-  }finally{
-    window.clearTimeout(timeout);
-  }
+  }finally{window.clearTimeout(timeout);}
 }
 
 const osmExactResolveEircode=resolveEircode;
@@ -68,24 +57,21 @@ function loadXploreScriptOnce(src,id,onload){
 }
 
 function setXploreReleaseVersion(){
-  IRELAND_NETWORK.version='Ireland v0.4.3';
+  IRELAND_NETWORK.version='Ireland v0.4.4';
   const versionBadge=document.querySelector('.header-meta .pill');
-  if(versionBadge)versionBadge.textContent='Ireland v0.4.3';
+  if(versionBadge)versionBadge.textContent='Ireland v0.4.4';
 }
 
-function loadXploreV043Modules(){
-  loadXploreScriptOnce('address-search.js?v=0.4.3','xplore-address-search-script',()=>{
-    loadXploreScriptOnce('address-rescue.js?v=0.4.3','xplore-address-rescue-script',()=>{
-      loadXploreScriptOnce('route-intelligence.js?v=0.4.3','xplore-route-intelligence-script',()=>{
-        loadXploreScriptOnce('mobile-ui.js?v=0.4.3','xplore-mobile-ui-script',()=>{
-          setXploreReleaseVersion();
-        });
+function loadXploreV044Modules(){
+  loadXploreScriptOnce('address-search.js?v=0.4.4','xplore-address-search-script',()=>{
+    loadXploreScriptOnce('address-rescue.js?v=0.4.4','xplore-address-rescue-script',()=>{
+      loadXploreScriptOnce('route-intelligence.js?v=0.4.4','xplore-route-intelligence-script',()=>{
+        loadXploreScriptOnce('mobile-ui.js?v=0.4.4','xplore-mobile-ui-script',()=>setXploreReleaseVersion());
       });
     });
   });
 }
 
 setXploreReleaseVersion();
-
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadXploreV043Modules,{once:true});
-else loadXploreV043Modules();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadXploreV044Modules,{once:true});
+else loadXploreV044Modules();
