@@ -1,4 +1,4 @@
-// XPLORE Ireland v0.4.4 — Eircode resolver + product-module loader.
+// XPLORE Ireland v0.4.5 — Eircode resolver + product-module loader.
 // Exact Eircodes should be resolved by an Eircode-aware provider before OSM/Nominatim.
 // This public endpoint is used only as a low-volume development adapter; it is not
 // the intended production dependency. Production should use an approved/licensed
@@ -57,21 +57,21 @@ function loadXploreScriptOnce(src,id,onload){
 }
 
 function setXploreReleaseVersion(){
-  IRELAND_NETWORK.version='Ireland v0.4.4';
+  IRELAND_NETWORK.version='Ireland v0.4.5';
   const versionBadge=document.querySelector('.header-meta .pill');
-  if(versionBadge)versionBadge.textContent='Ireland v0.4.4';
+  if(versionBadge)versionBadge.textContent='Ireland v0.4.5';
 }
 
-function loadXploreV044Modules(){
-  loadXploreScriptOnce('address-search.js?v=0.4.4','xplore-address-search-script',()=>{
-    loadXploreScriptOnce('address-rescue.js?v=0.4.4','xplore-address-rescue-script',()=>{
-      loadXploreScriptOnce('route-intelligence.js?v=0.4.4','xplore-route-intelligence-script',()=>{
-        loadXploreScriptOnce('mobile-ui.js?v=0.4.4','xplore-mobile-ui-script',()=>setXploreReleaseVersion());
+function loadXploreV045Modules(){
+  loadXploreScriptOnce('address-search.js?v=0.4.5','xplore-address-search-script',()=>{
+    loadXploreScriptOnce('address-rescue.js?v=0.4.5','xplore-address-rescue-script',()=>{
+      loadXploreScriptOnce('route-intelligence.js?v=0.4.5','xplore-route-intelligence-script',()=>{
+        loadXploreScriptOnce('mobile-ui.js?v=0.4.5','xplore-mobile-ui-script',()=>setXploreReleaseVersion());
       });
     });
   });
 }
 
 setXploreReleaseVersion();
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadXploreV044Modules,{once:true});
-else loadXploreV044Modules();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadXploreV045Modules,{once:true});
+else loadXploreV045Modules();
