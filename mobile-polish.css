@@ -1,6 +1,6 @@
-/* XPLORE Ireland v0.4.3 — final phone map/overlay polish. */
+/* XPLORE Ireland v0.4.5 — mobile planning-map polish. */
 @media (max-width:760px){
-  /* Give the map and the content below it two clearly separate visual sections. */
+  /* Give map and content below it two clearly separate sections. */
   .map-wrap{
     min-height:66svh;
     height:66svh;
@@ -37,40 +37,115 @@
     white-space:normal;
     text-align:right;
   }
-  .map-wrap:not(.navigation-active) .leaflet-control-attribution a{
-    color:#9bb3a7!important;
+  .map-wrap:not(.navigation-active) .leaflet-control-attribution a{color:#9bb3a7!important}
+
+  /* One compact Layers control replaces four permanently-open map buttons. */
+  .map-layer-panel{
+    top:10px;
+    right:10px;
+    width:auto;
+    max-width:220px;
+    padding:0;
+    border:0;
+    border-radius:12px;
+    background:transparent;
+    box-shadow:none;
+    backdrop-filter:none;
   }
+  .map-layer-panel .map-layer-heading,
+  .map-layer-panel .map-layer-status{display:none!important}
+  .map-layer-menu-toggle{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    width:94px;
+    min-height:42px;
+    margin-left:auto;
+    padding:0 12px;
+    border:1px solid rgba(82,217,141,.34);
+    border-radius:10px;
+    background:rgba(7,22,15,.94);
+    color:#d8e8df;
+    box-shadow:0 8px 22px rgba(0,0,0,.24);
+    font-family:"Inter Tight",sans-serif;
+    font-size:11px;
+    font-weight:700;
+  }
+  .map-layer-menu-toggle span{
+    color:#67df96;
+    font-size:16px;
+    font-weight:500;
+    line-height:1;
+  }
+  .map-layer-panel .map-layer-actions{display:none}
+  .map-layer-panel.layer-menu-open{
+    width:210px;
+    padding:7px;
+    border:1px solid rgba(82,217,141,.22);
+    background:rgba(7,22,15,.96);
+    box-shadow:0 10px 30px rgba(0,0,0,.30);
+    backdrop-filter:blur(14px);
+  }
+  .map-layer-panel.layer-menu-open .map-layer-menu-toggle{
+    width:100%;
+    margin:0 0 6px;
+    box-shadow:none;
+    background:#0b1c14;
+  }
+  .map-layer-panel.layer-menu-open .map-layer-actions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+  }
+  .map-layer-panel .map-layer-toggle,
+  .map-layer-panel .map-style-toggle{
+    min-width:0;
+    width:100%;
+    min-height:44px;
+    padding:7px 6px;
+    border-radius:9px;
+    font-size:9px;
+  }
+  .map-layer-panel .map-layer-toggle span,
+  .map-layer-panel .map-style-toggle span{font-size:9px;margin-top:3px}
 
   /* Base-map style is an option beside contextual layers, not another data layer. */
   .map-style-toggle{
-    min-width:54px;
-    min-height:36px;
-    padding:6px 7px;
     border:1px solid var(--line);
-    border-radius:8px;
     background:#0a1511;
     color:#9fb4aa;
     font-family:"Inter Tight",sans-serif;
-    font-size:8px;
     font-weight:650;
     cursor:pointer;
   }
-  .map-style-toggle span{
-    display:block;
-    margin-top:3px;
-    color:#739083;
-    font-size:9px;
-  }
+  .map-style-toggle span{display:block;color:#739083}
   .map-style-toggle.active{
     border-color:rgba(82,217,141,.55);
     background:#102a1d;
     color:#8cefb4;
   }
   .map-style-toggle.active span{color:#6fe39b}
-  .map-layer-actions{flex-wrap:nowrap}
 
-  /* The initial whole-island view is now intentionally closer; keep controls compact. */
-  .map-layer-panel{box-shadow:0 8px 22px rgba(0,0,0,.20)}
+  /* Recenter should read as a utility button, not a floating pill. */
+  .navigation-recenter{
+    min-width:104px;
+    min-height:44px;
+    padding:0 14px;
+    border-radius:10px!important;
+    background:rgba(8,19,14,.96);
+    border:1px solid rgba(82,217,141,.35);
+    box-shadow:0 8px 24px rgba(0,0,0,.28);
+    font-size:10px;
+    font-weight:700;
+  }
+
+  /* Empty inputs should explain the required action instead of shipping demo addresses. */
+  .field input::placeholder{
+    color:#71857b;
+    opacity:1;
+    font-weight:550;
+  }
 
   /* In active Guidance the navigation dock remains the only bottom overlay. */
   .map-wrap.navigation-active{
@@ -80,7 +155,9 @@
 }
 
 @media (max-width:390px){
-  .map-style-toggle{min-width:48px;padding:5px 6px}
+  .map-layer-panel{right:8px;top:8px}
+  .map-layer-panel.layer-menu-open{width:196px}
+  .map-layer-menu-toggle{width:88px;min-height:40px;padding:0 10px}
   .map-wrap.route-ready:not(.navigation-active) .bottom-left{
     bottom:calc(30px + env(safe-area-inset-bottom));
   }
@@ -88,4 +165,5 @@
     font-size:6.5px!important;
     max-width:96vw;
   }
+  .navigation-recenter{min-width:96px}
 }
