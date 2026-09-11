@@ -1,4 +1,4 @@
-// XPLORE Ireland v0.3.3 — explicit, user-triggered full-address selection.
+// XPLORE Ireland — explicit, user-triggered full-address selection.
 // Public Nominatim must not be used for client-side keystroke autocomplete.
 // XPLORE therefore searches only after an explicit user action (button, Enter,
 // or Find real routes) and requires a confirmed full address before routing.
@@ -28,17 +28,19 @@ nominatimSearch=function(params){
 
 function addressStatusElement(fieldId){return $(`${fieldId}AddressStatus`);}
 function addressSuggestionsElement(fieldId){return $(`${fieldId}Suggestions`);}
+function addressPrompt(fieldId){return fieldId==='from'?'Enter a start location, then tap Find address.':'Enter a destination location, then tap Find address.';}
 
 function ensureAddressStyles(){
   if(document.querySelector('link[data-xplore-address-search]'))return;
   const link=document.createElement('link');
-  link.rel='stylesheet';link.href='address-search.css?v=0.3.3';link.dataset.xploreAddressSearch='true';
+  link.rel='stylesheet';link.href='address-search.css?v=0.4.5';link.dataset.xploreAddressSearch='true';
   document.head.appendChild(link);
 }
 
 function ensureAddressFieldUI(fieldId){
   const input=$(fieldId);if(!input)return;
   const field=input.closest('.field');if(!field)return;
+  input.placeholder=fieldId==='from'?'Enter start location':'Enter destination location';
 
   let row=input.closest('.address-input-row');
   if(!row){
@@ -54,7 +56,7 @@ function ensureAddressFieldUI(fieldId){
 
   if(!addressStatusElement(fieldId)){
     const status=document.createElement('div');status.id=`${fieldId}AddressStatus`;status.className='address-field-status';
-    status.textContent='Type a full address or request address suggestions.';
+    status.textContent=addressPrompt(fieldId);
     row.insertAdjacentElement('afterend',status);
   }
 
@@ -93,7 +95,7 @@ function setAddressFieldStatus(fieldId,message,tone='normal'){
 function clearAddressSelection(fieldId,{keepStatus=false}={}){
   xploreAddressState.selections[fieldId]=null;
   const input=$(fieldId);if(input)input.classList.remove('address-confirmed');
-  if(!keepStatus)setAddressFieldStatus(fieldId,'Type a full address or request address suggestions.');
+  if(!keepStatus)setAddressFieldStatus(fieldId,addressPrompt(fieldId));
 }
 
 function selectedAddress(fieldId){
@@ -169,7 +171,7 @@ async function searchFieldAddress(fieldId,{routeIntent=false}={}){
   }
 
   const query=input.value.trim();
-  if(!query){setAddressFieldStatus(fieldId,'Enter an address first.','error');return null;}
+  if(!query){setAddressFieldStatus(fieldId,fieldId==='from'?'Enter a start location first.':'Enter a destination location first.','error');return null;}
 
   const coords=parseCoordinates(query);
   if(coords){
@@ -199,9 +201,6 @@ async function searchFieldAddress(fieldId,{routeIntent=false}={}){
   try{
     const items=await findAddressCandidates(query);
     if(requestId!==xploreAddressState.searches[fieldId])return null;
-    if(items.length===1){
-      return confirmAddress(fieldId,candidateFromNominatim(items[0]),{status:'One matching full address confirmed · ready to route'});
-    }
     renderAddressSuggestions(fieldId,items);
     setAddressFieldStatus(fieldId,items.length?`Choose one of ${items.length} full-address matches.`:'No full-address matches found.',items.length?'normal':'error');
     if(routeIntent&&items.length)setStatus(`Choose the full ${fieldId==='from'?'Start':'Destination'} address from the suggestions, then tap Find real routes again.`);
@@ -279,9 +278,6 @@ function initXploreAddressSearch(){
       if(field&&!field.contains(event.target))hideAddressSuggestions(fieldId);
     });
   });
-
-  const badge=document.querySelector('.header-meta .pill');if(badge)badge.textContent='Ireland v0.3.3';
-  if(typeof IRELAND_NETWORK!=='undefined')IRELAND_NETWORK.version='Ireland v0.3.3';
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initXploreAddressSearch,{once:true});
