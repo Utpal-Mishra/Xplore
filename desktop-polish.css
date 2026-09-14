@@ -1,0 +1,74 @@
+/* XPLORE desktop map-layer polish.
+   Natural is injected dynamically; keep it visually identical to contextual layer buttons. */
+@media (min-width:761px){
+  .map-layer-panel{
+    width:304px;
+    padding:10px;
+  }
+
+  .map-layer-actions{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:6px;
+    align-items:stretch;
+  }
+
+  .map-layer-panel .map-layer-toggle,
+  .map-layer-panel .map-style-toggle{
+    width:100%;
+    min-width:0;
+    min-height:48px;
+    margin:0;
+    padding:7px 5px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:3px;
+    border:1px solid #284238;
+    border-radius:8px;
+    background:#0a1712;
+    color:#91a79b;
+    font-family:"Inter Tight",sans-serif;
+    font-size:9px;
+    font-weight:600;
+    line-height:1.05;
+    appearance:none;
+    -webkit-appearance:none;
+    box-shadow:none;
+    transition:border-color .18s ease,background .18s ease,color .18s ease,transform .18s ease;
+  }
+
+  .map-layer-panel .map-layer-toggle span,
+  .map-layer-panel .map-style-toggle span{
+    display:block;
+    margin:0;
+    color:#72887d;
+    font-size:10px;
+    line-height:1;
+  }
+
+  .map-layer-panel .map-layer-toggle.active,
+  .map-layer-panel .map-style-toggle.active{
+    background:#102a1d;
+    border-color:#3b7654;
+    color:#a7e8bf;
+  }
+
+  .map-layer-panel .map-layer-toggle.active span,
+  .map-layer-panel .map-style-toggle.active span{
+    color:#5fdc91;
+  }
+
+  .map-layer-panel .map-layer-toggle:hover,
+  .map-layer-panel .map-style-toggle:hover{
+    border-color:#47725d;
+    background:#0d2118;
+  }
+
+  .map-layer-panel .map-layer-toggle:focus-visible,
+  .map-layer-panel .map-style-toggle:focus-visible{
+    outline:2px solid rgba(82,217,141,.55);
+    outline-offset:2px;
+  }
+}
