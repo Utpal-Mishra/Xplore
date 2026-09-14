@@ -1,6 +1,11 @@
 /* XPLORE desktop map-layer polish.
    Natural is injected dynamically; keep it visually identical to contextual layer buttons. */
 @media (min-width:761px){
+  /* Mobile-only Layers disclosure must never render in the desktop panel. */
+  .map-layer-menu-toggle{
+    display:none!important;
+  }
+
   .map-layer-panel{
     width:304px;
     padding:10px;
