@@ -1,8 +1,7 @@
-// XPLORE Ireland v0.4.5 — Eircode resolver + product-module loader.
-// Exact Eircodes should be resolved by an Eircode-aware provider before OSM/Nominatim.
-// This public endpoint is used only as a low-volume development adapter; it is not
-// the intended production dependency. Production should use an approved/licensed
-// Eircode provider behind an XPLORE-controlled server-side API.
+// XPLORE Ireland v0.4.6 — Eircode resolver + product-module loader.
+// Exact Eircodes should be resolved by an Eircode-aware provider before fuzzy place search.
+// This public endpoint is used only as a low-volume development adapter; production should
+// use an approved/licensed Eircode provider behind an XPLORE-controlled server-side API.
 
 const EIRCODE_PUBLIC_PILOT_ENDPOINT='https://www.agentcompare.ie/api/location/resolve-eircode';
 const EIRCODE_PUBLIC_PILOT_TIMEOUT_MS=9000;
@@ -42,7 +41,7 @@ resolveEircode=async function(eircode){
     const osm=await osmExactResolveEircode(eircode);
     return {...osm,provider:'OpenStreetMap exact postcode'};
   }catch(error){
-    throw new Error(`Eircode ${eircode} could not be resolved by either XPLORE's dedicated development resolver or the exact OpenStreetMap fallback. The old route has been cleared and XPLORE will not guess another location. For production-grade Eircode coverage we need a licensed Eircode/GeoDirectory provider.`);
+    throw new Error(`Eircode ${eircode} could not be resolved by either XPLORE's dedicated development resolver or the exact OpenStreetMap fallback. XPLORE will not guess another location. Type the building/street and town instead.`);
   }
 };
 
@@ -57,21 +56,21 @@ function loadXploreScriptOnce(src,id,onload){
 }
 
 function setXploreReleaseVersion(){
-  IRELAND_NETWORK.version='Ireland v0.4.5';
+  IRELAND_NETWORK.version='Ireland v0.4.6';
   const versionBadge=document.querySelector('.header-meta .pill');
-  if(versionBadge)versionBadge.textContent='Ireland v0.4.5';
+  if(versionBadge)versionBadge.textContent='Ireland v0.4.6';
 }
 
-function loadXploreV045Modules(){
-  loadXploreScriptOnce('address-search.js?v=0.4.5','xplore-address-search-script',()=>{
-    loadXploreScriptOnce('address-rescue.js?v=0.4.5','xplore-address-rescue-script',()=>{
-      loadXploreScriptOnce('route-intelligence.js?v=0.4.5','xplore-route-intelligence-script',()=>{
-        loadXploreScriptOnce('mobile-ui.js?v=0.4.5','xplore-mobile-ui-script',()=>setXploreReleaseVersion());
-      });
+function loadXploreV046Modules(){
+  // Dynamic autocomplete now includes apartment/building rescue itself, so the old
+  // user-triggered address-rescue module is intentionally no longer loaded.
+  loadXploreScriptOnce('address-search.js?v=0.4.6','xplore-address-search-script',()=>{
+    loadXploreScriptOnce('route-intelligence.js?v=0.4.6','xplore-route-intelligence-script',()=>{
+      loadXploreScriptOnce('mobile-ui.js?v=0.4.6','xplore-mobile-ui-script',()=>setXploreReleaseVersion());
     });
   });
 }
 
 setXploreReleaseVersion();
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadXploreV045Modules,{once:true});
-else loadXploreV045Modules();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadXploreV046Modules,{once:true});
+else loadXploreV046Modules();
