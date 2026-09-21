@@ -35,7 +35,6 @@ resolveEircode=async function(eircode){
   setStatus(`Verifying Eircode ${eircode} with the dedicated resolver…`);
   const dedicated=await resolveEircodeViaPublicPilotProvider(eircode);
   if(dedicated)return dedicated;
-
   setStatus(`Dedicated Eircode resolver unavailable for ${eircode} · checking exact OpenStreetMap match…`);
   try{
     const osm=await osmExactResolveEircode(eircode);
@@ -62,13 +61,13 @@ function setXploreReleaseVersion(){
 }
 
 function loadXploreV050Modules(){
-  // Address autocomplete stays confirmation-first. Transit is layered on top of the
-  // same confirmed coordinates rather than introducing a second location flow.
   loadXploreScriptOnce('address-search.js?v=0.5.0','xplore-address-search-script',()=>{
     loadXploreScriptOnce('transit-bootstrap.js?v=0.5.0','xplore-transit-bootstrap-script',()=>{
       loadXploreScriptOnce('transit.js?v=0.5.0','xplore-transit-script',()=>{
-        loadXploreScriptOnce('route-intelligence.js?v=0.5.0','xplore-route-intelligence-script',()=>{
-          loadXploreScriptOnce('mobile-ui.js?v=0.5.0','xplore-mobile-ui-script',()=>setXploreReleaseVersion());
+        loadXploreScriptOnce('transit-safety.js?v=0.5.0','xplore-transit-safety-script',()=>{
+          loadXploreScriptOnce('route-intelligence.js?v=0.5.0','xplore-route-intelligence-script',()=>{
+            loadXploreScriptOnce('mobile-ui.js?v=0.5.0','xplore-mobile-ui-script',()=>setXploreReleaseVersion());
+          });
         });
       });
     });
