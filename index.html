@@ -14,13 +14,13 @@
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="navigation.css">
-  <link rel="stylesheet" href="mobile.css?v=0.4.5">
+  <link rel="stylesheet" href="mobile.css?v=0.4.6">
   <link rel="stylesheet" href="desktop-polish.css?v=4">
 </head>
 <body>
 <header class="app-header">
   <div class="brand">XPLORE</div>
-  <div class="header-meta"><span class="pill">Ireland v0.4.5</span><span class="pill dev">Development Data Adapters</span></div>
+  <div class="header-meta"><span class="pill">Ireland v0.4.6</span><span class="pill dev">Development Data Adapters</span></div>
 </header>
 <main class="layout">
   <aside class="left">
@@ -148,7 +148,7 @@
     </div>
 
     <h2 class="section-title">Pilot Boundary</h2>
-    <div class="notice">XPLORE v0.4.5 refines the mobile planning experience: demo addresses are removed in favour of explicit start/destination placeholders, map layers collapse behind a compact Layers control, the Natural basemap exposes more geographic detail and regional labels, and Recenter uses a rectangular utility-button treatment. Natural colours are still derived from OpenStreetMap/OpenMapTiles vector features rather than satellite-classified land cover. Route Intelligence remains sampled and is not yet included in the XPLORE Score while validation continues.</div>
+    <div class="notice">XPLORE v0.4.6 introduces dynamic Ireland address autocomplete: Start and Destination suggestions appear while typing using a debounced Photon/OpenStreetMap development adapter, obsolete requests are cancelled, results are biased toward an already-known current/start location, and keyboard selection is supported. Ordinary fuzzy results still require explicit user selection before routing, while exact Eircodes retain their dedicated fail-safe resolver. Route Intelligence remains sampled and is not yet included in the XPLORE Score while validation continues.</div>
   </aside>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -157,8 +157,8 @@
 <script src="app.js"></script>
 <script src="map-context.js"></script>
 <script src="navigation.js"></script>
-<script src="navigation-map.js?v=0.4.5"></script>
-<script src="ireland-network.js?v=0.4.5"></script>
-<script src="eircode-provider.js?v=0.4.5"></script>
+<script src="navigation-map.js?v=0.4.6"></script>
+<script src="ireland-network.js?v=0.4.6"></script>
+<script src="eircode-provider.js?v=0.4.6"></script>
 </body>
 </html>
