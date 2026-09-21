@@ -1,4 +1,4 @@
-// XPLORE Ireland v0.4.6 — Eircode resolver + product-module loader.
+// XPLORE Ireland v0.5.0 — Eircode resolver + product-module loader.
 // Exact Eircodes should be resolved by an Eircode-aware provider before fuzzy place search.
 // This public endpoint is used only as a low-volume development adapter; production should
 // use an approved/licensed Eircode provider behind an XPLORE-controlled server-side API.
@@ -35,7 +35,6 @@ resolveEircode=async function(eircode){
   setStatus(`Verifying Eircode ${eircode} with the dedicated resolver…`);
   const dedicated=await resolveEircodeViaPublicPilotProvider(eircode);
   if(dedicated)return dedicated;
-
   setStatus(`Dedicated Eircode resolver unavailable for ${eircode} · checking exact OpenStreetMap match…`);
   try{
     const osm=await osmExactResolveEircode(eircode);
@@ -56,21 +55,25 @@ function loadXploreScriptOnce(src,id,onload){
 }
 
 function setXploreReleaseVersion(){
-  IRELAND_NETWORK.version='Ireland v0.4.6';
+  IRELAND_NETWORK.version='Ireland v0.5.0';
   const versionBadge=document.querySelector('.header-meta .pill');
-  if(versionBadge)versionBadge.textContent='Ireland v0.4.6';
+  if(versionBadge)versionBadge.textContent='Ireland v0.5.0';
 }
 
-function loadXploreV046Modules(){
-  // Dynamic autocomplete now includes apartment/building rescue itself, so the old
-  // user-triggered address-rescue module is intentionally no longer loaded.
-  loadXploreScriptOnce('address-search.js?v=0.4.6','xplore-address-search-script',()=>{
-    loadXploreScriptOnce('route-intelligence.js?v=0.4.6','xplore-route-intelligence-script',()=>{
-      loadXploreScriptOnce('mobile-ui.js?v=0.4.6','xplore-mobile-ui-script',()=>setXploreReleaseVersion());
+function loadXploreV050Modules(){
+  loadXploreScriptOnce('address-search.js?v=0.5.0','xplore-address-search-script',()=>{
+    loadXploreScriptOnce('transit-bootstrap.js?v=0.5.0','xplore-transit-bootstrap-script',()=>{
+      loadXploreScriptOnce('transit.js?v=0.5.0','xplore-transit-script',()=>{
+        loadXploreScriptOnce('transit-safety.js?v=0.5.0','xplore-transit-safety-script',()=>{
+          loadXploreScriptOnce('route-intelligence.js?v=0.5.0','xplore-route-intelligence-script',()=>{
+            loadXploreScriptOnce('mobile-ui.js?v=0.5.0','xplore-mobile-ui-script',()=>setXploreReleaseVersion());
+          });
+        });
+      });
     });
   });
 }
 
 setXploreReleaseVersion();
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadXploreV046Modules,{once:true});
-else loadXploreV046Modules();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadXploreV050Modules,{once:true});
+else loadXploreV050Modules();
