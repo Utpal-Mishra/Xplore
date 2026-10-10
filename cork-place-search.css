@@ -1,0 +1,8 @@
+.missing-place-button{margin-top:8px;padding:8px 10px;border:1px solid #2c5943;border-radius:9px;background:#09251a;color:#a7e8bf;font:600 11px "Inter Tight",sans-serif;}
+.missing-place-dialog{width:min(420px,calc(100vw - 36px));max-height:85svh;overflow:auto;border:1px solid #2c5943;border-radius:16px;padding:20px;background:#091b13;color:#d8ede1;font-family:"Inter",sans-serif;}
+.missing-place-dialog::backdrop{background:rgba(0,0,0,.65);}
+.missing-place-dialog h2{margin:0;font-size:19px;}.missing-place-dialog p{font-size:12px;line-height:1.5;color:#a7beb2;}
+.missing-place-dialog label{display:grid;gap:6px;margin:12px 0;font-size:12px;}
+.missing-place-dialog input{min-width:0;padding:12px;border:1px solid #2c5943;border-radius:9px;background:#06110c;color:#d8ede1;font-size:16px;}
+.missing-place-dialog button{padding:10px;border:1px solid #2c5943;border-radius:9px;background:#102a1d;color:#a7e8bf;font:600 12px "Inter",sans-serif;min-height:44px;}
+.personal-place-actions{display:flex;gap:8px;margin-bottom:12px;}.personal-place-actions button{flex:1;}#personalPlaceError{color:#e2c77e;}.picking-place{cursor:crosshair!important;}

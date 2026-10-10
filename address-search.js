@@ -344,9 +344,9 @@ function selectAddressSuggestion(fieldId,index){
   const item=xploreAddressState.suggestions[fieldId]?.[index];
   if(!item)return null;
   const relaxed=item._xploreRelaxed;
-  const status=relaxed
+  const status=item._xploreConfirmationStatus||(relaxed
     ?'Building-level address confirmed · apartment/unit itself may not be individually mapped'
-    :'Address confirmed · ready to route';
+    :'Address confirmed · ready to route');
   const confirmed=confirmAddress(fieldId,item,{status});
   setStatus(`${fieldId==='from'?'Start':'Destination'} confirmed. XPLORE will route only to the location you selected.`);
   return confirmed;
