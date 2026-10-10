@@ -47,3 +47,17 @@ Optional **Keep screen on** uses the browser Screen Wake Lock API during active 
 **Screen-off live tracking and lock-screen navigation notifications are not implemented in this web release.** Browser geolocation is restricted to visible documents. Installing the website as a PWA does not remove that restriction. Reliable screen-off tracking needs a native mobile location service. See [navigation recovery notes](docs/NAVIGATION_RECOVERY.md).
 
 Validation: `node --test tests/navigation-session.test.cjs`. Real-device lock/unlock and browser-discard verification remain required.
+
+## Cork place search (v0.5.3)
+
+Search now checks a static index of 4,586 named OpenStreetMap places in Cork city and surrounding suburbs, personal saved pins, and separately sourced address corrections before using Photon. It matches name aliases, accents, ampersands and prefixes; explicit locality qualifiers prevent a Cork place replacing a requested place elsewhere. Long business-plus-address queries can retry using the business name. Results always require user selection. Online results use a small location-aware cache.
+
+Desi Bites Cafe & Restaurant is included from its published business address. Its pin is the mapped John Harrington Industrial Estate road location, **not a verified restaurant entrance**; this is labelled in suggestions, confirmation and destination text.
+
+Use **Place missing? Save a pin** below Destination to name a place and choose its entrance on the map or enter coordinates. Personal pins stay in this browser's localStorage, can be removed by name, and are not uploaded. Selecting a pin while guidance is active requires stopping guidance first.
+
+This improves coverage but does not reproduce Google Maps' business directory or guarantee every Cork place. The extract covers city/suburbs, not all County Cork. Google Places is not enabled and no paid service was added.
+
+Refresh the OSM index manually from the repository root with `python scripts/build_cork_places.py`. No recurring job has been added. OSM data is © OpenStreetMap contributors and licensed ODbL-1.0; see `data/places/LICENSE.md`. Business corrections remain separately sourced in `cork-place-search.js`.
+
+Validation: `node --test tests/*.test.cjs`. Physical mobile search/pin-picker verification remains pending.

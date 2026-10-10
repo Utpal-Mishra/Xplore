@@ -55,18 +55,18 @@ function loadXploreScriptOnce(src,id,onload){
 }
 
 function setXploreReleaseVersion(){
-  IRELAND_NETWORK.version='Ireland v0.5.2';
+  IRELAND_NETWORK.version='Ireland v0.5.3';
   const versionBadge=document.querySelector('.header-meta .pill');
-  if(versionBadge)versionBadge.textContent='Ireland v0.5.2';
+  if(versionBadge)versionBadge.textContent='Ireland v0.5.3';
 }
 
 function loadXploreV050Modules(){
-  loadXploreScriptOnce('address-search.js?v=0.5.0','xplore-address-search-script',()=>{
+  loadXploreScriptOnce('address-search.js?v=0.5.3','xplore-address-search-script',()=>{
     loadXploreScriptOnce('transit-bootstrap.js?v=0.5.0','xplore-transit-bootstrap-script',()=>{
       loadXploreScriptOnce('transit.js?v=0.5.0','xplore-transit-script',()=>{
         loadXploreScriptOnce('transit-safety.js?v=0.5.0','xplore-transit-safety-script',()=>{
           loadXploreScriptOnce('route-intelligence.js?v=0.5.0','xplore-route-intelligence-script',()=>{
-            loadXploreScriptOnce('mobile-ui.js?v=0.5.0','xplore-mobile-ui-script',()=>{setXploreReleaseVersion();loadXploreScriptOnce('navigation-session.js?v=0.5.2','xplore-navigation-session-script');});
+            loadXploreScriptOnce('mobile-ui.js?v=0.5.0','xplore-mobile-ui-script',()=>{setXploreReleaseVersion();loadXploreScriptOnce('navigation-session.js?v=0.5.2','xplore-navigation-session-script',()=>loadXploreScriptOnce('cork-place-search.js?v=0.5.3','xplore-cork-places-script'));});
           });
         });
       });
