@@ -141,9 +141,17 @@ function restoreJourneySession(){
   }finally{journeySession.restoring=false;}
 }
 
+function syncNavigationDockLayout(){
+  const wrap=document.querySelector('.map-wrap');
+  const dock=wrap?.querySelector('.bottom-left');
+  if(!wrap||!dock)return;
+  const clearance=Math.max(0,Math.ceil(wrap.getBoundingClientRect().bottom-dock.getBoundingClientRect().top))+12;
+  wrap.style.setProperty('--navigation-dock-clearance',`${clearance}px`);
+}
+
 function installJourneySession(){
   const baseStart=startGuidance;
-  startGuidance=async function(){await baseStart();saveJourneySession();navigationFreshness();await acquireNavigationWakeLock();};
+  startGuidance=async function(){await baseStart();saveJourneySession();navigationFreshness();requestAnimationFrame(syncNavigationDockLayout);await acquireNavigationWakeLock();};
   const baseStop=stopGuidance;
   stopGuidance=function(){baseStop();releaseNavigationWakeLock();saveJourneySession();navigationFreshness();};
   const basePosition=handleLivePosition;
@@ -177,5 +185,12 @@ function installJourneySession(){
   window.addEventListener('online',resumeJourneySession);
   setInterval(()=>{if(document.visibilityState==='visible')navigationFreshness();},5000);
   restoreJourneySession();
+  const wrap=document.querySelector('.map-wrap'),dock=wrap?.querySelector('.bottom-left');
+  if(wrap&&dock&&typeof ResizeObserver!=='undefined'){
+    const observer=new ResizeObserver(()=>requestAnimationFrame(syncNavigationDockLayout));
+    observer.observe(dock);observer.observe(wrap);
+  }
+  window.addEventListener('resize',()=>requestAnimationFrame(syncNavigationDockLayout),{passive:true});
+  requestAnimationFrame(syncNavigationDockLayout);
 }
 installJourneySession();

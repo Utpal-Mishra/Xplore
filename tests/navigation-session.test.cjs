@@ -10,7 +10,7 @@ function setup(saved){
   const route={raw:{geometry:{coordinates:[[-8.47,51.89],[-8.46,51.90]]},distance:1500,duration:1200}};
   const ctx={console,Date,JSON,Number,Math,setInterval(){},requestAnimationFrame(fn){fn();},
     sessionStorage:{getItem:k=>store.get(k),setItem:(k,v)=>store.set(k,v),removeItem:k=>store.delete(k)},
-    document:{visibilityState:'visible',querySelectorAll:()=>[],addEventListener:(k,v)=>events[k]=v},
+    document:{visibilityState:'visible',querySelector:()=>null,querySelectorAll:()=>[],addEventListener:(k,v)=>events[k]=v},
     window:{addEventListener:(k,v)=>events[k]=v},
     navigator:{geolocation:{watchPosition:(ok,err)=>{calls.watch.push({ok,err});return calls.watch.length;},getCurrentPosition:(ok,err)=>calls.fix.push({ok,err}),clearWatch:id=>calls.clear.push(id)}},
     $:element,state:{map:{getCenter:()=>({lat:51.89,lng:-8.47}),getZoom:()=>17,setView(){},invalidateSize(){calls.resize++;}},liveTracking:true,livePosition:{lat:51.89,lon:-8.47,timestamp:Date.now()-60000},mode:'walking',preference:'Balanced',routes:[route],enrichedRoutes:[route],activeRoute:0,lastDestination:{lat:51.9,lon:-8.46},watchId:10},
@@ -80,4 +80,15 @@ test('a recent restored fix still waits for a new GPS reading',()=>{
   assert.match(element('navigationTrackingStatus').textContent,/Waiting for fresh GPS/);
   calls.watch[0].ok(position(Date.now()+1));
   assert.match(element('navigationTrackingStatus').textContent,/GPS updating/);
+});
+
+test('Recenter clearance follows dock growth instead of a fixed button offset',()=>{
+  const {ctx}=setup();let top=620;let clearance;
+  const dock={getBoundingClientRect:()=>({top})};
+  const wrap={querySelector:()=>dock,getBoundingClientRect:()=>({bottom:800}),style:{setProperty:(name,value)=>{clearance=parseInt(value,10);}}};
+  ctx.document.querySelector=()=>wrap;
+  ctx.syncNavigationDockLayout();
+  assert.ok(800-clearance<top);
+  top=570;ctx.syncNavigationDockLayout();
+  assert.equal(clearance,242);assert.ok(800-clearance<top);
 });

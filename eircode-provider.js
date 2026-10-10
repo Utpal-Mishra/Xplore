@@ -55,9 +55,9 @@ function loadXploreScriptOnce(src,id,onload){
 }
 
 function setXploreReleaseVersion(){
-  IRELAND_NETWORK.version='Ireland v0.5.1';
+  IRELAND_NETWORK.version='Ireland v0.5.2';
   const versionBadge=document.querySelector('.header-meta .pill');
-  if(versionBadge)versionBadge.textContent='Ireland v0.5.1';
+  if(versionBadge)versionBadge.textContent='Ireland v0.5.2';
 }
 
 function loadXploreV050Modules(){
@@ -66,7 +66,7 @@ function loadXploreV050Modules(){
       loadXploreScriptOnce('transit.js?v=0.5.0','xplore-transit-script',()=>{
         loadXploreScriptOnce('transit-safety.js?v=0.5.0','xplore-transit-safety-script',()=>{
           loadXploreScriptOnce('route-intelligence.js?v=0.5.0','xplore-route-intelligence-script',()=>{
-            loadXploreScriptOnce('mobile-ui.js?v=0.5.0','xplore-mobile-ui-script',()=>{setXploreReleaseVersion();loadXploreScriptOnce('navigation-session.js?v=0.5.1','xplore-navigation-session-script');});
+            loadXploreScriptOnce('mobile-ui.js?v=0.5.0','xplore-mobile-ui-script',()=>{setXploreReleaseVersion();loadXploreScriptOnce('navigation-session.js?v=0.5.2','xplore-navigation-session-script');});
           });
         });
       });

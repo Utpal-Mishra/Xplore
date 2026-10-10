@@ -31,3 +31,11 @@ Date: 2026-10-11. Scope: browser journey continuity. Owner: XPLORE maintainer.
 4. Stop guidance or edit destination; reload and verify the old journey does not return.
 5. Enable Keep screen on during guidance; verify wake lock while visible, release on stop, and reacquisition after unlock when supported.
 6. Manually lock the phone: browser screen-off GPS and lock-screen live notifications are unsupported in this release. Do not treat a saved fix as live tracking.
+
+## v0.5.2 — navigation dock layout (2026-10-11)
+
+- FEAT-NAV-002 / IMPLEMENTED: match tracking status and screen toggle typography to guidance controls, with readable wrapping and compact button sizing.
+- SYS-NAV-002 / ARCH-NAV-002 / IMPLEMENTED: measure the dock's top edge relative to the map and position Recenter/attribution 12 px above it. Observe dock/map resizing so multiline status, viewport changes and safe-area spacing retain clearance.
+- RISK-NAV-003 / MITIGATED: fixed bottom offsets overlapped the taller navigation dock. Use measured clearance with a CSS fallback. Owner: XPLORE maintainer.
+- QA-NAV-002: existing navigation regression tests and syntax checks; dock clearance checked at multiple simulated heights. Physical mobile layout verification pending.
+- REL-NAV-002: bump session loader, stylesheet and visible version to v0.5.2. No new dependency or external data integration.
