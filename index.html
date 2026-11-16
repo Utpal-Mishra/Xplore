@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="description" content="XPLORE — context-aware human-centred navigation pilot across Ireland.">
-  <meta name="theme-color" content="#07110d">
+  <meta name="theme-color" content="#0b1422">
   <title>XPLORE — Ireland Real-World Pilot</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,8 +17,8 @@
   <link rel="stylesheet" href="mobile.css?v=0.4.6">
   <link rel="stylesheet" href="desktop-polish.css?v=4">
   <link rel="stylesheet" href="cork-place-search.css?v=0.5.3">
-  <link rel="stylesheet" href="ui-business.css?v=0.5.4">
   <link rel="stylesheet" href="brand-theme.css?v=0.5.4">
+  <link rel="stylesheet" href="ui-business.css?v=0.5.5">
 </head>
 <body>
 <header class="app-header">
@@ -49,42 +49,16 @@
         <g class="workflow-node" data-workflow-node="3" transform="translate(288 36)"><circle class="workflow-node-halo" r="13"/><circle class="workflow-node-core" r="4"/></g>
         <circle class="workflow-packet" data-workflow-packet cx="24" cy="36" r="4"/>
       </svg>
-      <div class="workflow-steps" aria-hidden="true">
-        <span class="workflow-step is-active" data-workflow-step="0"><strong>Data</strong></span>
-        <span class="workflow-step" data-workflow-step="1"><strong>Workflow</strong></span>
-        <span class="workflow-step" data-workflow-step="2"><strong>Automation</strong></span>
-        <span class="workflow-step" data-workflow-step="3"><strong>Reporting</strong></span>
+      <div class="workflow-steps" role="group" aria-label="Explore processing stages">
+        <button class="workflow-step is-active" data-workflow-step="0" type="button" aria-pressed="true"><strong>Data</strong></button>
+        <button class="workflow-step" data-workflow-step="1" type="button" aria-pressed="false"><strong>Workflow</strong></button>
+        <button class="workflow-step" data-workflow-step="2" type="button" aria-pressed="false"><strong>Automation</strong></button>
+        <button class="workflow-step" data-workflow-step="3" type="button" aria-pressed="false"><strong>Reporting</strong></button>
       </div>
-      <p class="workflow-caption"><strong>Place and route context</strong> → structured checks → automated ranking → explainable route reporting.</p>
+      <div class="workflow-progress" aria-hidden="true"><span class="workflow-progress-fill" data-workflow-progress></span></div>
+      <p class="workflow-caption" id="workflowCaption"><strong data-workflow-caption-title>Data sources</strong><span data-workflow-caption-copy>Route geometry, places and contextual observations form the inputs.</span></p>
     </section>
 
-    <section class="decision-motion" id="decisionMotion" aria-label="Concept view of journey factors combining into route intelligence">
-      <div class="decision-motion-head">
-        <span class="decision-motion-kicker">Decision intelligence</span>
-        <span class="decision-motion-state" id="decisionMotionState">Ready for inputs</span>
-      </div>
-      <svg viewBox="0 0 320 105" aria-hidden="true" focusable="false">
-        <defs><linearGradient id="xploreSignalGradient" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#5b9fb2"/><stop offset="65%" stop-color="#82b6e2"/><stop offset="100%" stop-color="#9be3dd"/></linearGradient></defs>
-        <path class="signal-track" data-signal-path d="M20 17 C107 17 129 53 289 53"/>
-        <path class="signal-track" data-signal-path d="M20 40 C107 40 145 53 289 53"/>
-        <path class="signal-track" data-signal-path d="M20 66 C107 66 145 53 289 53"/>
-        <path class="signal-track" data-signal-path d="M20 89 C107 89 129 53 289 53"/>
-        <circle class="signal-source" cx="20" cy="17" r="5"/>
-        <circle class="signal-source" cx="20" cy="40" r="5"/>
-        <circle class="signal-source" cx="20" cy="66" r="5"/>
-        <circle class="signal-source" cx="20" cy="89" r="5"/>
-        <circle class="signal-particle" cx="22" cy="17" r="3.2"/>
-        <circle class="signal-particle" cx="22" cy="40" r="3.2"/>
-        <circle class="signal-particle" cx="22" cy="66" r="3.2"/>
-        <circle class="signal-particle" cx="22" cy="89" r="3.2"/>
-        <circle class="signal-destination-ring" cx="289" cy="53" r="15"/>
-        <circle class="signal-destination" cx="289" cy="53" r="5.5"/>
-      </svg>
-      <div class="decision-motion-foot">
-        <span>Time · Carbon · Activity · Confidence</span>
-        <strong>Concept view</strong>
-      </div>
-    </section>
 
     <div class="card route-form">
       <div class="field"><label for="from">Start</label><input id="from" placeholder="Enter start location" autocomplete="off" enterkeyhint="search" aria-label="Enter start location"></div>
@@ -127,6 +101,34 @@
       <div class="context"><span>Network</span><strong id="contextNetwork">Ireland-wide</strong></div>
       <div class="context"><span>Freshness</span><strong id="contextFreshness">Route pending</strong></div>
     </div>
+
+    <section class="decision-motion" id="decisionMotion" aria-label="Concept view of journey factors combining into route intelligence">
+      <div class="decision-motion-head">
+        <span class="decision-motion-kicker">Decision intelligence</span>
+        <span class="decision-motion-state" id="decisionMotionState">Ready for inputs</span>
+      </div>
+      <svg viewBox="0 0 320 105" aria-hidden="true" focusable="false">
+        <defs><linearGradient id="xploreSignalGradient" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#5b9fb2"/><stop offset="65%" stop-color="#82b6e2"/><stop offset="100%" stop-color="#9be3dd"/></linearGradient></defs>
+        <path class="signal-track" data-signal-path d="M20 17 C107 17 129 53 289 53"/>
+        <path class="signal-track" data-signal-path d="M20 40 C107 40 145 53 289 53"/>
+        <path class="signal-track" data-signal-path d="M20 66 C107 66 145 53 289 53"/>
+        <path class="signal-track" data-signal-path d="M20 89 C107 89 129 53 289 53"/>
+        <circle class="signal-source" cx="20" cy="17" r="5"/>
+        <circle class="signal-source" cx="20" cy="40" r="5"/>
+        <circle class="signal-source" cx="20" cy="66" r="5"/>
+        <circle class="signal-source" cx="20" cy="89" r="5"/>
+        <circle class="signal-particle" cx="22" cy="17" r="3.2"/>
+        <circle class="signal-particle" cx="22" cy="40" r="3.2"/>
+        <circle class="signal-particle" cx="22" cy="66" r="3.2"/>
+        <circle class="signal-particle" cx="22" cy="89" r="3.2"/>
+        <circle class="signal-destination-ring" cx="289" cy="53" r="15"/>
+        <circle class="signal-destination" cx="289" cy="53" r="5.5"/>
+      </svg>
+      <div class="decision-motion-foot">
+        <span>Time · Carbon · Activity · Confidence</span>
+        <strong>Concept view</strong>
+      </div>
+    </section>
   </aside>
 
   <section class="map-wrap">
@@ -220,7 +222,7 @@
 <script src="navigation-map.js?v=0.4.6"></script>
 <script src="ireland-network.js?v=0.4.6"></script>
 <script src="eircode-provider.js?v=0.5.3"></script>
-<script src="ui-workflow.js?v=0.5.4"></script>
+<script src="ui-workflow.js?v=0.5.5"></script>
 <script src="brand-motion.js?v=0.5.4" defer></script>
 </body>
 </html>
