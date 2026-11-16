@@ -61,3 +61,9 @@ This improves coverage but does not reproduce Google Maps' business directory or
 Refresh the OSM index manually from the repository root with `python scripts/build_cork_places.py`. No recurring job has been added. OSM data is © OpenStreetMap contributors and licensed ODbL-1.0; see `data/places/LICENSE.md`. Business corrections remain separately sourced in `cork-place-search.js`.
 
 Validation: `node --test tests/*.test.cjs`. Physical mobile search/pin-picker verification remains pending.
+
+## UI visual refresh (2026-11-16)
+
+Professional navy/graphite gradients and restrained teal/ice-blue accents now style the shell, panels, cards, controls and score surfaces. The left panel has a small SVG/JavaScript conceptual data-to-decision animation, representing route evaluation factors; it is **not** a live data feed. It reacts only to whether the existing route score is displayed. Motion respects reduced-motion preferences, browser visibility, viewport intersection and Save-Data. No new third-party library, location access or analytics tracking was added. Map/routing/navigation modules were not edited.
+
+Visual audit trail: [docs/logs/2026-11-16-ui-visual-refresh.md](docs/logs/2026-11-16-ui-visual-refresh.md). Real-device acceptance testing remains pending.
