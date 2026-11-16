@@ -1,4 +1,4 @@
-/* XPLORE v0.5.4 | enterprise visual system
+/* XPLORE v0.5.5 | enterprise visual system
    Loaded after layout/navigation styles: appearance-only, no map sizing changes. */
 :root{
   color-scheme:dark;
@@ -201,4 +201,60 @@ html,body{background:var(--bg);color:var(--ink)}
 @media(prefers-reduced-motion:reduce){
  .workflow-motion::after{animation:none}
  .workflow-motion *, .workflow-motion *::before,.workflow-motion *::after{transition:none!important}
+}
+
+/* v0.5.5: semantic workflow controls. This stays inside the context pane, never on the map. */
+.workflow-motion{
+  background:
+    radial-gradient(circle at var(--spot-x) var(--spot-y),rgba(88,164,185,.17),transparent 41%),
+    linear-gradient(125deg,#1b3047 0%,#152a3d 53%,#183745 100%);
+  border-color:rgba(124,176,197,.32);
+}
+.workflow-steps{gap:5px;margin-top:-3px;align-items:stretch}
+.workflow-step{
+  appearance:none;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:0;min-height:35px;padding:5px 2px 4px;
+  border:1px solid transparent;border-radius:8px;cursor:pointer;
+  background:transparent;color:#adc2d2;
+  font-family:"Inter Tight",sans-serif;
+  transition:background-color .2s ease,border-color .2s ease,color .2s ease;
+}
+.workflow-step strong{font-size:9px;font-weight:650;line-height:1.25}
+.workflow-step:hover{background:rgba(69,119,146,.19);border-color:rgba(117,181,199,.28)}
+.workflow-step.is-active{
+  background:rgba(40,117,135,.22);color:#ddfbf8;
+  border-color:rgba(112,214,206,.4);
+}
+.workflow-step.is-active strong{color:#ddfbf8}
+.workflow-step.is-active::after{width:14px;margin-top:4px;background:#86e4db}
+.workflow-step:focus-visible,.workflow-motion-toggle:focus-visible{
+  outline:2px solid #a5e9e4;outline-offset:2px;
+}
+.workflow-progress{
+  height:2px;overflow:hidden;margin:6px 2px 0;border-radius:99px;
+  background:rgba(114,172,188,.2);
+}
+.workflow-progress-fill{
+  display:block;width:100%;height:100%;transform:scaleX(0);transform-origin:left center;
+  background:linear-gradient(90deg,#4e93b9,#7fdfd8);
+}
+.workflow-caption{
+  min-height:54px;display:flex;flex-direction:column;gap:3px;
+  margin:10px 0 0;padding:9px 2px 0;
+  border-top:1px solid rgba(115,158,178,.18);
+  color:#b8cbd8;
+}
+.workflow-caption strong{font-size:10px;letter-spacing:.01em;color:#e2f1f6}
+.workflow-caption span{display:block;font-size:10px;line-height:1.45;color:#b6ccd9}
+.workflow-motion-toggle:disabled{opacity:.65;cursor:not-allowed}
+@media(max-width:760px){
+  .workflow-motion{margin-top:12px;padding:11px 12px}
+  .workflow-svg{height:43px}
+  .workflow-steps{gap:3px}
+  .workflow-step{min-height:37px}
+  .workflow-caption{min-height:48px}
+}
+@media(prefers-reduced-motion:reduce){
+  .workflow-motion::after{animation:none!important}
+  .workflow-step{transition:none!important}
 }
