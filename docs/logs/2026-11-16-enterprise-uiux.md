@@ -86,3 +86,28 @@
 - **Checks:** Style file fetch; stylesheet position; branch-specific change verified; original map and navigation sources unchanged.
 - **Pending:** Run `node --test tests/*.test.cjs`; desktop/mobile visual comparisons; real navigation overlap and contrast tests.
 - **Status:** Static file checks only; do not mark browser or device QA as passed.
+
+---
+
+## Revision 02 — Interactive workflow and gradient precedence (2026-11-16)
+
+**Change ID:** XPL-UIUX-20261116-02  
+**Status:** IMPLEMENTED IN BRANCH; scripted interaction smoke checks passed; browser/device verification pending.
+
+- **Business Learning — XPL-BIZ-20261116-02:** Keep the interface professional and put core journey controls ahead of decorative secondary information.
+- **System — XPL-SYS-20261116-02:** Load `brand-theme.css` before `ui-business.css` so the new enterprise palette is visually authoritative.
+- **Architecture — XPL-ARC-20261116-02:** Keep all illustrative motion inside the left pane; leave geolocation, map viewports, routing adapters and scoring code unchanged.
+- **Automation — XPL-AUTO-20261116-02:** Add four clickable animation stages, requestAnimationFrame pause/resume, visibility and IntersectionObserver safeguards, motion/data-saving preference handling.
+- **Recommendation — XPL-REC-20261116-02:** Maintain a compact route-first layout and keep the conceptual pipeline clearly distinct from live route activity.
+- **Experiment — XPL-EXPERIMENT-20261116-02:** Compare guided stage interaction against the old purely looping pipeline; qualitative UX hypothesis only, no user experiment performed.
+- **External Evidence — XPL-EVD-20261116-02:** Source is the project owner's UI request and checked repository files; no external claims or design-study results.
+- **Risk & Assumption — XPL-RISK-20261116-02:** Medium likelihood/medium impact of unexpected CSS cascade effects on existing control styles. Mitigation: load order fix, isolated workflow selectors, branch-only changes, visual regression review. Owner: maintainer. Status: open pending device verification.
+- **Data & Integration — XPL-DATA-20261116-02:** No new external calls, telemetry, geolocation access or backend data flows in the animation.
+- **Product / Feature — XPL-FEAT-20261116-02:** Four exploratory workflow stages with descriptions and signal progress; decision intelligence visual repositioned below the journey form.
+- **Merchant & Fulfilment — XPL-MERCH-20261116-02:** Not applicable.
+- **Expansion — XPL-EXPAND-20261116-02:** Option for a single consolidated animation component after usability review; not committed or implemented.
+- **Decision — XPL-DEC-20261116-02:** Continue development on `uiux/enterprise-gradient-2026-11-16` without changing `main` for this revision.
+- **Change / Release — XPL-REL-20261116-02:** Revised `index.html`, `ui-business.css`, `ui-workflow.js` and `tests/ui-design.test.cjs`.
+- **Validation / QA — XPL-QA-20261116-02:** In-memory JS smoke: initial rendering, stage click, accessible pressed state, replay, hidden-tab cancellation and absence of location/network calls passed. Automated Node suite was updated but not executed in a checked-out repository; full browser/mobile QA remains pending.
+
+**Privacy note:** This repository has public visibility. Only implementation-level UI details are recorded here; avoid storing private strategy, credentials or restricted project architecture in public logs.
