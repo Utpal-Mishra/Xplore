@@ -1,38 +1,57 @@
-/* XPLORE v0.5.4: illustrative data-to-decision flow animation.
-   No analytics, network, geolocation, routing or background timers. */
+/* XPLORE UIUX 0.5.5
+   Conceptual journey data -> workflow -> automation -> reporting.
+   Deliberately separate from routing, geolocation, data adapters and reporting APIs. */
 (()=>{
   "use strict";
   const panel=document.getElementById("workflowMotion");
   if(!panel)return;
-  const track=panel.querySelector("[data-workflow-track]");
   const packet=panel.querySelector("[data-workflow-packet]");
+  const progressBar=panel.querySelector("[data-workflow-progress]");
   const nodes=[...panel.querySelectorAll("[data-workflow-node]")];
-  const labels=[...panel.querySelectorAll("[data-workflow-step]")];
+  const steps=[...panel.querySelectorAll("[data-workflow-step]")];
   const toggle=panel.querySelector("[data-motion-toggle]");
-  if(!track||!packet||nodes.length!==4||labels.length!==4||!toggle)return;
-  const reduced=window.matchMedia?window.matchMedia("(prefers-reduced-motion: reduce)"):null;
-  let paused=Boolean(reduced&&reduced.matches);
-  let visible=true,frame=null,lastTime=null,progress=0,activeStage=-1;
-  const duration=11000;
-  const positions=[24,112,200,288];
+  const captionTitle=panel.querySelector("[data-workflow-caption-title]");
+  const captionCopy=panel.querySelector("[data-workflow-caption-copy]");
+  if(!packet||!progressBar||nodes.length!==4||steps.length!==4||!toggle||!captionTitle||!captionCopy)return;
+
+  // Illustrative concepts, not claims about actual jobs executing in this session.
+  const stages=[
+    ["Data sources","Route geometry, places and contextual observations form the inputs."],
+    ["Structured workflow","Normalize route alternatives, quality checks and freshness signals."],
+    ["Automation","Apply preference-weighted ranking and retain confidence separately."],
+    ["Reporting","Explain the route score, trade-offs and journey impact clearly."]
+  ];
+  const media=window.matchMedia?window.matchMedia("(prefers-reduced-motion: reduce)"):null;
+  const connection=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+  const blocked=()=>Boolean(media&&media.matches)||Boolean(connection&&connection.saveData);
+  let paused=false,visible=true,frame=null,lastTime=null,progress=0,activeStage=-1;
+  const duration=12000,from=24,to=288;
+
   function activate(stage){
     if(stage===activeStage)return;
     activeStage=stage;
     nodes.forEach((node,i)=>node.classList.toggle("is-active",i===stage));
-    labels.forEach((label,i)=>label.classList.toggle("is-active",i===stage));
+    steps.forEach((step,i)=>{
+      const selected=i===stage;
+      step.classList.toggle("is-active",selected);
+      step.setAttribute("aria-pressed",String(selected));
+    });
+    captionTitle.textContent=stages[stage][0];
+    captionCopy.textContent=stages[stage][1];
   }
   function render(){
-    const x=positions[0]+progress*(positions[3]-positions[0]);
-    packet.setAttribute("cx",x.toFixed(2));
-    packet.setAttribute("cy","36");
-    activate(Math.min(3,Math.floor(progress*4)));
+    packet.setAttribute("cx",(from+progress*(to-from)).toFixed(2));
+    progressBar.style.transform="scaleX("+progress.toFixed(4)+")";
+    activate(Math.min(3,Math.round(progress*3)));
   }
   function updateToggle(){
-    toggle.textContent=paused?"Play motion":"Pause motion";
-    toggle.setAttribute("aria-label",paused?"Play workflow animation":"Pause workflow animation");
+    const unavailable=blocked();
+    toggle.disabled=unavailable;
+    toggle.textContent=unavailable?"Motion off":paused?"Play motion":"Pause motion";
+    toggle.setAttribute("aria-label",unavailable?"Animation disabled by motion or data-saving preference":paused?"Play workflow animation":"Pause workflow animation");
   }
   function shouldAnimate(){
-    return !paused&&visible&&document.visibilityState!=="hidden";
+    return !paused&&!blocked()&&visible&&document.visibilityState!=="hidden";
   }
   function stop(){
     if(frame!==null){window.cancelAnimationFrame(frame);frame=null;}
@@ -41,41 +60,59 @@
   function tick(now){
     frame=null;
     if(!shouldAnimate()){stop();return;}
-    if(lastTime!==null)progress=(progress+Math.min(70,now-lastTime)/duration)%1;
+    if(lastTime!==null)progress=(progress+Math.max(0,Math.min(70,now-lastTime))/duration)%1;
     lastTime=now;
     render();
     frame=window.requestAnimationFrame(tick);
   }
   function sync(){
+    updateToggle();
     if(!shouldAnimate()){stop();return;}
     if(frame===null)frame=window.requestAnimationFrame(tick);
   }
   toggle.addEventListener("click",()=>{
-    paused=!paused;updateToggle();sync();
+    if(blocked())return;
+    paused=!paused;
+    sync();
+  });
+  steps.forEach((step,index)=>{
+    step.addEventListener("click",()=>{
+      paused=true;
+      progress=index/3;
+      stop();
+      render();
+      updateToggle();
+    });
   });
   document.addEventListener("visibilitychange",sync);
   if("IntersectionObserver" in window){
-    const observer=new IntersectionObserver((entries)=>{
-      visible=entries[0]?entries[0].isIntersecting:true;sync();
-    },{threshold:0.05});
+    const observer=new IntersectionObserver(entries=>{
+      visible=entries[0]?entries[0].isIntersecting:true;
+      sync();
+    },{threshold:.05});
     observer.observe(panel);
   }
-  if(reduced){
-    const onPreferenceChange=(event)=>{
-      if(event.matches)paused=true;
-      updateToggle();sync();
-    };
-    if(reduced.addEventListener)reduced.addEventListener("change",onPreferenceChange);
-    else if(reduced.addListener)reduced.addListener(onPreferenceChange);
+  if(media){
+    if(media.addEventListener)media.addEventListener("change",sync);
+    else if(media.addListener)media.addListener(sync);
   }
+  if(connection&&connection.addEventListener)connection.addEventListener("change",sync);
   if(window.matchMedia&&window.matchMedia("(pointer:fine)").matches){
-    panel.addEventListener("pointermove",(event)=>{
+    panel.addEventListener("pointermove",event=>{
       const r=panel.getBoundingClientRect();
-      panel.style.setProperty("--spot-x",((event.clientX-r.left)/r.width*100).toFixed(1)+"%");
-      panel.style.setProperty("--spot-y",((event.clientY-r.top)/r.height*100).toFixed(1)+"%");
+      if(!r.width||!r.height)return;
+      const x=Math.max(0,Math.min(100,(event.clientX-r.left)/r.width*100));
+      const y=Math.max(0,Math.min(100,(event.clientY-r.top)/r.height*100));
+      panel.style.setProperty("--spot-x",x.toFixed(1)+"%");
+      panel.style.setProperty("--spot-y",y.toFixed(1)+"%");
     },{passive:true});
+    panel.addEventListener("pointerleave",()=>{
+      panel.style.setProperty("--spot-x","16%");
+      panel.style.setProperty("--spot-y","12%");
+    });
   }
   window.addEventListener("pagehide",stop);
   window.addEventListener("pageshow",sync);
-  render();updateToggle();sync();
+  render();
+  sync();
 })();
