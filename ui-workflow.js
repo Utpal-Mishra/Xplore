@@ -76,5 +76,6 @@
     },{passive:true});
   }
   window.addEventListener("pagehide",stop);
+  window.addEventListener("pageshow",sync);
   render();updateToggle();sync();
 })();
