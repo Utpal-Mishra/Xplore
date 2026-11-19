@@ -1,47 +1,177 @@
-# XPLORE Transit v1
+# XPLORE Transit — v0.5 Schedule Planner + v0.7 Live Mobility
 
-XPLORE v0.5 introduces scheduled public-transport journey planning for Ireland.
+XPLORE's transit layer separates **journey planning** from **realtime evidence**.
+
+Scheduled public transport is the universal baseline. v0.7 enriches only those scheduled legs that can be proven to correspond to the current NTA realtime schedule generation.
 
 ## Data sources
 
-- **NTA GTFS (official, CC BY 4.0):** daily national schedules, stops, routes and trips.
-- **Irish Rail realtime:** best-effort live departure context for selected rail itineraries.
-- **NTA GTFS-Realtime:** architecturally planned but not called from the static GitHub Pages client because production access requires API tokens. Those tokens must not be embedded in browser JavaScript.
+### Broad scheduled planning
 
-## Build pipeline
+`GTFS_All.zip`
 
-`.github/workflows/update-transit-data.yml` runs daily and downloads the official NTA `GTFS_All.zip` feed. `scripts/build_transit_data.py` filters the national feed to the current Europe/Dublin service date and publishes compact browser data under `data/transit/`.
+Used for Ireland-wide stops, routes/trips, service calendars, scheduled stop times, and direct/one-transfer candidate generation.
 
-The browser therefore does not need to download or parse the full national GTFS archive.
+### Realtime compatibility
 
-## Transit planner
+`GTFS_Realtime.zip`
 
-Transit v1:
+Used only to prove which broad scheduled trips are safe to join to the current NTA GTFS-Realtime v2 generation.
 
-1. Uses XPLORE's confirmed Start and Destination coordinates.
-2. Finds nearby scheduled public-transport stops.
-3. Searches same-day direct itineraries.
-4. Searches one-transfer itineraries.
-5. Includes estimated access and egress walking.
-6. Scores candidates using door-to-door time, indicative carbon, active walking, transfer comfort and schedule confidence.
-7. Draws the selected stop sequence on the map.
-8. Queries Irish Rail realtime when a selected itinerary contains a rail leg and the browser can access the endpoint.
+A trip is eligible only when both conditions hold:
 
-## Current limitations
+1. exact `trip_id` match
+2. exact complete ordered `stop_id` sequence match
 
-- Bus realtime is not yet included in route scoring.
-- NTA GTFS-Realtime must be proxied through an XPLORE-controlled backend so credentials are not exposed in the browser.
-- Transit v1 supports direct and one-transfer journeys, not an unrestricted network-wide RAPTOR/CSA implementation.
-- Map lines follow the scheduled stop sequence, not official GTFS shape geometry yet.
-- Fare calculation and Leap fare caps are not included yet.
-- Transit turn-by-turn/stop-by-stop guidance is a later iteration.
+No fuzzy live join by route label, headsign, town or approximate time is permitted.
 
-## Next transit iteration
+### NTA GTFS-Realtime v2
 
-1. Server-side NTA GTFS-Realtime ingestion with 60-second compliant caching.
-2. Vehicle positions, trip updates and service alerts.
-3. GTFS shapes for exact bus/train geometry.
-4. Multi-transfer RAPTOR/CSA journey planning.
-5. Fare and Leap-card comparison.
-6. Disruption-aware rerouting and missed-connection recovery.
-7. Transit accessibility and step-free interchange data.
+The server-side snapshot can provide:
+- trip updates / delays
+- schedule relationships including cancellations
+- vehicle positions
+- service alerts
+
+The NTA API credential remains server-side.
+
+### Irish Rail realtime
+
+The public Irish Rail realtime API remains a rail fallback/cross-check for selected rail itineraries.
+
+## Daily schedule pipeline
+
+`.github/workflows/update-transit-data.yml` runs daily.
+
+`scripts/build_transit_data.py`:
+
+1. downloads `GTFS_All.zip`
+2. filters to the current Europe/Dublin service date
+3. publishes compact stops/trips for browser planning
+4. downloads the current realtime-compatible static GTFS
+5. builds `realtime_eligible.json` using the strict join
+6. publishes compatibility counts in `manifest.json`
+
+Outputs:
+
+- `data/transit/manifest.json`
+- `data/transit/stops.json`
+- `data/transit/trips.json`
+- `data/transit/realtime_eligible.json`
+
+If the realtime-compatible static feed is unavailable, scheduled planning still publishes; realtime eligibility becomes empty.
+
+## Scheduled planner
+
+The browser:
+
+1. uses confirmed Start/Destination coordinates
+2. finds nearby stops
+3. searches direct itineraries
+4. searches one-transfer itineraries
+5. includes estimated access/egress walking
+6. calculates time/carbon/activity/transfer/schedule components
+7. produces an explainable XPLORE score
+8. draws stop sequence and walking connectors
+
+## v0.7 realtime snapshot
+
+`.github/workflows/refresh-live-mobility.yml` is designed for a five-minute refresh.
+
+When secret `NTA_GTFS_RT_API_KEY` is configured, it:
+
+1. checks out current `main`
+2. fetches one combined NTA GTFS-Realtime v2 feed
+3. filters entities to today's strict-compatible trips
+4. validates source freshness
+5. writes browser-safe compact JSON
+6. deploys the site plus snapshot to GitHub Pages
+
+Outputs:
+
+- `data/realtime/manifest.json`
+- `data/realtime/feed.json`
+
+The public browser never receives the NTA API key.
+
+## Realtime decision logic
+
+Fresh exact-match live evidence can update:
+
+- boarding delay
+- alighting delay
+- effective departure/arrival
+- effective total journey duration
+- transit reliability
+- transfer margin
+- cancellation state
+- route-specific alert severity
+- candidate ranking
+
+For a one-transfer journey:
+
+```text
+live gap =
+  (next scheduled departure + next departure delay)
+  -
+  (first scheduled arrival + first arrival delay)
+```
+
+A negative gap means the connection is already infeasible under the current evidence.
+
+## Freshness
+
+Client thresholds:
+
+- <= 7 min: Live
+- >7 to <=12 min: Aging but usable with reliability penalty
+- >12 min: Stale; schedule only
+
+The snapshot builder also rejects source feeds older than 15 minutes.
+
+## Candidate labels
+
+Transit results can display:
+
+- **Scheduled** — no fresh exact live match
+- **Part-live** — only some legs have exact live data
+- **Live** — every transit leg has an exact live update
+- **Cancelled** — a relevant trip/stop relationship is cancelled/skipped
+
+These labels describe the evidence available to XPLORE, not a guarantee that the operator will perform exactly as predicted.
+
+## Vehicle positions
+
+A selected compatible trip can show its matched NTA vehicle position on the map.
+
+Vehicle position is informational and never replaces route geometry.
+
+## Alerts
+
+A route-specific alert is associated only through exact trip, route or relevant stop identifiers.
+
+Network-wide/unscoped alerts can be retained as feed evidence but are not used to penalise a particular candidate automatically.
+
+## Failure policy
+
+Scheduled data wins whenever realtime cannot be proven trustworthy.
+
+Fallback triggers include:
+- unconfigured key
+- refresh failure
+- stale snapshot
+- incompatible static generation
+- trip mismatch
+- stop-sequence mismatch
+- missing live update
+- malformed data
+
+## Remaining transit work
+
+- activate/validate the NTA production key
+- exact GTFS Shapes geometry
+- multi-transfer RAPTOR/CSA planning
+- fare/Leap comparison
+- stop-by-stop transit guidance
+- disruption-aware journey replanning
+- stronger station/vehicle accessibility evidence
