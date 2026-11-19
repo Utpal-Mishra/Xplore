@@ -1,0 +1,91 @@
+/* XPLORE green theme restoration — 2026-11-19.
+   Styles ONLY the two optional illustrative animations.
+   Base styles.css/navigation.css/mobile.css remain the original dark-green visual system.
+   No routing, geolocation, map or responsive-position overrides. */
+
+/* Data -> workflow -> automation -> reporting, a conceptual illustration. */
+.workflow-motion{
+  --spot-x:16%; --spot-y:12%;
+  position:relative;isolation:isolate;overflow:hidden;
+  margin-top:16px;padding:13px 14px 12px;border-radius:15px;
+  background:radial-gradient(circle at var(--spot-x) var(--spot-y),rgba(52,217,141,.13),transparent 42%),
+    linear-gradient(125deg,#122e20,#0b2116 55%,#112a1c);
+  border:1px solid rgba(82,217,141,.23);
+  box-shadow:0 12px 28px rgba(0,11,5,.19);
+}
+.workflow-motion::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(110deg,transparent 15%,rgba(119,238,174,.05) 45%,transparent 70%);
+  transform:translateX(-120%);animation:xp-green-sheen 13s ease-in-out infinite;
+}
+@keyframes xp-green-sheen{
+  0%,55%,100%{transform:translateX(-120%)}
+  75%{transform:translateX(120%)}
+}
+.workflow-topline{display:flex;align-items:center;justify-content:space-between;gap:9px;position:relative;z-index:1}
+.workflow-kicker{font:700 10px "Inter Tight",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#d1f7df}
+.workflow-controls{display:flex;align-items:center;gap:7px}
+.workflow-preview{font-size:8px;font-weight:650;letter-spacing:.055em;text-transform:uppercase;color:#87b69c}
+.workflow-motion-toggle{
+  padding:5px 8px;min-height:26px;border-radius:7px;
+  background:rgba(14,47,29,.94);border:1px solid #386e4b;color:#c5f3d4;
+  font:600 9px "Inter",sans-serif;
+}
+.workflow-motion-toggle:focus-visible{outline:2px solid #8df2b5;outline-offset:2px}
+.workflow-motion-toggle:hover{border-color:#72e6a5;background:#1a5031}
+.workflow-svg{width:100%;height:55px;display:block;overflow:visible;margin:4px 0 0}
+.workflow-rail{fill:none;stroke:rgba(102,176,126,.32);stroke-width:2}
+.workflow-rail-glow{fill:none;stroke:url(#workflowLineGradient);stroke-width:2;stroke-dasharray:3 7;opacity:.85}
+.workflow-node-halo{fill:rgba(40,118,69,.22);stroke:rgba(92,184,123,.46);stroke-width:1.5}
+.workflow-node-core{fill:#94e6ac;opacity:.84}
+.workflow-node.is-active .workflow-node-halo{fill:rgba(50,156,82,.23);stroke:#71e79f;stroke-width:2.4}
+.workflow-node.is-active .workflow-node-core{fill:#e0ffeb}
+.workflow-packet{fill:#c9ffdf;stroke:#49b876;stroke-width:2;filter:drop-shadow(0 0 5px rgba(104,225,144,.6))}
+.workflow-steps{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}
+.workflow-step{text-align:center;min-width:0;color:#accbb9}
+.workflow-step strong{display:block;font:650 9px "Inter Tight",sans-serif;line-height:1.2;white-space:normal}
+.workflow-step.is-active strong{color:#d9ffea}
+.workflow-step.is-active::after{content:"";display:block;width:12px;height:2px;margin:5px auto 0;border-radius:99px;background:#6ee6a0}
+.workflow-caption{position:relative;z-index:1;margin:10px 0 0;color:#afcdbb;font-size:10px;line-height:1.45}
+.workflow-caption strong{color:#d9f3e1;font-weight:650}
+
+/* Concept view of factors converging into a route decision. */
+.decision-motion{
+  position:relative;isolation:isolate;overflow:hidden;
+  margin:16px 0 15px;padding:12px 13px 10px;
+  border:1px solid #315341;border-radius:14px;
+  background:linear-gradient(127deg,rgba(18,57,33,.88),rgba(13,38,25,.94) 60%,rgba(16,45,29,.94));
+  box-shadow:inset 0 1px 0 rgba(199,255,217,.06),0 9px 26px rgba(0,12,5,.17);
+}
+.decision-motion::before{
+  content:"";position:absolute;width:210px;height:150px;right:-100px;top:-100px;
+  border-radius:50%;background:radial-gradient(circle,rgba(83,203,123,.13),transparent 70%);
+  pointer-events:none;z-index:-1;
+}
+.decision-motion-head,.decision-motion-foot{display:flex;justify-content:space-between;align-items:center;gap:9px}
+.decision-motion-kicker{color:#a3e4b8;font-size:9px;letter-spacing:.12em;font-weight:750;text-transform:uppercase}
+.decision-motion-state{display:flex;align-items:center;gap:6px;font-size:9px;color:#b2d1be;white-space:nowrap}
+.decision-motion-state::before{content:"";display:block;width:6px;height:6px;border-radius:50%;background:#73cb92;box-shadow:0 0 0 3px rgba(82,217,141,.1)}
+.decision-motion[data-scored="true"] .decision-motion-state::before{background:#a5efb7;box-shadow:0 0 0 4px rgba(82,217,141,.14)}
+.decision-motion svg{display:block;width:100%;height:92px;margin:1px auto 0;overflow:visible}
+.decision-motion .signal-track{fill:none;stroke:url(#xploreSignalGradient);stroke-width:1.45;stroke-opacity:.58}
+.decision-motion .signal-source{fill:#80c99b;stroke:#183d2a;stroke-width:3}
+.decision-motion .signal-particle{fill:#cdffdd;stroke:#2c7948;stroke-width:1.1;filter:drop-shadow(0 0 3px rgba(123,219,152,.35))}
+.decision-motion .signal-destination-ring{fill:#17442b;stroke:#79d39c;stroke-width:1.4}
+.decision-motion .signal-destination{fill:#b7f6c9}
+.decision-motion-foot{color:#91b59f;font-size:9px;letter-spacing:.01em}
+.decision-motion-foot strong{color:#c9f0d8;font-weight:650}
+@media(max-width:760px){
+  .decision-motion{margin:13px 0;padding:10px 12px 9px}
+  .decision-motion svg{height:76px}
+  .decision-motion-foot{font-size:8px}
+}
+@media(max-width:390px){
+  .workflow-motion{padding:12px}
+  .workflow-step strong{font-size:8px}
+  .workflow-preview{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .workflow-motion::after{animation:none!important}
+  .workflow-motion *, .workflow-motion *::before,.workflow-motion *::after{transition:none!important}
+}
