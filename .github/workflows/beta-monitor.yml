@@ -1,0 +1,44 @@
+name: XPLORE Beta production monitor
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_run:
+    workflows: ['Deploy XPLORE to GitHub Pages']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: xplore-beta-monitor
+  cancel-in-progress: true
+
+jobs:
+  public-smoke:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Monitor public Beta
+        run: python scripts/beta_monitor.py --base https://utpal-mishra.github.io/Xplore/
+
+      - name: Upload monitor report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xplore-beta-monitor-report
+          path: beta-monitor-report.json
+          retention-days: 7
+          if-no-files-found: warn
