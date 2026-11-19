@@ -30,3 +30,6 @@ jobs:
 
       - name: Check transit builder syntax
         run: python -m py_compile scripts/build_transit_data.py scripts/build_realtime_snapshot.py
+
+      - name: Run transit compatibility tests
+        run: python -m unittest discover -s tests -p 'test_*.py'
