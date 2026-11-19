@@ -1,0 +1,60 @@
+name: XPLORE Beta bug
+description: Report a non-sensitive software or data-quality issue found while testing XPLORE Beta.
+title: "[Beta] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for testing XPLORE.
+        
+        **Privacy:** this is a public GitHub issue. Do not include your home/work address, exact GPS coordinates, Eircode, name, email, personal travel history, or other identifying journey details.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Search / address confirmation
+        - Driving / cycling / walking route
+        - Decision Intelligence
+        - Live navigation
+        - Public transport
+        - Map / GTFS geometry
+        - Fare reference
+        - Accessibility evidence
+        - Privacy / tester controls
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device class
+      options:
+        - Desktop browser
+        - Android browser
+        - iPhone / iPad browser
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: What happened?
+      description: Describe the behaviour without including an exact personal location.
+      placeholder: "Example: Transit route line used stop-to-stop fallback instead of the GTFS shape."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I have removed exact addresses, GPS coordinates, Eircodes and personal identifying details from this public report.
+          required: true
