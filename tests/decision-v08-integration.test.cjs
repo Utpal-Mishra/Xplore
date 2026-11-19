@@ -24,7 +24,7 @@ test('route intelligence cache survives the prefetched v0.8 draw once',()=>{
 
 test('accessibility remains evidence-only in v0.8',()=>{
   assert.ok(integration.includes('accessibility observations remain evidence-only'));
-  assert.ok(html.includes('Accessibility observations remain evidence-only'));
+  assert.ok(read('README.md').includes('Accessibility observations remain evidence-only'));
   const core=read('decision-core-v08.js');
   assert.ok(!core.includes('accessPositive,weight'));
   assert.ok(!core.includes('accessConcerns,weight'));
@@ -35,11 +35,13 @@ test('v0.8 modules load after route intelligence and before final release versio
   const core=loader.indexOf("decision-core-v08.js?v=0.8.0");
   const decision=loader.indexOf("decision-v08.js?v=0.8.0");
   assert.ok(route>=0&&route<core&&core<decision);
-  assert.ok(loader.includes("Ireland v0.8.0"));
+  assert.ok(loader.includes("Ireland v0.9.0"));
 });
 
-test('pilot boundary no longer claims Route Intelligence is never scored',()=>{
-  assert.ok(html.includes('Ireland v0.8.0'));
-  assert.ok(html.includes('Route Intelligence can now enter the XPLORE Score'));
+test('later releases preserve the v0.8 scoring boundary',()=>{
+  const docs=read('docs/V08_DECISION_INTELLIGENCE.md');
+  assert.ok(html.includes('Ireland v0.9.0'));
+  assert.ok(docs.includes('Route Intelligence from a display-only layer into the recommendation model'));
+  assert.ok(docs.includes('Accessibility remains evidence-only in v0.8'));
   assert.ok(!html.includes('Route Intelligence remains sampled and is not yet included in the XPLORE Score'));
 });
