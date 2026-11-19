@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="desktop-polish.css?v=4">
   <link rel="stylesheet" href="cork-place-search.css?v=0.5.3">
   <link rel="stylesheet" href="motion-green.css?v=20261119">
+  <link rel="stylesheet" href="decision-insight.css?v=20261119">
 </head>
 <body>
 <header class="app-header">
@@ -57,33 +58,7 @@
       <p class="workflow-caption"><strong>Place and route context</strong> → structured checks → automated ranking → explainable route reporting.</p>
     </section>
 
-    <section class="decision-motion" id="decisionMotion" aria-label="Concept view of journey factors combining into route intelligence">
-      <div class="decision-motion-head">
-        <span class="decision-motion-kicker">Decision intelligence</span>
-        <span class="decision-motion-state" id="decisionMotionState">Ready for inputs</span>
-      </div>
-      <svg viewBox="0 0 320 105" aria-hidden="true" focusable="false">
-        <defs><linearGradient id="xploreSignalGradient" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#4cba7b"/><stop offset="65%" stop-color="#6bd692"/><stop offset="100%" stop-color="#c1f5d0"/></linearGradient></defs>
-        <path class="signal-track" data-signal-path d="M20 17 C107 17 129 53 289 53"/>
-        <path class="signal-track" data-signal-path d="M20 40 C107 40 145 53 289 53"/>
-        <path class="signal-track" data-signal-path d="M20 66 C107 66 145 53 289 53"/>
-        <path class="signal-track" data-signal-path d="M20 89 C107 89 129 53 289 53"/>
-        <circle class="signal-source" cx="20" cy="17" r="5"/>
-        <circle class="signal-source" cx="20" cy="40" r="5"/>
-        <circle class="signal-source" cx="20" cy="66" r="5"/>
-        <circle class="signal-source" cx="20" cy="89" r="5"/>
-        <circle class="signal-particle" cx="22" cy="17" r="3.2"/>
-        <circle class="signal-particle" cx="22" cy="40" r="3.2"/>
-        <circle class="signal-particle" cx="22" cy="66" r="3.2"/>
-        <circle class="signal-particle" cx="22" cy="89" r="3.2"/>
-        <circle class="signal-destination-ring" cx="289" cy="53" r="15"/>
-        <circle class="signal-destination" cx="289" cy="53" r="5.5"/>
-      </svg>
-      <div class="decision-motion-foot">
-        <span>Time · Carbon · Activity · Confidence</span>
-        <strong>Concept view</strong>
-      </div>
-    </section>
+
 
     <div class="card route-form">
       <div class="field"><label for="from">Start</label><input id="from" placeholder="Enter start location" autocomplete="off" enterkeyhint="search" aria-label="Enter start location"></div>
@@ -110,6 +85,35 @@
       <button class="primary" id="find" type="button" style="margin-top:12px">Find real routes</button>
       <div class="status" id="status">Enter a start and destination to begin.</div>
     </div>
+
+    <section class="decision-insight" id="decisionInsight" aria-label="Decision Intelligence for the selected route">
+      <div class="decision-insight-top">
+        <span class="decision-insight-kicker">Decision Intelligence</span>
+        <span class="decision-insight-status" id="decisionInsightStatus">Awaiting route</span>
+      </div>
+      <p class="decision-insight-empty" id="decisionInsightEmpty">Select a journey to see what shapes its XPLORE score and how it compares with other routes.</p>
+      <div id="decisionInsightBody" hidden>
+        <div class="decision-insight-heading-row">
+          <strong id="decisionInsightHeading">Selected route</strong>
+          <span class="decision-insight-score" id="decisionInsightScore">—</span>
+        </div>
+        <p class="decision-insight-priority" id="decisionInsightPriority"></p>
+        <div class="decision-insight-comparisons">
+          <div><span>Compared with fastest</span><strong id="decisionInsightTime">—</strong></div>
+          <div><span>Estimated CO₂ comparison</span><strong id="decisionInsightCarbon">—</strong></div>
+        </div>
+        <div class="decision-insight-driver">
+          <div class="decision-insight-driver-heading">
+            <span id="decisionInsightDriverLabel">Top preference weight</span>
+            <strong id="decisionInsightDriverWeight">—</strong>
+          </div>
+          <div class="decision-insight-track"><span id="decisionInsightDriverFill"></span></div>
+          <p id="decisionInsightDriverDetail"></p>
+        </div>
+        <p class="decision-insight-context" id="decisionInsightContext"></p>
+        <p class="decision-insight-note">Pilot estimates, not a safety assessment. Confidence is displayed separately and also contributes to the current prototype score.</p>
+      </div>
+    </section>
 
     <h2 class="section-title">Journey impact</h2>
     <div class="impact-grid">
@@ -220,6 +224,6 @@
 <script src="ireland-network.js?v=0.4.6"></script>
 <script src="eircode-provider.js?v=0.5.3"></script>
 <script src="ui-workflow.js?v=0.5.4"></script>
-<script src="brand-motion.js?v=0.5.4" defer></script>
+
 </body>
 </html>
