@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 """Build compact daily XPLORE transit data from official NTA GTFS feeds.
 
-v0.7 keeps broad scheduled coverage from GTFS_All.zip, while separately validating
-which trip IDs are safe to join to NTA GTFS-Realtime v2. The realtime-compatible
-static feed is downloaded from GTFS_Realtime.zip on the same run.
-
-Output schema:
+v0.9 outputs:
   manifest.json
-  stops.json: {stop_id: [name, lat, lon, parent_station_or_empty]}
+  stops.json: {stop_id: [name, lat, lon, parent_station, zone_id]}
   trips.json: [[trip_id, route_short, route_long, mode, headsign,
-                [[stop_id, arrival_seconds, departure_seconds], ...], route_id], ...]
-  realtime_eligible.json: exact trip IDs whose stop sequence matches the current
-                          realtime-compatible static GTFS generation.
+                [[stop_id, arrival_seconds, departure_seconds], ...],
+                route_id, shape_id, agency_id], ...]
+  agencies.json: {agency_id: [agency_name, agency_url]}
+  realtime_eligible.json
+  shapes/00.json ... shapes/3f.json: {shape_id: encoded_polyline}
 
-The realtime join is intentionally strict: XPLORE never applies a live update to a
-scheduled trip merely because route names or times look similar.
+Shapes preserve the ordered GTFS shape points and are encoded using Google-style
+polyline precision 5 for compact browser transport. They are sharded by a stable
+FNV-1a hash so the browser only loads geometry required by selected itineraries.
 """
 
 from __future__ import annotations
@@ -23,6 +22,7 @@ import csv
 import io
 import json
 import os
+import shutil
 import sys
 import urllib.request
 import zipfile
@@ -41,13 +41,13 @@ GTFS_REALTIME_STATIC_URL = os.environ.get(
     "https://www.transportforireland.ie/transitData/Data/GTFS_Realtime.zip",
 )
 OUT = Path(os.environ.get("XPLORE_TRANSIT_OUT", "data/transit"))
+SHAPE_SHARDS = int(os.environ.get("XPLORE_SHAPE_SHARDS", "64"))
 DUBLIN = ZoneInfo("Europe/Dublin")
-USER_AGENT = "XPLORE-transit-builder/0.7 (+https://github.com/Utpal-Mishra/Xplore)"
+USER_AGENT = "XPLORE-transit-builder/0.9 (+https://github.com/Utpal-Mishra/Xplore)"
 
 
 @contextmanager
 def csv_rows(zf: zipfile.ZipFile, name: str):
-    """Yield a DictReader over one GTFS text member without materialising all rows."""
     try:
         binary = zf.open(name)
     except KeyError:
@@ -89,7 +89,6 @@ def active_services(zf: zipfile.ZipFile, today: datetime) -> set[str]:
     date_key = today.strftime("%Y%m%d")
     weekday = today.strftime("%A").lower()
     active: set[str] = set()
-
     with csv_rows(zf, "calendar.txt") as rows:
         for row in rows:
             service = row.get("service_id", "")
@@ -101,7 +100,6 @@ def active_services(zf: zipfile.ZipFile, today: datetime) -> set[str]:
             if end and date_key > end:
                 continue
             active.add(service)
-
     with csv_rows(zf, "calendar_dates.txt") as rows:
         for row in rows:
             if row.get("date") != date_key:
@@ -111,7 +109,6 @@ def active_services(zf: zipfile.ZipFile, today: datetime) -> set[str]:
                 active.add(service)
             elif row.get("exception_type") == "2":
                 active.discard(service)
-
     if not active:
         raise RuntimeError(f"No active GTFS service IDs were found for {date_key}")
     return active
@@ -120,7 +117,7 @@ def active_services(zf: zipfile.ZipFile, today: datetime) -> set[str]:
 def download(url: str, label: str) -> bytes:
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     print(f"Downloading {label} from {url}")
-    with urllib.request.urlopen(request, timeout=180) as response:
+    with urllib.request.urlopen(request, timeout=240) as response:
         blob = response.read()
     print(f"Downloaded {len(blob):,} bytes for {label}")
     return blob
@@ -133,8 +130,46 @@ def require_members(zf: zipfile.ZipFile, label: str) -> None:
         raise RuntimeError(f"{label} required GTFS members missing: {sorted(missing)}")
 
 
+def _encode_value(value: int) -> str:
+    value = ~(value << 1) if value < 0 else value << 1
+    chars = []
+    while value >= 0x20:
+        chars.append(chr((0x20 | (value & 0x1F)) + 63))
+        value >>= 5
+    chars.append(chr(value + 63))
+    return "".join(chars)
+
+
+def encode_polyline(points: list[tuple[float, float]], precision: int = 5) -> str:
+    """Encode ordered (lat, lon) points without geometry simplification."""
+    factor = 10**precision
+    previous_lat = previous_lon = 0
+    encoded = []
+    for lat, lon in points:
+        lat_i = int(round(lat * factor))
+        lon_i = int(round(lon * factor))
+        encoded.append(_encode_value(lat_i - previous_lat))
+        encoded.append(_encode_value(lon_i - previous_lon))
+        previous_lat, previous_lon = lat_i, lon_i
+    return "".join(encoded)
+
+
+def fnv1a_32(value: str) -> int:
+    result = 0x811C9DC5
+    for byte in value.encode("utf-8"):
+        result ^= byte
+        result = (result * 0x01000193) & 0xFFFFFFFF
+    return result
+
+
+def shape_shard(shape_id: str, shard_count: int = SHAPE_SHARDS) -> str:
+    if shard_count <= 0 or shard_count & (shard_count - 1):
+        raise ValueError("shape shard count must be a positive power of two")
+    width = max(2, len(f"{shard_count - 1:x}"))
+    return f"{fnv1a_32(shape_id) & (shard_count - 1):0{width}x}"
+
+
 def realtime_trip_sequences(blob: bytes, today: datetime) -> dict[str, tuple[str, ...]]:
-    """Return active trip -> exact stop-id sequence from the v2-compatible static feed."""
     with zipfile.ZipFile(io.BytesIO(blob)) as zf:
         require_members(zf, "Realtime-compatible")
         active = active_services(zf, today)
@@ -144,7 +179,6 @@ def realtime_trip_sequences(blob: bytes, today: datetime) -> dict[str, tuple[str
                 trip_id = row.get("trip_id", "")
                 if trip_id and row.get("service_id") in active:
                     trip_ids.add(trip_id)
-
         by_trip: dict[str, list[tuple[int, str]]] = defaultdict(list)
         with csv_rows(zf, "stop_times.txt") as rows:
             for row in rows:
@@ -159,12 +193,36 @@ def realtime_trip_sequences(blob: bytes, today: datetime) -> dict[str, tuple[str
                 except ValueError:
                     sequence = 0
                 by_trip[trip_id].append((sequence, stop_id))
-
     return {
         trip_id: tuple(stop for _, stop in sorted(rows, key=lambda x: x[0]))
         for trip_id, rows in by_trip.items()
         if len(rows) >= 2
     }
+
+
+def build_active_shapes(zf: zipfile.ZipFile, active_shape_ids: set[str]) -> dict[str, str]:
+    if not active_shape_ids or "shapes.txt" not in zf.namelist():
+        return {}
+    points: dict[str, list[tuple[int, float, float]]] = defaultdict(list)
+    with csv_rows(zf, "shapes.txt") as rows:
+        for row in rows:
+            shape_id = row.get("shape_id", "")
+            if shape_id not in active_shape_ids:
+                continue
+            try:
+                sequence = int(row.get("shape_pt_sequence", "0") or 0)
+                lat = float(row.get("shape_pt_lat", ""))
+                lon = float(row.get("shape_pt_lon", ""))
+            except (TypeError, ValueError):
+                continue
+            points[shape_id].append((sequence, lat, lon))
+
+    encoded: dict[str, str] = {}
+    for shape_id, rows in points.items():
+        ordered = [(lat, lon) for _, lat, lon in sorted(rows, key=lambda x: x[0])]
+        if len(ordered) >= 2:
+            encoded[shape_id] = encode_polyline(ordered, 5)
+    return encoded
 
 
 def build_scheduled(blob: bytes, today: datetime):
@@ -173,7 +231,18 @@ def build_scheduled(blob: bytes, today: datetime):
         require_members(zf, "All-operator")
         active = active_services(zf, today)
 
-        route_map: dict[str, tuple[str, str, str]] = {}
+        agencies: dict[str, list[str]] = {}
+        with csv_rows(zf, "agency.txt") as rows:
+            for row in rows:
+                agency_id = (row.get("agency_id", "") or "").strip()
+                if not agency_id:
+                    continue
+                agencies[agency_id] = [
+                    (row.get("agency_name", "") or agency_id).strip(),
+                    (row.get("agency_url", "") or "").strip(),
+                ]
+
+        route_map: dict[str, tuple[str, str, str, str]] = {}
         with csv_rows(zf, "routes.txt") as rows:
             for row in rows:
                 route_id = row.get("route_id", "")
@@ -182,22 +251,29 @@ def build_scheduled(blob: bytes, today: datetime):
                         row.get("route_short_name", "").strip(),
                         row.get("route_long_name", "").strip(),
                         route_mode(row.get("route_type", "3")),
+                        row.get("agency_id", "").strip(),
                     )
 
-        active_trips: dict[str, tuple[str, str, str, str, str]] = {}
+        active_trips: dict[str, tuple[str, str, str, str, str, str, str]] = {}
+        active_shape_ids: set[str] = set()
         with csv_rows(zf, "trips.txt") as rows:
             for row in rows:
                 trip_id = row.get("trip_id", "")
                 route_id = row.get("route_id", "")
                 if not trip_id or row.get("service_id") not in active:
                     continue
-                short, long, mode = route_map.get(route_id, ("", "", "bus"))
+                short, long, mode, agency_id = route_map.get(route_id, ("", "", "bus", ""))
+                shape_id = row.get("shape_id", "").strip()
+                if shape_id:
+                    active_shape_ids.add(shape_id)
                 active_trips[trip_id] = (
                     short,
                     long,
                     mode,
                     row.get("trip_headsign", "").strip(),
                     route_id,
+                    shape_id,
+                    agency_id,
                 )
 
         if not active_trips:
@@ -244,30 +320,40 @@ def build_scheduled(blob: bytes, today: datetime):
                     lat,
                     lon,
                     row.get("parent_station", "").strip(),
+                    row.get("zone_id", "").strip(),
                 ]
+
+        encoded_shapes = build_active_shapes(zf, active_shape_ids)
 
     valid_stop_ids = set(stop_lookup)
     compact_trips = []
     sequence_by_trip: dict[str, tuple[str, ...]] = {}
+    used_agencies: set[str] = set()
     for trip_id, meta in active_trips.items():
         rows = sorted(stop_times_by_trip.get(trip_id, []), key=lambda x: x[0])
         compact_stops = [[stop_id, arr, dep] for _, stop_id, arr, dep in rows if stop_id in valid_stop_ids]
         if len(compact_stops) < 2:
             continue
-        short, long, mode, headsign, route_id = meta
-        compact_trips.append([trip_id, short, long, mode, headsign, compact_stops, route_id])
+        short, long, mode, headsign, route_id, shape_id, agency_id = meta
+        compact_trips.append([
+            trip_id, short, long, mode, headsign, compact_stops,
+            route_id, shape_id, agency_id,
+        ])
         sequence_by_trip[trip_id] = tuple(stop[0] for stop in compact_stops)
+        if agency_id:
+            used_agencies.add(agency_id)
 
     if not compact_trips or not stop_lookup:
         raise RuntimeError("The compact daily transit dataset would be empty; refusing to publish it")
-    return stop_lookup, compact_trips, sequence_by_trip
+
+    filtered_agencies = {key: value for key, value in agencies.items() if key in used_agencies}
+    return stop_lookup, compact_trips, sequence_by_trip, encoded_shapes, filtered_agencies
 
 
 def strict_realtime_eligible(
     all_sequences: dict[str, tuple[str, ...]],
     realtime_sequences: dict[str, tuple[str, ...]],
 ) -> list[str]:
-    """Return only exact trip-id + ordered-stop-sequence matches."""
     return sorted(
         trip_id
         for trip_id, sequence in all_sequences.items()
@@ -275,11 +361,28 @@ def strict_realtime_eligible(
     )
 
 
+def write_shape_shards(shapes: dict[str, str]) -> None:
+    shape_dir = OUT / "shapes"
+    if shape_dir.exists():
+        shutil.rmtree(shape_dir)
+    shape_dir.mkdir(parents=True, exist_ok=True)
+    shards: dict[str, dict[str, str]] = defaultdict(dict)
+    for shape_id, encoded in shapes.items():
+        shards[shape_shard(shape_id)][shape_id] = encoded
+    options = dict(ensure_ascii=False, separators=(",", ":"))
+    for index in range(SHAPE_SHARDS):
+        name = f"{index:02x}"
+        (shape_dir / f"{name}.json").write_text(
+            json.dumps(shards.get(name, {}), **options),
+            encoding="utf-8",
+        )
+
+
 def main() -> int:
     now = datetime.now(DUBLIN)
     service_date = now.strftime("%Y-%m-%d")
     all_blob = download(GTFS_ALL_URL, "NTA all-operator GTFS")
-    stop_lookup, compact_trips, all_sequences = build_scheduled(all_blob, now)
+    stop_lookup, compact_trips, all_sequences, shapes, agencies = build_scheduled(all_blob, now)
 
     realtime_status = "unavailable"
     realtime_error = None
@@ -293,11 +396,10 @@ def main() -> int:
         print(f"Realtime-compatible GTFS unavailable: {exc}", file=sys.stderr)
 
     eligible = strict_realtime_eligible(all_sequences, realtime_sequences)
-    eligible_set = set(eligible)
 
     OUT.mkdir(parents=True, exist_ok=True)
     manifest = {
-        "version": "2",
+        "version": "3",
         "available": True,
         "source": "National Transport Authority GTFS",
         "sourceUrl": GTFS_ALL_URL,
@@ -306,7 +408,15 @@ def main() -> int:
         "generatedAt": now.isoformat(timespec="seconds"),
         "stopCount": len(stop_lookup),
         "tripCount": len(compact_trips),
+        "shapeCount": len(shapes),
+        "shapeShardCount": SHAPE_SHARDS,
+        "shapeEncoding": "polyline5; ordered GTFS shape points; no topology simplification",
         "coverage": "Ireland scheduled public transport",
+        "planner": {
+            "maxTransfers": 2,
+            "nearbyInterchangeMeters": 250,
+            "fareEvidence": "official reference rules only; unavailable where eligibility cannot be proven",
+        },
         "realtimeCompatibility": {
             "status": realtime_status,
             "sourceUrl": GTFS_REALTIME_STATIC_URL,
@@ -334,11 +444,14 @@ def main() -> int:
     (OUT / "manifest.json").write_text(json.dumps(manifest, **json_options), encoding="utf-8")
     (OUT / "stops.json").write_text(json.dumps(stop_lookup, **json_options), encoding="utf-8")
     (OUT / "trips.json").write_text(json.dumps(compact_trips, **json_options), encoding="utf-8")
+    (OUT / "agencies.json").write_text(json.dumps(agencies, **json_options), encoding="utf-8")
     (OUT / "realtime_eligible.json").write_text(json.dumps(eligible_payload, **json_options), encoding="utf-8")
+    write_shape_shards(shapes)
 
     print(
-        f"Published {len(stop_lookup):,} stops, {len(compact_trips):,} active trips "
-        f"and {len(eligible_set):,} strict realtime-compatible trips for {service_date}"
+        f"Published {len(stop_lookup):,} stops, {len(compact_trips):,} active trips, "
+        f"{len(shapes):,} GTFS shapes and {len(eligible):,} strict realtime-compatible trips "
+        f"for {service_date}"
     )
     return 0
 
