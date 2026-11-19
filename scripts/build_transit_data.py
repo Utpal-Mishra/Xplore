@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
-"""Build compact daily XPLORE transit data from the official NTA GTFS feed.
+"""Build compact daily XPLORE transit data from official NTA GTFS feeds.
+
+v0.7 keeps broad scheduled coverage from GTFS_All.zip, while separately validating
+which trip IDs are safe to join to NTA GTFS-Realtime v2. The realtime-compatible
+static feed is downloaded from GTFS_Realtime.zip on the same run.
 
 Output schema:
   manifest.json
   stops.json: {stop_id: [name, lat, lon, parent_station_or_empty]}
   trips.json: [[trip_id, route_short, route_long, mode, headsign,
-                [[stop_id, arrival_seconds, departure_seconds], ...]], ...]
+                [[stop_id, arrival_seconds, departure_seconds], ...], route_id], ...]
+  realtime_eligible.json: exact trip IDs whose stop sequence matches the current
+                          realtime-compatible static GTFS generation.
 
-The daily GitHub Action downloads the national GTFS feed once, filters it to services
-active for the current Europe/Dublin service date, and publishes only the compact data
-needed by the browser planner.
+The realtime join is intentionally strict: XPLORE never applies a live update to a
+scheduled trip merely because route names or times look similar.
 """
 
 from __future__ import annotations
@@ -27,12 +32,17 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-GTFS_URL = os.environ.get(
+GTFS_ALL_URL = os.environ.get(
     "XPLORE_GTFS_URL",
     "https://www.transportforireland.ie/transitData/Data/GTFS_All.zip",
 )
+GTFS_REALTIME_STATIC_URL = os.environ.get(
+    "XPLORE_GTFS_REALTIME_STATIC_URL",
+    "https://www.transportforireland.ie/transitData/Data/GTFS_Realtime.zip",
+)
 OUT = Path(os.environ.get("XPLORE_TRANSIT_OUT", "data/transit"))
 DUBLIN = ZoneInfo("Europe/Dublin")
+USER_AGENT = "XPLORE-transit-builder/0.7 (+https://github.com/Utpal-Mishra/Xplore)"
 
 
 @contextmanager
@@ -107,29 +117,61 @@ def active_services(zf: zipfile.ZipFile, today: datetime) -> set[str]:
     return active
 
 
-def download_gtfs() -> bytes:
-    request = urllib.request.Request(
-        GTFS_URL,
-        headers={"User-Agent": "XPLORE-transit-builder/0.5 (+https://github.com/Utpal-Mishra/Xplore)"},
-    )
+def download(url: str, label: str) -> bytes:
+    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    print(f"Downloading {label} from {url}")
     with urllib.request.urlopen(request, timeout=180) as response:
-        return response.read()
+        blob = response.read()
+    print(f"Downloaded {len(blob):,} bytes for {label}")
+    return blob
 
 
-def main() -> int:
-    now = datetime.now(DUBLIN)
-    service_date = now.strftime("%Y-%m-%d")
-    print(f"Downloading NTA GTFS from {GTFS_URL}")
-    blob = download_gtfs()
-    print(f"Downloaded {len(blob):,} bytes")
+def require_members(zf: zipfile.ZipFile, label: str) -> None:
+    required = {"routes.txt", "trips.txt", "stops.txt", "stop_times.txt"}
+    missing = required.difference(zf.namelist())
+    if missing:
+        raise RuntimeError(f"{label} required GTFS members missing: {sorted(missing)}")
 
+
+def realtime_trip_sequences(blob: bytes, today: datetime) -> dict[str, tuple[str, ...]]:
+    """Return active trip -> exact stop-id sequence from the v2-compatible static feed."""
     with zipfile.ZipFile(io.BytesIO(blob)) as zf:
-        required = {"routes.txt", "trips.txt", "stops.txt", "stop_times.txt"}
-        missing = required.difference(zf.namelist())
-        if missing:
-            raise RuntimeError(f"Required GTFS members missing: {sorted(missing)}")
+        require_members(zf, "Realtime-compatible")
+        active = active_services(zf, today)
+        trip_ids: set[str] = set()
+        with csv_rows(zf, "trips.txt") as rows:
+            for row in rows:
+                trip_id = row.get("trip_id", "")
+                if trip_id and row.get("service_id") in active:
+                    trip_ids.add(trip_id)
 
-        active = active_services(zf, now)
+        by_trip: dict[str, list[tuple[int, str]]] = defaultdict(list)
+        with csv_rows(zf, "stop_times.txt") as rows:
+            for row in rows:
+                trip_id = row.get("trip_id", "")
+                if trip_id not in trip_ids:
+                    continue
+                stop_id = row.get("stop_id", "")
+                if not stop_id:
+                    continue
+                try:
+                    sequence = int(row.get("stop_sequence", "0") or 0)
+                except ValueError:
+                    sequence = 0
+                by_trip[trip_id].append((sequence, stop_id))
+
+    return {
+        trip_id: tuple(stop for _, stop in sorted(rows, key=lambda x: x[0]))
+        for trip_id, rows in by_trip.items()
+        if len(rows) >= 2
+    }
+
+
+def build_scheduled(blob: bytes, today: datetime):
+    service_date = today.strftime("%Y-%m-%d")
+    with zipfile.ZipFile(io.BytesIO(blob)) as zf:
+        require_members(zf, "All-operator")
+        active = active_services(zf, today)
 
         route_map: dict[str, tuple[str, str, str]] = {}
         with csv_rows(zf, "routes.txt") as rows:
@@ -142,18 +184,20 @@ def main() -> int:
                         route_mode(row.get("route_type", "3")),
                     )
 
-        active_trips: dict[str, tuple[str, str, str, str]] = {}
+        active_trips: dict[str, tuple[str, str, str, str, str]] = {}
         with csv_rows(zf, "trips.txt") as rows:
             for row in rows:
                 trip_id = row.get("trip_id", "")
+                route_id = row.get("route_id", "")
                 if not trip_id or row.get("service_id") not in active:
                     continue
-                short, long, mode = route_map.get(row.get("route_id", ""), ("", "", "bus"))
+                short, long, mode = route_map.get(route_id, ("", "", "bus"))
                 active_trips[trip_id] = (
                     short,
                     long,
                     mode,
                     row.get("trip_headsign", "").strip(),
+                    route_id,
                 )
 
         if not active_trips:
@@ -204,41 +248,90 @@ def main() -> int:
 
     valid_stop_ids = set(stop_lookup)
     compact_trips = []
+    sequence_by_trip: dict[str, tuple[str, ...]] = {}
     for trip_id, meta in active_trips.items():
         rows = sorted(stop_times_by_trip.get(trip_id, []), key=lambda x: x[0])
         compact_stops = [[stop_id, arr, dep] for _, stop_id, arr, dep in rows if stop_id in valid_stop_ids]
         if len(compact_stops) < 2:
             continue
-        short, long, mode, headsign = meta
-        compact_trips.append([trip_id, short, long, mode, headsign, compact_stops])
+        short, long, mode, headsign, route_id = meta
+        compact_trips.append([trip_id, short, long, mode, headsign, compact_stops, route_id])
+        sequence_by_trip[trip_id] = tuple(stop[0] for stop in compact_stops)
 
     if not compact_trips or not stop_lookup:
         raise RuntimeError("The compact daily transit dataset would be empty; refusing to publish it")
+    return stop_lookup, compact_trips, sequence_by_trip
+
+
+def main() -> int:
+    now = datetime.now(DUBLIN)
+    service_date = now.strftime("%Y-%m-%d")
+    all_blob = download(GTFS_ALL_URL, "NTA all-operator GTFS")
+    stop_lookup, compact_trips, all_sequences = build_scheduled(all_blob, now)
+
+    realtime_status = "unavailable"
+    realtime_error = None
+    realtime_sequences: dict[str, tuple[str, ...]] = {}
+    try:
+        rt_blob = download(GTFS_REALTIME_STATIC_URL, "NTA realtime-compatible GTFS")
+        realtime_sequences = realtime_trip_sequences(rt_blob, now)
+        realtime_status = "matched"
+    except Exception as exc:
+        realtime_error = str(exc)
+        print(f"Realtime-compatible GTFS unavailable: {exc}", file=sys.stderr)
+
+    eligible = sorted(
+        trip_id
+        for trip_id, sequence in all_sequences.items()
+        if realtime_sequences.get(trip_id) == sequence
+    )
+    eligible_set = set(eligible)
 
     OUT.mkdir(parents=True, exist_ok=True)
     manifest = {
-        "version": "1",
+        "version": "2",
         "available": True,
         "source": "National Transport Authority GTFS",
-        "sourceUrl": GTFS_URL,
+        "sourceUrl": GTFS_ALL_URL,
         "license": "CC BY 4.0",
         "serviceDate": service_date,
         "generatedAt": now.isoformat(timespec="seconds"),
         "stopCount": len(stop_lookup),
         "tripCount": len(compact_trips),
         "coverage": "Ireland scheduled public transport",
-        "realtime": {
-            "bus": "NTA GTFS-Realtime requires API key; not embedded in static client",
-            "rail": "Irish Rail public realtime queried client-side when available",
+        "realtimeCompatibility": {
+            "status": realtime_status,
+            "sourceUrl": GTFS_REALTIME_STATIC_URL,
+            "eligibleTripCount": len(eligible),
+            "eligibleRatio": round(len(eligible) / max(1, len(compact_trips)), 4),
+            "strictJoin": "trip_id + exact ordered stop_id sequence",
+            "error": realtime_error,
         },
+        "realtime": {
+            "nta": "Server-side GTFS-Realtime v2 snapshot when configured",
+            "rail": "Irish Rail public realtime remains a fallback/cross-check",
+        },
+    }
+
+    eligible_payload = {
+        "version": "1",
+        "generatedAt": now.isoformat(timespec="seconds"),
+        "serviceDate": service_date,
+        "sourceUrl": GTFS_REALTIME_STATIC_URL,
+        "strictJoin": "trip_id + exact ordered stop_id sequence",
+        "tripIds": eligible,
     }
 
     json_options = dict(ensure_ascii=False, separators=(",", ":"))
     (OUT / "manifest.json").write_text(json.dumps(manifest, **json_options), encoding="utf-8")
     (OUT / "stops.json").write_text(json.dumps(stop_lookup, **json_options), encoding="utf-8")
     (OUT / "trips.json").write_text(json.dumps(compact_trips, **json_options), encoding="utf-8")
+    (OUT / "realtime_eligible.json").write_text(json.dumps(eligible_payload, **json_options), encoding="utf-8")
 
-    print(f"Published {len(stop_lookup):,} stops and {len(compact_trips):,} active trips for {service_date}")
+    print(
+        f"Published {len(stop_lookup):,} stops, {len(compact_trips):,} active trips "
+        f"and {len(eligible_set):,} strict realtime-compatible trips for {service_date}"
+    )
     return 0
 
 
