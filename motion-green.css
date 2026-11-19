@@ -49,37 +49,6 @@
 .workflow-caption{position:relative;z-index:1;margin:10px 0 0;color:#afcdbb;font-size:10px;line-height:1.45}
 .workflow-caption strong{color:#d9f3e1;font-weight:650}
 
-/* Concept view of factors converging into a route decision. */
-.decision-motion{
-  position:relative;isolation:isolate;overflow:hidden;
-  margin:16px 0 15px;padding:12px 13px 10px;
-  border:1px solid #315341;border-radius:14px;
-  background:linear-gradient(127deg,rgba(18,57,33,.88),rgba(13,38,25,.94) 60%,rgba(16,45,29,.94));
-  box-shadow:inset 0 1px 0 rgba(199,255,217,.06),0 9px 26px rgba(0,12,5,.17);
-}
-.decision-motion::before{
-  content:"";position:absolute;width:210px;height:150px;right:-100px;top:-100px;
-  border-radius:50%;background:radial-gradient(circle,rgba(83,203,123,.13),transparent 70%);
-  pointer-events:none;z-index:-1;
-}
-.decision-motion-head,.decision-motion-foot{display:flex;justify-content:space-between;align-items:center;gap:9px}
-.decision-motion-kicker{color:#a3e4b8;font-size:9px;letter-spacing:.12em;font-weight:750;text-transform:uppercase}
-.decision-motion-state{display:flex;align-items:center;gap:6px;font-size:9px;color:#b2d1be;white-space:nowrap}
-.decision-motion-state::before{content:"";display:block;width:6px;height:6px;border-radius:50%;background:#73cb92;box-shadow:0 0 0 3px rgba(82,217,141,.1)}
-.decision-motion[data-scored="true"] .decision-motion-state::before{background:#a5efb7;box-shadow:0 0 0 4px rgba(82,217,141,.14)}
-.decision-motion svg{display:block;width:100%;height:92px;margin:1px auto 0;overflow:visible}
-.decision-motion .signal-track{fill:none;stroke:url(#xploreSignalGradient);stroke-width:1.45;stroke-opacity:.58}
-.decision-motion .signal-source{fill:#80c99b;stroke:#183d2a;stroke-width:3}
-.decision-motion .signal-particle{fill:#cdffdd;stroke:#2c7948;stroke-width:1.1;filter:drop-shadow(0 0 3px rgba(123,219,152,.35))}
-.decision-motion .signal-destination-ring{fill:#17442b;stroke:#79d39c;stroke-width:1.4}
-.decision-motion .signal-destination{fill:#b7f6c9}
-.decision-motion-foot{color:#91b59f;font-size:9px;letter-spacing:.01em}
-.decision-motion-foot strong{color:#c9f0d8;font-weight:650}
-@media(max-width:760px){
-  .decision-motion{margin:13px 0;padding:10px 12px 9px}
-  .decision-motion svg{height:76px}
-  .decision-motion-foot{font-size:8px}
-}
 @media(max-width:390px){
   .workflow-motion{padding:12px}
   .workflow-step strong{font-size:8px}
