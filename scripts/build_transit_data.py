@@ -263,6 +263,18 @@ def build_scheduled(blob: bytes, today: datetime):
     return stop_lookup, compact_trips, sequence_by_trip
 
 
+def strict_realtime_eligible(
+    all_sequences: dict[str, tuple[str, ...]],
+    realtime_sequences: dict[str, tuple[str, ...]],
+) -> list[str]:
+    """Return only exact trip-id + ordered-stop-sequence matches."""
+    return sorted(
+        trip_id
+        for trip_id, sequence in all_sequences.items()
+        if realtime_sequences.get(trip_id) == sequence
+    )
+
+
 def main() -> int:
     now = datetime.now(DUBLIN)
     service_date = now.strftime("%Y-%m-%d")
@@ -280,11 +292,7 @@ def main() -> int:
         realtime_error = str(exc)
         print(f"Realtime-compatible GTFS unavailable: {exc}", file=sys.stderr)
 
-    eligible = sorted(
-        trip_id
-        for trip_id, sequence in all_sequences.items()
-        if realtime_sequences.get(trip_id) == sequence
-    )
+    eligible = strict_realtime_eligible(all_sequences, realtime_sequences)
     eligible_set = set(eligible)
 
     OUT.mkdir(parents=True, exist_ok=True)
