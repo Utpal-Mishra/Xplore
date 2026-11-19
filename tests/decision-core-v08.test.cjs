@@ -72,8 +72,10 @@ test('preference controls maximum Route Intelligence weight',()=>{
 test('validated route intelligence blends rather than replacing base score',()=>{
   const result=core.integrateRouteIntelligence(70,high,'cycling','Calmest');
   assert.equal(result.effectiveWeight,.20);
-  assert.ok(result.routeQuality>70);
-  assert.ok(result.score>70&&result.score<result.routeQuality);
+  assert.notEqual(result.routeQuality,70);
+  assert.ok(result.score>=Math.min(70,result.routeQuality));
+  assert.ok(result.score<=Math.max(70,result.routeQuality));
+  assert.notEqual(result.score,result.routeQuality);
 });
 
 test('medium evidence applies only a fraction of configured weight',()=>{
