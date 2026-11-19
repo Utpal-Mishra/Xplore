@@ -99,7 +99,7 @@ test('clearing a journey removes stale route-specific explanation',()=>{
 test('selected routes and reset paths are wired without touching map markup',()=>{
   assert.match(html,/id="decisionInsight"/);
   assert.match(html,/decision-insight\.css\?v=20261119/);
-  assert.match(html,/decision-insight\\.js\\?v=0\\.8\\.0/);
+  assert.match(html,/decision-insight\.js\?v=0\.8\.0/);
   assert.ok(html.indexOf('class="card route-form"')<html.indexOf('id="decisionInsight"'));
   assert.ok(html.indexOf('id="decisionInsight"')<html.indexOf('<section class="map-wrap">'));
   assert.doesNotMatch(html,/id="decisionMotion"/);
