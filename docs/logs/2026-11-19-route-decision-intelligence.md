@@ -93,3 +93,22 @@
 - **ID:** XPL-SEC-20261119-02
 - **Control:** Dynamic text written through `textContent`; new component requests no permissions and stores no user location.
 - **Note:** Repository is public. Keep logs limited to implementation-level facts, without private strategy or credentials.
+
+---
+
+## UI clarification and correction — 2026-11-19
+
+**ID:** XPL-DEC-20261119-03  
+**Context / User Feedback:** Owner pointed out that the prior implementation replaced the *Decision Intelligence animation* but left the *Data to Decisions* card in front of the route form. The intended UX was to remove the generic data-to-reporting card, and keep the functional selected-route Decision Intelligence explanation.
+
+**Decision / Rationale:** Remove `workflowMotion` and its `ui-workflow.js` / `motion-green.css` references from `index.html`; keep the route form prominent, with `decisionInsight` directly after it. Preserve the dark-green base theme and route-specific insight component. This corrects the UI hierarchy without changing route calculation, scoring, GPS, navigation or the map.
+
+**System / Architecture / Automation / Integration:** No changes to route engine, APIs or mobile navigation. Unused animation assets remain in repository history and on the experimental UI branch, but are no longer loaded by `main`.
+
+**Product / Feature:** First-screen focus is now the journey form. Decision Intelligence is visible below it and provides a placeholder until a route is selected, then the selected-route evidence and comparisons.
+
+**Validation:** Verified the absent card/script/stylesheet references, preserved green base CSS, preserved route explanation scripts and placement. Updated `tests/ui-design.test.cjs` for the intended layout. Full browser, mobile and Node test-suite execution still pending.
+
+**Risk / Mitigation:** Browser or CDN caching could temporarily show the previous layout. Confirm deployment and hard-refresh if needed. Owner: project maintainer. Status: static checks pending final verification.
+
+**Merchant & Fulfilment:** Not applicable. **Expansion:** None approved. **External Evidence:** Direct user feedback. **Experiment:** Decorative animation withdrawn from main interface pending future use-case justification. **Business Learning:** Prioritise actionable route information over internal-system illustrations. **Recommendation:** Keep the improved Decision Intelligence explanation; don't reintroduce generic workflow diagrams in primary journey UI.
