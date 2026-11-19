@@ -36,7 +36,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/transit/manifest.json data/transit/stops.json data/transit/trips.json data/transit/realtime_eligible.json
+          git add data/transit/manifest.json data/transit/stops.json data/transit/trips.json data/transit/agencies.json data/transit/realtime_eligible.json data/transit/shapes
           if git diff --cached --quiet; then
             echo "Transit data already current"
             exit 0
