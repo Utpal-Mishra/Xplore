@@ -87,7 +87,7 @@
       driverWeight: rounded(weight * 100) + '% weight · ' + rounded(component) + '/100',
       driverValue: Math.max(0,Math.min(100,component)),
       driverDetail: names[priorityKey] + ' contributes approximately ' +
-        oneDecimal(component * weight) + ' weighted points before final rounding to this route’s ' +
+        oneDecimal(component * weight) + ' points after effective weighting, before final rounding to this route’s ' +
         rounded(route.score) + '/100 score.',
       contextText
     };
