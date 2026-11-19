@@ -1,0 +1,94 @@
+.writing-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 .55rem;
+  color: var(--ink);
+  font-size: .875rem;
+  font-weight: 600;
+  text-underline-offset: .2em;
+  white-space: nowrap;
+}
+
+.writing-header {
+  position: relative;
+}
+
+.writing-page {
+  width: min(100% - 2rem, 53rem);
+  margin-inline: auto;
+  padding-block: clamp(2rem, 6vw, 4.5rem) 4rem;
+  line-height: 1.55;
+}
+
+.writing-page h1 {
+  margin: 0;
+  font-size: clamp(2.25rem, 6vw, 3.5rem);
+  line-height: 1.12;
+}
+
+.writing-page p {
+  margin: .3rem 0 0;
+  color: var(--muted);
+}
+
+.writing-intro {
+  font-size: 1.05rem;
+}
+
+.writing-topics ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .3rem 1.2rem;
+  margin: 1.25rem 0 1.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.writing-topics a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.writing-topic {
+  padding-block: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.writing-topic h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.writing-posts {
+  display: grid;
+  gap: 1rem;
+  margin: 1.15rem 0 0;
+  padding: 0 0 0 1rem;
+  border-inline-start: 1px solid var(--line);
+  list-style: none;
+}
+
+.writing-posts h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.writing-page a {
+  color: var(--green);
+  text-underline-offset: .22em;
+  overflow-wrap: anywhere;
+}
+
+.writing-nav-link:hover,
+.writing-page a:hover {
+  color: var(--accent-ice);
+}
+
+.writing-nav-link:focus-visible,
+.writing-page a:focus-visible,
+.writing-topic:focus-visible {
+  outline: 2px solid var(--accent-ice);
+  outline-offset: 3px;
+}
