@@ -61,7 +61,7 @@ function setXploreReleaseVersion(){
 }
 
 function loadXploreV100Modules(){
-  loadXploreScriptOnce('address-search.js?v=1.0.2','xplore-address-search-script',()=>{
+  loadXploreScriptOnce('address-search.js?v=1.0.3','xplore-address-search-script',()=>{
     loadXploreScriptOnce('transit-bootstrap.js?v=0.7.0','xplore-transit-bootstrap-script',()=>{
       loadXploreScriptOnce('transit.js?v=0.7.0','xplore-transit-script',()=>{
         loadXploreScriptOnce('transit-safety.js?v=0.7.0','xplore-transit-safety-script',()=>{
@@ -75,7 +75,7 @@ function loadXploreV100Modules(){
                     loadXploreScriptOnce('decision-v08.js?v=0.8.0','xplore-decision-v08-script',()=>{
             loadXploreScriptOnce('mobile-ui.js?v=0.5.0','xplore-mobile-ui-script',()=>{
               loadXploreScriptOnce('navigation-session.js?v=0.5.2','xplore-navigation-session-script',()=>{
-                loadXploreScriptOnce('cork-place-search.js?v=0.5.3','xplore-cork-places-script',()=>{
+                loadXploreScriptOnce('cork-place-search.js?v=0.5.4','xplore-cork-places-script',()=>{
                   loadXploreScriptOnce('learning-core.js?v=0.6.0','xplore-learning-core-script',()=>{
                     loadXploreScriptOnce('learning-v06.js?v=1.0.0','xplore-learning-v06-script',()=>{
                       loadXploreScriptOnce('beta-core-v10.js?v=1.0.0','xplore-beta-core-v10-script',()=>{

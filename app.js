@@ -1,4 +1,4 @@
-const CORK={lat:51.8985,lon:-8.4756};
+const IRELAND_DEFAULT={lat:53.35,lon:-7.8};
 const state={
   map:null,markers:[],layers:[],routes:[],activeRoute:0,mode:'driving',preference:'Balanced',lastContext:null,
   watchId:null,liveTracking:false,livePosition:null,liveMarker:null,accuracyCircle:null,
@@ -15,7 +15,7 @@ function addRasterFallback(){
 }
 
 function initMap(){
-  state.map=L.map('map',{zoomControl:true,preferCanvas:true}).setView([CORK.lat,CORK.lon],13);
+  state.map=L.map('map',{zoomControl:true,preferCanvas:true}).setView([IRELAND_DEFAULT.lat,IRELAND_DEFAULT.lon],7);
   if(typeof L.maplibreGL==='function'){
     try{
       L.maplibreGL({style:'https://tiles.openfreemap.org/styles/dark'}).addTo(state.map);
@@ -43,15 +43,28 @@ function parseCoordinates(query){
   return Math.abs(lat)<=90&&Math.abs(lon)<=180?{lat,lon,name:'Current location'}:null;
 }
 
-async function geocode(query){
+function legacyDistanceKm(a,b){
+  const rad=v=>v*Math.PI/180,R=6371;
+  const dLat=rad(b.lat-a.lat),dLon=rad(b.lon-a.lon),lat1=rad(a.lat),lat2=rad(b.lat);
+  const h=Math.sin(dLat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;
+  return 2*R*Math.atan2(Math.sqrt(h),Math.sqrt(1-h));
+}
+
+async function geocode(query,bias=null){
   const coords=parseCoordinates(query);if(coords)return coords;
-  const q=`${query}, Cork, Ireland`;
-  const url='https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ie&q='+encodeURIComponent(q);
-  const res=await fetch(url,{headers:{Accept:'application/json'}});
+  const params=new URLSearchParams({format:'jsonv2',limit:'8',countrycodes:'ie',q:query});
+  if(bias){
+    const d=1.35;
+    params.set('viewbox',(bias.lon-d)+','+(bias.lat+d)+','+(bias.lon+d)+','+(bias.lat-d));
+    params.set('bounded','0');
+  }
+  const res=await fetch('https://nominatim.openstreetmap.org/search?'+params.toString(),{headers:{Accept:'application/json'}});
   if(!res.ok)throw new Error('Place search failed');
   const data=await res.json();
   if(!data.length)throw new Error(`Could not find: ${query}`);
-  return {lat:+data[0].lat,lon:+data[0].lon,name:data[0].display_name};
+  const candidates=data.map(item=>({lat:+item.lat,lon:+item.lon,name:item.display_name}));
+  if(bias)candidates.sort((a,b)=>legacyDistanceKm(bias,a)-legacyDistanceKm(bias,b));
+  return candidates[0];
 }
 
 function routingEndpoint(){
@@ -282,10 +295,10 @@ async function planJourney(){
   const from=$('from').value.trim(),to=$('to').value.trim();
   if((!from&&!state.liveTracking)||!to){setStatus('Enter both start and destination.',true);return;}
   if(state.liveTracking&&!state.livePosition){setStatus('Waiting for a live GPS fix before routing.',true);return;}
-  document.body.classList.add('loading');setStatus('Finding real Cork locations…');
+  document.body.classList.add('loading');setStatus('Finding Ireland locations near your journey start…');
   try{
-    const startPromise=state.liveTracking?Promise.resolve({...state.livePosition,name:'Live location'}):geocode(from);
-    const [a,b]=await Promise.all([startPromise,geocode(to)]);
+    const a=state.liveTracking?{...state.livePosition,name:'Live location'}:await geocode(from);
+    const b=await geocode(to,a);
     setStatus('Requesting routes and live context…');await routeBetween(a,b);
     if(state.liveTracking)renderLivePosition(state.livePosition);
   }catch(error){console.error(error);setStatus(error.message||'Could not calculate route.',true);}finally{document.body.classList.remove('loading');}

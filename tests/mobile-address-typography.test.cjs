@@ -34,6 +34,6 @@ test('placeholder matches the app control scale',()=>{
 
 test('balanced typography assets are cache-busted consistently',()=>{
   assert.match(index,/mobile\.css\?v=1\.0\.2/);
-  assert.match(loader,/address-search\.js\?v=1\.0\.2/);
+  assert.match(loader,/address-search\.js\?v=1\.0\.3/);
   assert.match(addressJs,/address-search\.css\?v=1\.0\.2/);
 });

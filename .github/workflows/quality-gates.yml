@@ -23,7 +23,7 @@ jobs:
           node-version: 22
 
       - name: Check browser JavaScript syntax
-        run: node --check learning-core.js && node --check learning-v06.js && node --check realtime-core.js && node --check realtime-v07.js && node --check transit-live-patch-v07.js && node --check decision-core-v08.js && node --check decision-v08.js && node --check multimodal-core-v09.js && node --check multimodal-v09.js && node --check beta-core-v10.js && node --check beta-v10.js && node --check route-intelligence.js && node --check decision-insight.js && node --check eircode-provider.js
+        run: node --check app.js && node --check address-search.js && node --check cork-place-search.js && node --check learning-core.js && node --check learning-v06.js && node --check realtime-core.js && node --check realtime-v07.js && node --check transit-live-patch-v07.js && node --check decision-core-v08.js && node --check decision-v08.js && node --check multimodal-core-v09.js && node --check multimodal-v09.js && node --check beta-core-v10.js && node --check beta-v10.js && node --check route-intelligence.js && node --check decision-insight.js && node --check eircode-provider.js
 
       - name: Run JavaScript regression tests
         run: node --test tests/*.test.cjs

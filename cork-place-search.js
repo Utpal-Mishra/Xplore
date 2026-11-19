@@ -1,5 +1,7 @@
 // Local OSM coverage plus separately sourced address-level corrections.
 const corkPlaceSearch={places:[],loaded:false,loading:null,cache:new Map(),storageKey:'xplore-personal-places-v1',pickHandler:null};
+const CORK_LOCAL_SEARCH_CENTER={lat:51.8985,lon:-8.4756};
+const CORK_LOCAL_PRIORITY_KM=60;
 const corkAddressCorrections=[{
   id:'desi-bites-cork-estate',name:'Desi Bites Cafe & Restaurant',aliases:['Desi Bites','Desi Bites Cafe and Restaurant'],
   address:'John Harrington Industrial Estate, Tramore Road, Ballyphehane, Cork',lat:51.8759212,lon:-8.481984,
@@ -11,6 +13,13 @@ function placeWords(value){
 }
 function placeNameQuery(query){return normaliseIrishAddressText(query).split(/\s+at\s+|,/i)[0].trim();}
 function placeNameTokens(value){return placeWords(value).split(' ').filter(t=>t&&!['and','the','cork','ireland','cafe','restaurant'].includes(t));}
+function queryExplicitlyTargetsCork(query){return /\bcork\b/i.test(String(query||''));}
+function shouldPrioritiseCorkLocalIndex(fieldId,query){
+  if(queryExplicitlyTargetsCork(query))return true;
+  const bias=addressSearchBias(fieldId);
+  const distance=haversineDistanceKm(bias,CORK_LOCAL_SEARCH_CENTER);
+  return Number.isFinite(distance)&&distance<=CORK_LOCAL_PRIORITY_KM;
+}
 function matchingPlaceScore(query,place){
   const tokens=placeNameTokens(placeNameQuery(query));if(!tokens.length)return 0;
   // A Cork correction must not override an explicitly named different city.
@@ -54,8 +63,13 @@ function localPlaceCandidates(fieldId,query){
   const bias=addressSearchBias(fieldId),seen=new Set();
   const personal=personalPlaces().map(p=>({...p,precision:'user_pin'}));
   const namedByUser=new Set(personal.map(p=>placeWords(p.name)));
-  const corrections=corkAddressCorrections.filter(p=>![p.name,...p.aliases].some(name=>namedByUser.has(placeWords(name))));
-  const mapped=corkPlaceSearch.places.filter(p=>!namedByUser.has(placeWords(p.name)));
+  const useCorkLocal=shouldPrioritiseCorkLocalIndex(fieldId,query);
+  const corrections=useCorkLocal
+    ?corkAddressCorrections.filter(p=>![p.name,...p.aliases].some(name=>namedByUser.has(placeWords(name))))
+    :[];
+  const mapped=useCorkLocal
+    ?corkPlaceSearch.places.filter(p=>!namedByUser.has(placeWords(p.name)))
+    :[];
   return [...personal,...corrections,...mapped].map(p=>({p,score:matchingPlaceScore(query,p)})).filter(x=>x.score>0)
     .sort((a,b)=>b.score-a.score||(haversineDistanceKm(bias,a.p)-haversineDistanceKm(bias,b.p)))
     .filter(({p})=>{const key=`${placeWords(p.name)}|${p.lat.toFixed(4)}|${p.lon.toFixed(4)}`;if(seen.has(key))return false;seen.add(key);return true;})
@@ -85,8 +99,28 @@ fetchDynamicAddressSuggestions=async function(fieldId,query,signal){
     const city=/\bcork\b/i.test(query)?', Cork':'';
     try{const retry=await fetchPhotonSuggestions(fieldId,name+city,signal);if(retry.length)items=retry;}catch(error){if(error.name==='AbortError')throw error;if(!items.length)failure=error;}
   }
+  // Keep the curated Cork correction as a final rescue only when the nationwide
+  // provider finds nothing. The broad Cork OSM index must never hijack a distant search.
+  if(!items.length){
+    const correction=corkAddressCorrections
+      .map(p=>({p,score:matchingPlaceScore(query,p)}))
+      .filter(x=>x.score>0)
+      .sort((a,b)=>b.score-a.score)[0]?.p;
+    if(correction){
+      const note=correction.note||'Curated Cork place · check the entrance';
+      const label=`${correction.name} — estate-level location, ${correction.address}`;
+      items=[{lat:correction.lat,lon:correction.lon,name:label,label,display_name:label,primary:correction.name,secondary:correction.address,
+        type:correction.type||'place',provider:'Business address + OSM estate location',distanceKm:haversineDistanceKm(bias,correction),
+        precision:correction.precision,_xploreRelaxed:true,_xploreMatchLabel:note,_xploreConfirmationStatus:note}];
+    }
+  }
   if(!items.length&&failure)throw failure;
   if(signal?.aborted)throw new DOMException('Search cancelled','AbortError');
+  items=[...items].sort((a,b)=>{
+    const ad=Number.isFinite(a.distanceKm)?a.distanceKm:haversineDistanceKm(bias,a);
+    const bd=Number.isFinite(b.distanceKm)?b.distanceKm:haversineDistanceKm(bias,b);
+    return ad-bd;
+  });
   if(corkPlaceSearch.cache.size>=80)corkPlaceSearch.cache.delete(corkPlaceSearch.cache.keys().next().value);
   corkPlaceSearch.cache.set(key,{at:Date.now(),items});return items;
 };
