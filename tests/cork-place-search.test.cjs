@@ -1,17 +1,17 @@
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path');
 const source=fs.readFileSync(path.join(__dirname,'../cork-place-search.js'),'utf8').replace('loadCorkPlaceIndex();initPersonalPlaceUI();','');
 const dataset=JSON.parse(fs.readFileSync(path.join(__dirname,'../data/places/cork-osm.json'),'utf8'));
-function setup(){
+function setup({bias={lat:51.89,lon:-8.47},remoteSuggestions=null}={}){
  const stored=new Map(),calls=[];
  const ctx={console,Date,JSON,Number,Math,Map,Set,AbortController,DOMException,setTimeout,clearTimeout,XPLORE_AUTOCOMPLETE_LIMIT:8,
   localStorage:{getItem:k=>stored.get(k),setItem:(k,v)=>stored.set(k,v)},
   normaliseIrishAddressText:v=>String(v).trim().replace(/\s+/g,' '),
-  addressSearchBias:()=>({lat:51.89,lon:-8.47}),
+  addressSearchBias:()=>bias,
   haversineDistanceKm:(a,b)=>Math.hypot(a.lat-b.lat,a.lon-b.lon)*111,
   isInsideIrelandBounds:p=>p.lat>=51.25&&p.lat<=55.45&&p.lon>=-10.75&&p.lon<=-5.25,
   uniqueAddressParts:p=>[...new Set(p.filter(Boolean))],
   fetch:async()=>({ok:true,json:async()=>dataset}),
-  fetchDynamicAddressSuggestions:async(field,q)=>{calls.push(q);return [{primary:'Unrelated Place',name:'Unrelated Place',lat:51.8,lon:-8.4}];},
+  fetchDynamicAddressSuggestions:async(field,q)=>{calls.push(q);return remoteSuggestions||[{primary:'Unrelated Place',name:'Unrelated Place',lat:51.8,lon:-8.4,distanceKm:1}];},
   fetchPhotonSuggestions:async(field,q)=>{calls.push(q);return [{primary:'New Bistro',name:'New Bistro',lat:51.8,lon:-8.4}];}
  };
  vm.createContext(ctx);vm.runInContext(source,ctx);return {ctx,calls,stored};
@@ -57,4 +57,22 @@ test('a saved entrance pin replaces the approximate correction for the same name
  const {ctx}=setup();ctx.savePersonalPlace({name:'Desi Bites',lat:51.876,lon:-8.482});
  const items=await ctx.fetchDynamicAddressSuggestions('to','Desi Bites Cork');
  assert.equal(items[0].precision,'user_pin');assert.ok(items.every(p=>p.precision!=='estate'));
+});
+
+
+test('a generic business search far from Cork does not get hijacked by the Cork OSM index',async()=>{
+ const kildare={lat:53.16297,lon:-6.92073};
+ const remote=[{primary:'Circle K Kildare',name:'Circle K Kildare',lat:53.159,lon:-6.91,distanceKm:1.1,provider:'Photon / OpenStreetMap autocomplete'}];
+ const {ctx,calls}=setup({bias:kildare,remoteSuggestions:remote});
+ const items=await ctx.fetchDynamicAddressSuggestions('to','Circle K');
+ assert.equal(items[0].primary,'Circle K Kildare');
+ assert.ok(calls.length>0,'nationwide provider should be queried');
+ assert.ok(items.every(item=>item.provider!=='Cork OpenStreetMap index'));
+});
+
+test('an explicit Cork query may still use the richer Cork local index from a distant start',async()=>{
+ const {ctx,calls}=setup({bias:{lat:53.16297,lon:-6.92073}});
+ const items=await ctx.fetchDynamicAddressSuggestions('to','English Market, Cork');
+ assert.ok(items.some(p=>/english market/i.test(p.primary)));
+ assert.equal(calls.length,0);
 });
