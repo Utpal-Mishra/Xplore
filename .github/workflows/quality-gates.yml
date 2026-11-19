@@ -1,0 +1,32 @@
+name: XPLORE quality gates
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check browser JavaScript syntax
+        run: node --check learning-core.js && node --check learning-v06.js
+
+      - name: Run JavaScript regression tests
+        run: node --test tests/*.test.cjs
+
+      - name: Check transit builder syntax
+        run: python -m py_compile scripts/build_transit_data.py

@@ -1,0 +1,86 @@
+/* XPLORE v0.6.0 — Learn release: feedback + local analytics */
+.learning-card{position:relative;display:grid;gap:12px;overflow:visible}
+.learning-card[hidden]{display:none}
+.learning-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.learning-kicker{display:block;margin-bottom:4px;color:var(--green);font-size:8px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.learning-head strong{display:block;font-family:"Inter Tight",sans-serif;font-size:13px;line-height:1.3}
+.learning-open,.learning-close,.learning-small-button{
+  border:1px solid var(--line);background:#0a1712;color:#cfe1d7;border-radius:9px;
+  font-family:"Inter Tight",sans-serif;font-weight:700;cursor:pointer
+}
+.learning-open{padding:8px 10px;font-size:10px;white-space:nowrap}
+.learning-open:disabled{opacity:.4;cursor:not-allowed}
+.learning-open:not(:disabled):hover,.learning-small-button:hover{border-color:#47725d;background:#102219}
+.learning-close{display:none;width:30px;height:30px;padding:0;font-size:17px}
+.learning-card.is-open .learning-open{display:none}
+.learning-card.is-open .learning-close{display:block}
+.learning-prompt{margin:0;color:#8fa39a;font-size:10px;line-height:1.5}
+.learning-form{display:grid;gap:13px;padding-top:2px}
+.learning-form[hidden],.learning-saved[hidden]{display:none}
+.learning-question{display:grid;gap:7px}
+.learning-question>span,.learning-question>label{font-size:9px;color:#9db0a7;font-weight:700;letter-spacing:.02em}
+.learning-answer-row{display:flex;flex-wrap:wrap;gap:6px}
+.learning-answer,.learning-issue{
+  border:1px solid #263d33;background:#091510;color:#9fb4a9;border-radius:9px;
+  padding:7px 9px;font-size:9px;font-weight:650;cursor:pointer
+}
+.learning-answer.active,.learning-issue.active{
+  border-color:var(--green);background:#102a1d;color:#9be8b8;box-shadow:0 0 0 2px rgba(82,217,141,.06)
+}
+.learning-rating-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.learning-rating{min-height:42px;font-size:10px}
+.learning-details{border-top:1px solid var(--line);padding-top:11px;display:grid;gap:12px}
+.learning-details summary{cursor:pointer;color:#91a79b;font-size:9px;font-weight:700}
+.learning-details[open] summary{margin-bottom:2px}
+.learning-issues{display:flex;flex-wrap:wrap;gap:6px}
+.learning-note{
+  width:100%;min-height:66px;resize:vertical;border:1px solid var(--line);border-radius:10px;
+  padding:9px 10px;background:#08130f;color:var(--ink);font-family:"Inter",sans-serif;font-size:10px;line-height:1.45;outline:none
+}
+.learning-note:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(82,217,141,.08)}
+.learning-note-meta{display:flex;justify-content:space-between;gap:8px;color:#6f8579;font-size:8px}
+.learning-submit{
+  width:100%;border:1px solid rgba(82,217,141,.28);border-radius:10px;padding:10px 12px;
+  background:linear-gradient(135deg,#19874f,#2ea965);color:#f5fff9;font-family:"Inter Tight",sans-serif;font-size:11px;font-weight:800;cursor:pointer
+}
+.learning-submit:disabled{opacity:.42;cursor:not-allowed}
+.learning-saved{padding:9px 10px;border:1px solid rgba(82,217,141,.22);border-radius:10px;background:#0c2117;color:#a8dbba;font-size:9px;line-height:1.45}
+.learning-summary{border-top:1px solid var(--line);padding-top:11px;display:grid;gap:8px}
+.learning-summary-title{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.learning-summary-title span{font-size:8px;color:#758b80;text-transform:uppercase;letter-spacing:.07em;font-weight:700}
+.learning-funnel{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.learning-funnel div{padding:7px 5px;border:1px solid var(--line);border-radius:8px;background:#091510;text-align:center}
+.learning-funnel strong{display:block;font-family:"Inter Tight",sans-serif;font-size:12px;color:#dcebe3}
+.learning-funnel span{display:block;margin-top:2px;font-size:7px;color:#71877c;text-transform:uppercase;letter-spacing:.04em}
+.learning-privacy{margin:0;color:#71877c;font-size:8px;line-height:1.45}
+.learning-tools{display:flex;gap:6px;flex-wrap:wrap}
+.learning-small-button{padding:7px 9px;font-size:8px}
+.learning-share{display:flex;align-items:center;gap:7px;color:#83988d;font-size:8px}
+.learning-share input{accent-color:var(--green)}
+.learning-route-shortcut{
+  border:1px solid var(--line);background:#0a1712;color:#9fb4a9;border-radius:9px;padding:8px 10px;
+  font-family:"Inter Tight",sans-serif;font-size:9px;font-weight:700;cursor:pointer
+}
+.learning-route-shortcut:hover{border-color:#47725d;color:#bfe8cf}
+.learning-toast{
+  position:fixed;left:50%;bottom:24px;z-index:1900;transform:translate(-50%,12px);
+  opacity:0;pointer-events:none;max-width:min(420px,calc(100vw - 28px));padding:10px 13px;border-radius:11px;
+  background:rgba(8,23,16,.97);border:1px solid rgba(82,217,141,.28);box-shadow:0 18px 50px rgba(0,0,0,.38);
+  color:#cce2d6;font-size:10px;transition:opacity .2s ease,transform .2s ease
+}
+.learning-toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:760px){
+  .learning-funnel{grid-template-columns:repeat(5,1fr)}
+  .learning-funnel div{padding:6px 3px}
+  .learning-funnel strong{font-size:11px}
+  .learning-card.is-prompted{
+    position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:1600;
+    max-height:min(78svh,620px);overflow:auto;border-color:rgba(82,217,141,.35);
+    box-shadow:0 24px 70px rgba(0,0,0,.55);background:rgba(7,19,13,.985);backdrop-filter:blur(18px)
+  }
+  .learning-card.is-prompted .learning-details{padding-bottom:4px}
+  .learning-rating{min-height:46px}
+  .learning-answer,.learning-issue{min-height:40px}
+  .learning-submit{min-height:44px}
+}

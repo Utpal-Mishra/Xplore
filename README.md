@@ -1,69 +1,155 @@
 # XPLORE
 
-XPLORE is a human-centred navigation prototype for Cork, Ireland. It goes beyond the fastest route by helping people choose journeys based on sustainability, safety, quietness, accessibility, scenery and affordability.
+XPLORE is a human-centred navigation and decision-intelligence pilot for Ireland. Instead of optimising only for the fastest ETA, it compares journey options using time, carbon, activity, comfort, confidence and contextual route signals, then explains why a route is being recommended.
 
-## v0.2 Cork real-world pilot
+## Current release — Ireland v0.6.0 · Learn
 
-The live pilot now moves beyond representative route cards toward real journey intelligence:
+The current web pilot includes:
 
-1. Real OpenStreetMap/Leaflet map rendering for Cork.
-2. User-submitted place search and real route geometry.
-3. Driving, cycling and walking route adapters with alternative routes.
-4. XPLORE Route Score with preference weighting.
-5. Journey Confidence shown separately from the route score.
-6. Structured "Why this route?" explanations and trade-offs.
-7. Live weather and European AQI context for the route area.
-8. Current-location capture with explicit browser consent.
+1. Ireland-wide Start/Destination search with dynamic suggestions and explicit selection.
+2. Driving, cycling and walking route alternatives.
+3. Scheduled Ireland public transport using the official NTA GTFS feed, including direct and one-transfer journeys.
+4. Best-effort Irish Rail realtime context.
+5. XPLORE scoring and structured route explanations.
+6. Route Segment Intelligence for sampled cycling, greenery, foot/sidewalk, major-road, lighting and accessibility signals.
+7. Live GPS guidance for road/path modes with route recovery and optional Screen Wake Lock.
+8. Weather and European AQI context.
+9. Natural/dark map styles and mobile navigation-first layouts.
+10. **v0.6 Learn:** privacy-first journey feedback, route-quality reporting and a rolling 30-day local product-analytics funnel.
 
-The routing, geocoding and environmental services currently used are development adapters. XPLORE keeps scoring, confidence and explanation logic provider-independent so production infrastructure can be changed without redesigning the product.
+The current web application remains a pilot. Routing, geocoding and some context services use development/public adapters that should be replaced or governed before production scale.
 
-## Product direction
+## v0.6 Learn
 
-XPLORE should answer more than "How do I get there?" It should help answer: "What is the best journey for me, given my preferences and what is happening around me right now — and why?"
+XPLORE now measures whether the product is actually helping, not just whether features exist.
 
-## Architecture and roadmap
+The local funnel records:
+
+```text
+Search -> Results -> Guidance -> Arrival -> Feedback
+```
+
+Journey Feedback can capture:
+
+- Good / Okay / Poor
+- destination correctness
+- route-quality / ETA / map-data / safety / accessibility / transit issues
+- whether the user would choose XPLORE's recommendation over simply taking the fastest route
+- an optional local free-text note
+
+### Privacy boundary
+
+v0.6 analytics deliberately exclude:
+
+- raw latitude/longitude
+- GPS coordinates
+- typed addresses
+- Eircodes
+- destination/origin names
+- search text
+- free-text notes from anonymous analytics payloads
+
+Distance, duration, score and confidence are stored as coarse bands. Local learning data expires after 30 days and is capped. Users can export or clear their local learning record.
+
+There is **no remote analytics collector configured by default**. A future governed XPLORE endpoint can be enabled without exposing privileged credentials in browser JavaScript.
+
+See [docs/V06_LEARNING.md](docs/V06_LEARNING.md).
+
+## Transit
+
+Transit v1 uses the official NTA GTFS schedule feed, refreshed automatically each day. It supports nearby-stop discovery, direct and one-transfer itineraries, access/egress walking, transit-aware XPLORE scoring and mapped stop sequences.
+
+Current transit limitations:
+
+- NTA bus GTFS-Realtime is not yet connected because production API credentials must not be embedded in the static client.
+- exact GTFS shape geometry is still pending
+- unrestricted multi-transfer RAPTOR/CSA journey planning is pending
+- fares/Leap caps are pending
+- transit stop-by-stop guidance is pending
+
+See [docs/TRANSIT_V1.md](docs/TRANSIT_V1.md).
+
+## Navigation recovery
+
+Active walking/cycling/driving guidance is saved in the current browser tab. Returning from lock/background resizes/repaints the map, restarts GPS and requests a fresh fix. Reloading can restore route alternatives, selected route, destination, mode, preferences, voice state and the last retained position without immediately calling the routing service again.
+
+Browser geolocation still cannot provide reliable screen-off tracking. A native mobile service is required for dependable background GPS and lock-screen navigation.
+
+See [docs/NAVIGATION_RECOVERY.md](docs/NAVIGATION_RECOVERY.md).
+
+## Place search
+
+XPLORE combines dynamic Ireland search with a richer Cork place index, address corrections and personal saved pins. Ordinary fuzzy results still require explicit selection before routing; exact Eircodes use the dedicated fail-safe resolution path.
+
+The richer static named-place index is currently Cork-focused and should be generalised Ireland-wide in a later release.
+
+See [docs/CORK_PLACE_SEARCH.md](docs/CORK_PLACE_SEARCH.md).
+
+## Architecture
+
+Core direction:
+
+```text
+Live Map
+  -> Location Intelligence
+  -> Route / Transit Adapters
+  -> Context Layers
+  -> Decision Engine
+  -> Explanation
+  -> Learning & Evaluation
+```
+
+Routing providers generate candidates; XPLORE remains responsible for recommendation logic, confidence, explanation and learning.
 
 See:
 
-- `docs/XPLORE_V02_ROADMAP.md`
-- `docs/ARCHITECTURE.md`
-- `docs/ENTERPRISE_READINESS.md`
-- `docs/DATA_SOURCES.md`
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- [docs/ENTERPRISE_READINESS.md](docs/ENTERPRISE_READINESS.md)
+- [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md)
 
-## Next production steps
+## Validation
 
-- Persist Community Truth observations with provenance, freshness, verification and expiry.
-- Add real Cork route-segment features for cycling protection, accessibility, greenery and safety.
-- Add automated routing-regression tests for representative Cork journeys.
-- Move public development adapters to governed/self-hosted/commercial production infrastructure where required.
-- Continue privacy, moderation, observability and enterprise-readiness controls.
+Automated:
 
-## Navigation recovery (v0.5.1)
+```bash
+node --check learning-core.js
+node --check learning-v06.js
+node --test tests/*.test.cjs
+python -m py_compile scripts/build_transit_data.py
+```
 
-Active walking/cycling/driving guidance is saved in the current browser tab. Returning from lock/background resizes and repaints the existing map, restarts the GPS watch and requests an uncached fix. Reloading restores route alternatives, the selected route, destination, travel mode, preferences, voice setting and last known position without a routing-service request. A saved fix is marked stale until fresh GPS arrives. Stop Guidance, Stop live tracking and manual journey changes clear recovery. Sessions expire after 12 hours; closing the tab or clearing browser storage may remove them. Storage failure is reported without stopping navigation.
+The repository now includes a pull-request/main-branch quality-gate workflow.
 
-Optional **Keep screen on** uses the browser Screen Wake Lock API during active visible guidance. It cannot override manual screen locking.
+Real-device acceptance testing is still required for mobile navigation recovery, search/pin selection and the new feedback bottom-sheet flow.
 
-**Screen-off live tracking and lock-screen navigation notifications are not implemented in this web release.** Browser geolocation is restricted to visible documents. Installing the website as a PWA does not remove that restriction. Reliable screen-off tracking needs a native mobile location service. See [navigation recovery notes](docs/NAVIGATION_RECOVERY.md).
+## Next releases
 
-Validation: `node --test tests/navigation-session.test.cjs`. Real-device lock/unlock and browser-discard verification remain required.
+### v0.7 — Live Mobility
+- XPLORE-controlled NTA GTFS-Realtime adapter
+- live bus arrivals / trip updates
+- service alerts
+- stronger Irish Rail realtime integration
+- realtime reliability in the decision layer
 
-## Cork place search (v0.5.3)
+### v0.8 — Decision Intelligence
+- validate Route Segment Intelligence across representative Irish journeys
+- introduce validated route intelligence into XPLORE scoring
+- strengthen accessibility/safety evidence boundaries
 
-Search now checks a static index of 4,586 named OpenStreetMap places in Cork city and surrounding suburbs, personal saved pins, and separately sourced address corrections before using Photon. It matches name aliases, accents, ampersands and prefixes; explicit locality qualifiers prevent a Cork place replacing a requested place elsewhere. Long business-plus-address queries can retry using the business name. Results always require user selection. Online results use a small location-aware cache.
+### v0.9 — Multimodal
+- exact GTFS shapes
+- stronger transfer planning
+- fare / Leap comparison
+- disruption-aware recovery
 
-Desi Bites Cafe & Restaurant is included from its published business address. Its pin is the mapped John Harrington Industrial Estate road location, **not a verified restaurant entrance**; this is labelled in suggestions, confirmation and destination text.
+### v1.0 Beta
+- reliability gates
+- privacy/monitoring controls
+- tester analytics
+- Founding Tester programme
 
-Use **Place missing? Save a pin** below Destination to name a place and choose its entrance on the map or enter coordinates. Personal pins stay in this browser's localStorage, can be removed by name, and are not uploaded. Selecting a pin while guidance is active requires stopping guidance first.
+## Audit trail
 
-This improves coverage but does not reproduce Google Maps' business directory or guarantee every Cork place. The extract covers city/suburbs, not all County Cork. Google Places is not enabled and no paid service was added.
+XPLORE maintains structured decision, system, architecture, risk, data, validation and release logs. The v0.6 release record is:
 
-Refresh the OSM index manually from the repository root with `python scripts/build_cork_places.py`. No recurring job has been added. OSM data is © OpenStreetMap contributors and licensed ODbL-1.0; see `data/places/LICENSE.md`. Business corrections remain separately sourced in `cork-place-search.js`.
-
-Validation: `node --test tests/*.test.cjs`. Physical mobile search/pin-picker verification remains pending.
-
-## UI visual refresh (2026-11-16)
-
-Professional navy/graphite gradients and restrained teal/ice-blue accents now style the shell, panels, cards, controls and score surfaces. The left panel has a small SVG/JavaScript conceptual data-to-decision animation, representing route evaluation factors; it is **not** a live data feed. It reacts only to whether the existing route score is displayed. Motion respects reduced-motion preferences, browser visibility, viewport intersection and Save-Data. No new third-party library, location access or analytics tracking was added. Map/routing/navigation modules were not edited.
-
-Visual audit trail: [docs/logs/2026-11-16-ui-visual-refresh.md](docs/logs/2026-11-16-ui-visual-refresh.md). Real-device acceptance testing remains pending.
+[docs/logs/2026-11-19-v0.6-learning-release.md](docs/logs/2026-11-19-v0.6-learning-release.md)
