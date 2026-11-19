@@ -154,6 +154,7 @@ function selectRoute(index,enriched){
   state.activeRoute=index;document.querySelectorAll('.route-option').forEach((el,i)=>el.classList.toggle('active',i===index));state.layers.forEach((l,i)=>l.setStyle({weight:i===index?7:5,opacity:i===index?.9:.30}));
   const r=enriched[index];$('summaryTitle').textContent=index===0?'XPLORE Recommended':'Route Alternative';$('summaryMeta').textContent=`${formatDuration(r.raw.duration)} · ${formatDistance(r.raw.distance)}`;$('routeScore').textContent=r.score;$('confidenceValue').textContent=r.confidence+'%';$('co2').textContent=r.carbon<1?'0 g':Math.round(r.carbon)+' g';$('health').textContent=Math.round(r.health)+'/100';$('activeMinutes').textContent=state.mode==='driving'?'Low':formatDuration(r.raw.duration);
   const reasons=reasonsFor(r,index);$('reasons').innerHTML=reasons.map(x=>`<span class="reason">${x}</span>`).join('');$('explainList').innerHTML=reasons.map(x=>`<li>${x}</li>`).join('');renderScoreRationale(r);
+  if(typeof window.renderRouteDecisionInsight==='function')window.renderRouteDecisionInsight(r,index);
 }
 
 function renderContext(ctx){
@@ -292,6 +293,18 @@ async function planJourney(){
 
 document.addEventListener('DOMContentLoaded',()=>{
   initMap();$('find').onclick=()=>planJourney();$('useLocation').onclick=captureLocationOnce;$('toggleLive').onclick=()=>state.liveTracking?stopLiveTracking(true):startLiveTracking();
-  document.querySelectorAll('.mode').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.mode').forEach(x=>x.classList.remove('active'));btn.classList.add('active');state.mode=btn.dataset.mode;});
-  document.querySelectorAll('.choice').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.choice').forEach(x=>x.classList.remove('active'));btn.classList.add('active');state.preference=btn.dataset.pref;});
+  document.querySelectorAll('.mode').forEach(btn=>btn.onclick=()=>{
+    const changed=state.mode!==btn.dataset.mode;
+    document.querySelectorAll('.mode').forEach(x=>x.classList.remove('active'));
+    btn.classList.add('active');state.mode=btn.dataset.mode;
+    if(changed&&state.routes.length&&typeof resetJourneyPresentation==='function')
+      resetJourneyPresentation('Travel mode changed — find routes again to update the evaluation.');
+  });
+  document.querySelectorAll('.choice').forEach(btn=>btn.onclick=()=>{
+    const changed=state.preference!==btn.dataset.pref;
+    document.querySelectorAll('.choice').forEach(x=>x.classList.remove('active'));
+    btn.classList.add('active');state.preference=btn.dataset.pref;
+    if(changed&&state.routes.length&&typeof resetJourneyPresentation==='function')
+      resetJourneyPresentation('Route preference changed — find routes again to update the evaluation.');
+  });
 });
