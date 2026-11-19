@@ -81,6 +81,14 @@ Official NTA static sources:
 
 The daily build publishes compact browser schedule data.
 
+## Transit geometry and fare evidence — v0.9
+
+NTA GTFS `shapes.txt` is used as the source path geometry for active transit trips. Geometry is encoded/sharded during the daily build and loaded lazily for selected itineraries.
+
+Current fare evidence uses verified public TFI reference rules stored with source/verification metadata. The current GTFS data path is not treated as a universal fare engine. If journey eligibility cannot be bounded, XPLORE displays "Fare lookup required" instead of creating a price.
+
+Fare evidence does not affect XPLORE Score.
+
 ## Live public transport — v0.7
 
 NTA GTFS-Realtime v2:
