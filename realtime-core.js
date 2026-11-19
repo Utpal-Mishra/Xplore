@@ -6,7 +6,11 @@
   if(typeof module==='object'&&module.exports)module.exports=api;
   if(root)root.XploreRealtimeCore=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
-  function finite(value){return Number.isFinite(Number(value))?Number(value):null;}
+  function finite(value){
+    if(value==null||value==='')return null;
+    const number=Number(value);
+    return Number.isFinite(number)?number:null;
+  }
 
   function freshness(ageSeconds){
     const age=finite(ageSeconds);
