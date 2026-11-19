@@ -1,11 +1,11 @@
-// XPLORE Ireland v0.5.0 — scheduled public-transport planner + Irish Rail live context.
+// XPLORE Ireland v0.7.0 — scheduled planner; Live Mobility enrichment is layered by v0.7 adapters.
 // Scheduled data is generated daily from the official NTA GTFS feed by GitHub Actions.
 // NTA GTFS-Realtime requires an API key, so bus realtime is intentionally not exposed
 // from this static GitHub Pages client. The adapter boundary is documented for a later
 // server-side integration. Irish Rail's public realtime endpoint is queried directly
 // when the browser permits it; scheduled GTFS remains the fallback.
 
-const XPLORE_TRANSIT_VERSION='0.5.0';
+const XPLORE_TRANSIT_VERSION='0.7.0';
 const XPLORE_TRANSIT_DATA_ROOT='data/transit';
 const XPLORE_IRISH_RAIL_BASE='https://api.irishrail.ie/realtime/realtime.asmx';
 
