@@ -191,10 +191,10 @@ async function planJourney(){
 
   try{
     const a=await geocode(from,state.userLocation);
-    const searchAnchor=state.userLocation||a;
+    const searchAnchor=a;
     const b=await geocode(to,searchAnchor);
-    const matchDistance=searchAnchor?distanceKm(searchAnchor,b):null;
-    const anchorLabel=state.userLocation?'your live location':'the journey start';
+    const matchDistance=distanceKm(searchAnchor,b);
+    const anchorLabel=/^current location$/i.test(from)?'your live location':'the journey start';
 
     setStatus('Nearest match: '+shortPlaceName(b.name)+(matchDistance!=null?' · '+matchDistance.toFixed(1)+' km from '+anchorLabel:'')+'.');
 
