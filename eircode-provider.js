@@ -1,4 +1,4 @@
-// XPLORE Ireland v0.9.0 — Eircode resolver + product-module loader.
+// XPLORE Ireland v1.0.0 Beta — Eircode resolver + product-module loader.
 // Exact Eircodes should be resolved by an Eircode-aware provider before fuzzy place search.
 // This public endpoint is used only as a low-volume development adapter; production should
 // use an approved/licensed Eircode provider behind an XPLORE-controlled server-side API.
@@ -55,12 +55,12 @@ function loadXploreScriptOnce(src,id,onload){
 }
 
 function setXploreReleaseVersion(){
-  IRELAND_NETWORK.version='Ireland v0.9.0';
+  IRELAND_NETWORK.version='Ireland v1.0.0 Beta';
   const versionBadge=document.querySelector('.header-meta .pill');
-  if(versionBadge)versionBadge.textContent='Ireland v0.9.0';
+  if(versionBadge)versionBadge.textContent='Ireland v1.0.0 Beta';
 }
 
-function loadXploreV090Modules(){
+function loadXploreV100Modules(){
   loadXploreScriptOnce('address-search.js?v=0.5.3','xplore-address-search-script',()=>{
     loadXploreScriptOnce('transit-bootstrap.js?v=0.7.0','xplore-transit-bootstrap-script',()=>{
       loadXploreScriptOnce('transit.js?v=0.7.0','xplore-transit-script',()=>{
@@ -77,7 +77,11 @@ function loadXploreV090Modules(){
               loadXploreScriptOnce('navigation-session.js?v=0.5.2','xplore-navigation-session-script',()=>{
                 loadXploreScriptOnce('cork-place-search.js?v=0.5.3','xplore-cork-places-script',()=>{
                   loadXploreScriptOnce('learning-core.js?v=0.6.0','xplore-learning-core-script',()=>{
-                    loadXploreScriptOnce('learning-v06.js?v=0.6.0','xplore-learning-v06-script',()=>setXploreReleaseVersion());
+                    loadXploreScriptOnce('learning-v06.js?v=1.0.0','xplore-learning-v06-script',()=>{
+                      loadXploreScriptOnce('beta-core-v10.js?v=1.0.0','xplore-beta-core-v10-script',()=>{
+                        loadXploreScriptOnce('beta-v10.js?v=1.0.0','xplore-beta-v10-script',()=>setXploreReleaseVersion());
+                      });
+                    });
                   });
                     });
                   });
@@ -97,5 +101,5 @@ function loadXploreV090Modules(){
 }
 
 setXploreReleaseVersion();
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadXploreV090Modules,{once:true});
-else loadXploreV090Modules();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadXploreV100Modules,{once:true});
+else loadXploreV100Modules();

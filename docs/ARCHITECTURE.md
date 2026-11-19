@@ -168,6 +168,34 @@ Analytics events use bucketed journey attributes (distance, duration, score and 
 
 A production collector, when introduced, should sit behind the XPLORE API boundary and add schema validation, authentication, rate limiting, deletion controls and aggregate reporting.
 
+### Beta operations and privacy control layer
+
+v1.0 adds an operational layer around the existing navigation stack rather than changing scoring weights.
+
+```text
+client journey + local learning controls
+  -> explicit local analytics opt-out / export / clear
+  -> pseudonymous Founding Tester profile
+  -> user-initiated Tester Pack export
+
+source repository
+  -> regression suite
+  -> offline release gate
+  -> GitHub Pages deployment
+  -> public production smoke monitor
+```
+
+The monitoring and tester paths are intentionally separated:
+
+- production monitoring reads only public application/system artifacts
+- monitoring has no access to browser local storage, tester profiles, user feedback or location
+- Founding Tester data stays local until the tester explicitly exports it
+- no tester name/email is collected by v1.0
+- a future remote analytics/tester backend must be a separate governed integration
+- the local analytics switch prevents new passive product events from being persisted or shared when disabled
+
+GitHub Actions is the initial Beta monitoring/alert surface. This is appropriate for the controlled web Beta but is not a substitute for a production observability platform if XPLORE later gains a durable backend or high-volume users.
+
 ### Explanation engine
 Produces structured reasons, not generated marketing prose.
 

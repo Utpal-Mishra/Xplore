@@ -2,7 +2,7 @@
 
 XPLORE is a human-centred navigation and decision-intelligence pilot for Ireland. Instead of optimising only for the fastest ETA, it compares journey options using time, carbon, activity, comfort, confidence and contextual route signals, then explains why a route is being recommended.
 
-## Current release — Ireland v0.9.0 · Multimodal
+## Current release — Ireland v1.0.0 Beta
 
 The current web pilot includes:
 
@@ -11,14 +11,15 @@ The current web pilot includes:
 3. Ireland public transport planning using official NTA GTFS schedules, with a bounded search supporting direct journeys and up to two transfers.
 4. **v0.7 Live Mobility:** strict-match NTA GTFS-Realtime v2 enrichment for compatible transit trips, including live timing, reliability, vehicle positions and route-specific alerts.
 5. Irish Rail public realtime as a rail fallback/cross-check.
-6. **v0.9 Multimodal:** official GTFS source-shape geometry, nearby-stop interchange planning and official-reference fare evidence.
-7. **v0.8 Decision Intelligence:** evidence-gated Route Intelligence can influence road/path XPLORE scoring and reranking only when route-match/sample thresholds pass.
-8. Structured route explanations with effective scoring weights and evidence tiers.
-9. Route Segment Intelligence for sampled cycling, greenery, foot/sidewalk, major-road, lighting and accessibility signals.
-10. Live GPS guidance for road/path modes with route recovery and optional Screen Wake Lock.
-11. Weather and European AQI context.
-12. Natural/dark map styles and mobile navigation-first layouts.
-13. **v0.6 Learn:** privacy-first journey feedback, route-quality reporting and a rolling 30-day local product-analytics funnel.
+6. **v1.0 Beta:** release gates, explicit local-analytics controls, privacy-safe production monitoring and a pseudonymous Founding Tester workflow.
+7. **v0.9 Multimodal:** official GTFS source-shape geometry, nearby-stop interchange planning and official-reference fare evidence.
+8. **v0.8 Decision Intelligence:** evidence-gated Route Intelligence can influence road/path XPLORE scoring and reranking only when route-match/sample thresholds pass.
+9. Structured route explanations with effective scoring weights and evidence tiers.
+10. Route Segment Intelligence for sampled cycling, greenery, foot/sidewalk, major-road, lighting and accessibility signals.
+11. Live GPS guidance for road/path modes with route recovery and optional Screen Wake Lock.
+12. Weather and European AQI context.
+13. Natural/dark map styles and mobile navigation-first layouts.
+14. **v0.6 Learn:** privacy-first journey feedback, route-quality reporting and a rolling 30-day local product-analytics funnel.
 
 The current web application remains a pilot. Routing, geocoding and some context services still use development/public adapters that should be governed or replaced before production scale.
 
@@ -154,26 +155,30 @@ node --check learning-v06.js
 node --check realtime-core.js
 node --check realtime-v07.js
 node --check transit-live-patch-v07.js
+node --check decision-core-v08.js
+node --check decision-v08.js
+node --check multimodal-core-v09.js
+node --check multimodal-v09.js
+node --check beta-core-v10.js
+node --check beta-v10.js
 node --test tests/*.test.cjs
-python -m py_compile scripts/build_transit_data.py scripts/build_realtime_snapshot.py
+python -m py_compile scripts/build_transit_data.py scripts/build_realtime_snapshot.py scripts/release_gate.py scripts/beta_monitor.py
+python scripts/release_gate.py --repo .
 ```
 
 The repository quality gate runs on pull requests and main-branch changes.
 
 Real-device acceptance testing remains required for mobile navigation recovery, search/pin selection, feedback UI and v0.7 live transit badges/vehicle markers.
 
-## Next releases
+## Beta validation
 
-### v1.0 Beta
-- reliability gates
-- privacy/monitoring controls
-- tester analytics
-- Founding Tester programme
+The release remains subject to real-device testing and the Founding Tester evidence cycle. A wider public launch should depend on stable search/routing behaviour, green production smoke checks and useful structured tester feedback rather than the version number alone.
 
 ## Audit trail
 
 XPLORE maintains structured decision, system, architecture, risk, data, validation and release logs.
 
+- [v1.0 Beta release log](docs/logs/2026-11-19-v1.0-beta.md)
 - [v0.9 Multimodal release log](docs/logs/2026-11-19-v0.9-multimodal.md)
 - [v0.8 Decision Intelligence release log](docs/logs/2026-11-19-v0.8-decision-intelligence.md)
 - [v0.7 Live Mobility release log](docs/logs/2026-11-19-v0.7-live-mobility.md)

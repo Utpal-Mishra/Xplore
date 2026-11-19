@@ -10,6 +10,7 @@
   const FEEDBACK_KEY='xplore:v06:feedback';
   const SHARE_KEY='xplore:v06:share';
   const SESSION_KEY='xplore:v06:session';
+  const LOCAL_ANALYTICS_KEY='xplore:v10:local-analytics-enabled';
   const MAX_NOTE=240;
   const REMOTE_ENDPOINT=String(globalThis.XPLORE_LEARNING_ENDPOINT||'').trim();
 
@@ -65,8 +66,20 @@
     }
   }
 
+  function localAnalyticsEnabled(){
+    try{return localStorage.getItem(LOCAL_ANALYTICS_KEY)!=='false';}
+    catch(error){return true;}
+  }
+
+  function setLocalAnalyticsEnabled(enabled){
+    try{localStorage.setItem(LOCAL_ANALYTICS_KEY,enabled?'true':'false');}catch(error){}
+    if(!enabled)setSharingEnabled(false);
+    refreshPrivacyCopy();
+    return localAnalyticsEnabled();
+  }
+
   function sharingEnabled(){
-    if(!REMOTE_ENDPOINT)return false;
+    if(!REMOTE_ENDPOINT||!localAnalyticsEnabled())return false;
     try{return localStorage.getItem(SHARE_KEY)==='true';}catch(error){return false;}
   }
 
@@ -91,6 +104,7 @@
   function track(event,payload={}){
     const safe=core.sanitizeEvent(event,payload);
     const record={...safe,session:sessionId()};
+    if(!localAnalyticsEnabled())return record;
     const events=readList(EVENT_KEY);
     events.push(record);
     writeList(EVENT_KEY,events);
@@ -435,7 +449,7 @@
     };
     Object.entries(values).forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.textContent=String(value);});
     const storage=document.getElementById('learningStorageState');
-    if(storage)storage.textContent=learningState.storageAvailable?(REMOTE_ENDPOINT&&sharingEnabled()?'Anonymous sharing on':'Local only'):'Storage unavailable';
+    if(storage)storage.textContent=!localAnalyticsEnabled()?'Analytics off':learningState.storageAvailable?(REMOTE_ENDPOINT&&sharingEnabled()?'Anonymous sharing on':'Local only'):'Storage unavailable';
   }
 
   function refreshPrivacyCopy(){
@@ -443,7 +457,9 @@
     const shareRow=document.getElementById('learningShareRow');
     if(shareRow)shareRow.hidden=!REMOTE_ENDPOINT;
     if(!privacy)return;
-    if(!learningState.storageAvailable){
+    if(!localAnalyticsEnabled()){
+      privacy.textContent='Local product analytics are off. XPLORE continues routing normally. Existing local learning records remain until you export or clear them.';
+    }else if(!learningState.storageAvailable){
       privacy.textContent='Browser storage is unavailable. XPLORE will continue routing, but this device cannot retain learning events or feedback.';
     }else if(REMOTE_ENDPOINT){
       privacy.textContent='Coarse metrics are stored locally for 30 days. Anonymous sharing is optional. Raw GPS, typed addresses, Eircodes, destination names and free-text notes are excluded from shared analytics.';
@@ -453,14 +469,21 @@
     refreshLearningSummary();
   }
 
-  function exportLearningData(){
-    const exportPayload={
-      schema:'xplore-learning-v0.6',
+  function learningExportPayload(){
+    return {
+      schema:'xplore-learning-v1-compatible',
       generatedAt:new Date().toISOString(),
       privacy:'User-initiated local export. Feedback notes may be included because the user explicitly exported their own device data.',
+      localAnalyticsEnabled:localAnalyticsEnabled(),
+      remoteCollectorConfigured:Boolean(REMOTE_ENDPOINT),
+      anonymousSharingEnabled:sharingEnabled(),
       events:readList(EVENT_KEY),
       feedback:readList(FEEDBACK_KEY)
     };
+  }
+
+  function exportLearningData(){
+    const exportPayload=learningExportPayload();
     const blob=new Blob([JSON.stringify(exportPayload,null,2)],{type:'application/json'});
     const url=URL.createObjectURL(blob),a=document.createElement('a');
     a.href=url;a.download='xplore-learning-export-'+new Date().toISOString().slice(0,10)+'.json';
@@ -587,12 +610,23 @@
     }
   }
 
+  globalThis.XploreLearning={
+    track,
+    localAnalyticsEnabled,
+    setLocalAnalyticsEnabled,
+    sharingEnabled,
+    exportLearningData,
+    clearLearningData,
+    exportPayload:learningExportPayload,
+    refreshPrivacyCopy
+  };
+
   function init(){
     if(learningState.initialised)return;
     learningState.initialised=true;
     ensureStyles();ensureUI();installHooks();
     resetJourneyLearning();
-    track('app_loaded',{release:'0.6.0'});
+    track('app_loaded',{release:'1.0-compatible'});
     refreshPrivacyCopy();
   }
 
