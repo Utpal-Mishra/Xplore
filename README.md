@@ -2,7 +2,7 @@
 
 XPLORE is a human-centred navigation and decision-intelligence pilot for Ireland. Instead of optimising only for the fastest ETA, it compares journey options using time, carbon, activity, comfort, confidence and contextual route signals, then explains why a route is being recommended.
 
-## Current release — Ireland v0.7.0 · Live Mobility
+## Current release — Ireland v0.8.0 · Decision Intelligence
 
 The current web pilot includes:
 
@@ -11,14 +11,30 @@ The current web pilot includes:
 3. Ireland public transport planning using official NTA GTFS schedules, including direct and one-transfer journeys.
 4. **v0.7 Live Mobility:** strict-match NTA GTFS-Realtime v2 enrichment for compatible transit trips, including live timing, reliability, vehicle positions and route-specific alerts.
 5. Irish Rail public realtime as a rail fallback/cross-check.
-6. XPLORE scoring and structured route explanations.
-7. Route Segment Intelligence for sampled cycling, greenery, foot/sidewalk, major-road, lighting and accessibility signals.
-8. Live GPS guidance for road/path modes with route recovery and optional Screen Wake Lock.
-9. Weather and European AQI context.
-10. Natural/dark map styles and mobile navigation-first layouts.
-11. **v0.6 Learn:** privacy-first journey feedback, route-quality reporting and a rolling 30-day local product-analytics funnel.
+6. **v0.8 Decision Intelligence:** evidence-gated Route Intelligence can influence road/path XPLORE scoring and reranking only when route-match/sample thresholds pass.
+7. Structured route explanations with effective scoring weights and evidence tiers.
+8. Route Segment Intelligence for sampled cycling, greenery, foot/sidewalk, major-road, lighting and accessibility signals.
+9. Live GPS guidance for road/path modes with route recovery and optional Screen Wake Lock.
+10. Weather and European AQI context.
+11. Natural/dark map styles and mobile navigation-first layouts.
+12. **v0.6 Learn:** privacy-first journey feedback, route-quality reporting and a rolling 30-day local product-analytics funnel.
 
 The current web application remains a pilot. Routing, geocoding and some context services still use development/public adapters that should be governed or replaced before production scale.
+
+## v0.8 Decision Intelligence
+
+Route Intelligence now participates in road/path scoring only after an explicit evidence-quality gate.
+
+- High evidence: >=10 samples, >=82% route-to-road match, <=30 km
+- Medium evidence: >=10 samples, >=70% match, <=50 km
+- Long-route medium evidence: >=8 samples, >=78% match, >50 km
+- Indicative evidence: displayed but contributes 0% to the score
+
+Maximum configured Route Intelligence influence is bounded by preference: 12% Balanced, 8% Greenest, 13% Healthiest and 20% Calmest. Medium evidence is attenuated further.
+
+Lighting is scored only when at least half of matched route-road samples have explicit lighting tags. Accessibility observations remain evidence-only; missing accessibility tags are never interpreted as inaccessible.
+
+See [docs/V08_DECISION_INTELLIGENCE.md](docs/V08_DECISION_INTELLIGENCE.md).
 
 ## v0.7 Live Mobility
 
@@ -137,11 +153,6 @@ Real-device acceptance testing remains required for mobile navigation recovery, 
 
 ## Next releases
 
-### v0.8 — Decision Intelligence
-- validate Route Segment Intelligence across representative Irish journeys
-- introduce validated route intelligence into XPLORE scoring
-- strengthen evidence-quality thresholds and uncertainty communication
-
 ### v0.9 — Multimodal maturity
 - exact GTFS shapes
 - multi-transfer RAPTOR/CSA planning
@@ -159,5 +170,6 @@ Real-device acceptance testing remains required for mobile navigation recovery, 
 
 XPLORE maintains structured decision, system, architecture, risk, data, validation and release logs.
 
+- [v0.8 Decision Intelligence release log](docs/logs/2026-11-19-v0.8-decision-intelligence.md)
 - [v0.7 Live Mobility release log](docs/logs/2026-11-19-v0.7-live-mobility.md)
 - [v0.6 Learn release log](docs/logs/2026-11-19-v0.6-learning-release.md)
