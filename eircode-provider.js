@@ -1,4 +1,4 @@
-// XPLORE Ireland v0.7.0 — Eircode resolver + product-module loader.
+// XPLORE Ireland v0.8.0 — Eircode resolver + product-module loader.
 // Exact Eircodes should be resolved by an Eircode-aware provider before fuzzy place search.
 // This public endpoint is used only as a low-volume development adapter; production should
 // use an approved/licensed Eircode provider behind an XPLORE-controlled server-side API.
@@ -55,12 +55,12 @@ function loadXploreScriptOnce(src,id,onload){
 }
 
 function setXploreReleaseVersion(){
-  IRELAND_NETWORK.version='Ireland v0.7.0';
+  IRELAND_NETWORK.version='Ireland v0.8.0';
   const versionBadge=document.querySelector('.header-meta .pill');
-  if(versionBadge)versionBadge.textContent='Ireland v0.7.0';
+  if(versionBadge)versionBadge.textContent='Ireland v0.8.0';
 }
 
-function loadXploreV070Modules(){
+function loadXploreV080Modules(){
   loadXploreScriptOnce('address-search.js?v=0.5.3','xplore-address-search-script',()=>{
     loadXploreScriptOnce('transit-bootstrap.js?v=0.7.0','xplore-transit-bootstrap-script',()=>{
       loadXploreScriptOnce('transit.js?v=0.7.0','xplore-transit-script',()=>{
@@ -68,12 +68,16 @@ function loadXploreV070Modules(){
           loadXploreScriptOnce('realtime-core.js?v=0.7.0','xplore-realtime-core-script',()=>{
             loadXploreScriptOnce('realtime-v07.js?v=0.7.0','xplore-realtime-v07-script',()=>{
               loadXploreScriptOnce('transit-live-patch-v07.js?v=0.7.0','xplore-transit-live-patch-v07-script',()=>{
-                loadXploreScriptOnce('route-intelligence.js?v=0.5.0','xplore-route-intelligence-script',()=>{
+                loadXploreScriptOnce('route-intelligence.js?v=0.8.0','xplore-route-intelligence-script',()=>{
+                  loadXploreScriptOnce('decision-core-v08.js?v=0.8.0','xplore-decision-core-v08-script',()=>{
+                    loadXploreScriptOnce('decision-v08.js?v=0.8.0','xplore-decision-v08-script',()=>{
             loadXploreScriptOnce('mobile-ui.js?v=0.5.0','xplore-mobile-ui-script',()=>{
               loadXploreScriptOnce('navigation-session.js?v=0.5.2','xplore-navigation-session-script',()=>{
                 loadXploreScriptOnce('cork-place-search.js?v=0.5.3','xplore-cork-places-script',()=>{
                   loadXploreScriptOnce('learning-core.js?v=0.6.0','xplore-learning-core-script',()=>{
                     loadXploreScriptOnce('learning-v06.js?v=0.6.0','xplore-learning-v06-script',()=>setXploreReleaseVersion());
+                  });
+                    });
                   });
                 });
               });
@@ -89,5 +93,5 @@ function loadXploreV070Modules(){
 }
 
 setXploreReleaseVersion();
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadXploreV070Modules,{once:true});
-else loadXploreV070Modules();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadXploreV080Modules,{once:true});
+else loadXploreV080Modules();

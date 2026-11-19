@@ -89,24 +89,51 @@ Key rules:
 
 The GitHub Actions snapshot is a beta backend adapter, not the final production service. A production XPLORE API should own polling, caching, schema validation, metrics, alert normalisation and provider failover.
 
+### Evidence-gated Route Intelligence
+
+v0.8 inserts an explicit validation step between sampled route context and the numeric road/path decision model.
+
+```text
+road/path candidates
+  -> base five-component score
+  -> candidate Route Intelligence sampling
+  -> evidence tier
+  -> mode-specific route-quality score
+  -> confidence attenuation
+  -> final score + reranking
+```
+
+Evidence quality and route quality are separate concepts. A high route-quality value cannot affect the XPLORE Score when the evidence tier is only Indicative.
+
+The current scoring boundary is intentionally narrow:
+- route-to-road coverage and sample count gate eligibility
+- long routes receive reduced evidence influence
+- lighting is used only when explicit tagging coverage is sufficient
+- accessibility remains evidence-only and is never inferred from missing tags
+- Route Intelligence maximum influence is preference-bounded between 8% and 20%
+- when the context service fails, the candidate keeps its original score
+
+This is an explainable decision-support model, not a safety/accessibility certification.
+
 ### Decision engine
 Consumes candidate routes + route features + contextual observations + user preferences.
 
-Initial conceptual score:
+Current road/path pilot score:
 
 ```text
-score(route) =
-  w_time          * time_score
-+ w_safety        * safety_score
-+ w_accessibility * accessibility_score
-+ w_environment   * environmental_score
-+ w_health        * health_score
-+ w_carbon        * carbon_score
-+ w_cost          * cost_score
-+ w_community     * community_score
+base(route) =
+  w_time       * time
++ w_carbon     * carbon
++ w_health     * health_activity
++ w_comfort    * comfort
++ w_confidence * confidence
+
+final(route) =
+  base(route) * (1 - effective_route_intelligence_weight)
++ route_intelligence_quality * effective_route_intelligence_weight
 ```
 
-Confidence is deliberately NOT hidden inside this utility score. It is returned separately so the product can communicate uncertainty.
+The Route Intelligence weight is zero when the evidence gate fails. Accessibility is not part of the current numeric score. Journey confidence remains visible as its own user-facing metric even though the current pilot also includes a bounded confidence component inside the utility score.
 
 ### Learning and evaluation layer
 

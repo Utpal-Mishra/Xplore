@@ -45,7 +45,7 @@ test('route search immediately follows hero and Decision Intelligence remains ro
 });
 
 test('decision panel still loads its actual route explanation logic',()=>{
-  assert.ok(html.includes('decision-insight.js?v=20261119'));
+  assert.ok(html.includes('decision-insight.js?v=0.8.0'));
   assert.ok(html.indexOf('decision-insight.js')>html.indexOf('app.js'));
   assert.ok(explanation.includes('buildRouteDecisionInsight'));
   assert.ok(explanation.includes('resetRouteDecisionInsight'));

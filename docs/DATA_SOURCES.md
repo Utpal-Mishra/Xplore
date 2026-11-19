@@ -52,7 +52,14 @@ Current:
 - lighting-tag availability
 - accessibility positive/concern signals
 
-These signals remain indicative and are not yet included in the main XPLORE Score pending validation.
+v0.8 applies an evidence gate before any of these signals can affect the main XPLORE Score. High/Medium evidence can contribute a bounded Route Intelligence component; Indicative evidence is displayed with zero score influence.
+
+Scored contextual signals are mode-specific:
+- cycling: protected/general cycling context, green proximity, lower major-road exposure, sufficiently covered lighting
+- walking: foot/sidewalk support, green proximity, lower major-road exposure, sufficiently covered lighting
+- driving: lower major-road exposure, green proximity, sufficiently covered lighting
+
+Accessibility remains evidence-only. Missing accessibility or lighting tags are treated as unknown rather than negative evidence.
 
 ## Weather
 
@@ -138,6 +145,8 @@ Provider-independent product logic includes:
 - freshness gates
 - transfer-risk penalties
 - route-intelligence analysis
+- Route Intelligence evidence gating and confidence attenuation
+- mode-specific Route Intelligence quality scoring
 - structured explanations
 - learning/feedback taxonomy
 

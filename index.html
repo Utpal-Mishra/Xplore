@@ -22,7 +22,7 @@
 <body>
 <header class="app-header">
   <div class="brand">XPLORE</div>
-  <div class="header-meta"><span class="pill">Ireland v0.7.0</span><span class="pill dev">Development Data Adapters</span></div>
+  <div class="header-meta"><span class="pill">Ireland v0.8.0</span><span class="pill dev">Development Data Adapters</span></div>
 </header>
 <main class="layout">
   <aside class="left">
@@ -181,7 +181,7 @@
     </div>
 
     <h2 class="section-title">Pilot Boundary</h2>
-    <div class="notice">XPLORE v0.7.0 adds Live Mobility for Transit. Scheduled national journeys remain the fallback, while fresh NTA GTFS-Realtime v2 snapshots can adjust timing, reliability, connection risk and ranking for trips that exactly match the same-day realtime-compatible static schedule. Live vehicle positions and route-specific alerts are shown when matched. Stale, unmatched or unavailable realtime data never replaces the schedule. The NTA API key stays server-side. Route Intelligence remains sampled and is not yet included in the XPLORE Score while validation continues.</div>
+    <div class="notice">XPLORE v0.8.0 adds evidence-gated Decision Intelligence for road/path routes. Route Intelligence can now enter the XPLORE Score only when route-to-road matching, sample count and route-length thresholds pass. High-confidence evidence receives full configured influence; medium evidence is deliberately down-weighted; indicative evidence stays visible but cannot alter ranking. Accessibility observations remain evidence-only and missing map tags are never interpreted as inaccessible. Transit retains the v0.7 Scheduled/Live Mobility fallback model.</div>
   </aside>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -192,8 +192,8 @@
 <script src="navigation.js"></script>
 <script src="navigation-map.js?v=0.4.6"></script>
 <script src="ireland-network.js?v=0.4.6"></script>
-<script src="eircode-provider.js?v=0.7.0"></script>
-<script src="decision-insight.js?v=20261119"></script>
+<script src="eircode-provider.js?v=0.8.0"></script>
+<script src="decision-insight.js?v=0.8.0"></script>
 
 </body>
 </html>
