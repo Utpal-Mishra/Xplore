@@ -1,8 +1,8 @@
-# XPLORE Transit — v0.5 Schedule Planner + v0.7 Live Mobility
+# XPLORE Transit — Schedule + Live Mobility + v0.9 Multimodal
 
 XPLORE's transit layer separates **journey planning** from **realtime evidence**.
 
-Scheduled public transport is the universal baseline. v0.7 enriches only those scheduled legs that can be proven to correspond to the current NTA realtime schedule generation.
+Scheduled public transport is the universal baseline. v0.7 enriches only strict realtime-compatible legs. v0.9 adds GTFS source geometry, bounded planning up to two transfers and conservative fare-reference evidence.
 
 ## Data sources
 
@@ -152,6 +152,24 @@ A route-specific alert is associated only through exact trip, route or relevant 
 
 Network-wide/unscoped alerts can be retained as feed evidence but are not used to penalise a particular candidate automatically.
 
+## v0.9 Multimodal layer
+
+The daily schedule builder now also publishes:
+
+- active trip `shape_id`
+- active route `agency_id`
+- stop `zone_id`
+- compact agency metadata
+- active GTFS shape geometry in 64 lazy-load shards
+
+The selected transit itinerary first renders a stop-sequence fallback, then replaces each compatible leg with its GTFS source shape after the relevant shard loads. Shape segments are rejected when board/alight stops are more than 500 m from the candidate source geometry.
+
+The planner now performs a bounded round search supporting up to two transfers. Transfer candidates can use the same stop, same parent station, or a mapped stop within 250 m. Walking time and a minimum two-minute transfer buffer are enforced.
+
+Fare values are not inferred from route distance. XPLORE uses current TFI references only for bounded city contexts and otherwise reports that a fare lookup is required. Fare evidence is excluded from scoring.
+
+See [V09_MULTIMODAL.md](V09_MULTIMODAL.md).
+
 ## Failure policy
 
 Scheduled data wins whenever realtime cannot be proven trustworthy.
@@ -169,9 +187,8 @@ Fallback triggers include:
 ## Remaining transit work
 
 - activate/validate the NTA production key
-- exact GTFS Shapes geometry
-- multi-transfer RAPTOR/CSA planning
-- fare/Leap comparison
+- unrestricted backend RAPTOR/CSA planning beyond the current bounded two-transfer browser search
+- authoritative end-to-end fare quoting beyond current reference evidence
 - stop-by-stop transit guidance
 - disruption-aware journey replanning
 - stronger station/vehicle accessibility evidence

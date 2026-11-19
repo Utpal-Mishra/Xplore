@@ -22,7 +22,7 @@
 <body>
 <header class="app-header">
   <div class="brand">XPLORE</div>
-  <div class="header-meta"><span class="pill">Ireland v0.8.0</span><span class="pill dev">Development Data Adapters</span></div>
+  <div class="header-meta"><span class="pill">Ireland v0.9.0</span><span class="pill dev">Development Data Adapters</span></div>
 </header>
 <main class="layout">
   <aside class="left">
@@ -181,7 +181,7 @@
     </div>
 
     <h2 class="section-title">Pilot Boundary</h2>
-    <div class="notice">XPLORE v0.8.0 adds evidence-gated Decision Intelligence for road/path routes. Route Intelligence can now enter the XPLORE Score only when route-to-road matching, sample count and route-length thresholds pass. High-confidence evidence receives full configured influence; medium evidence is deliberately down-weighted; indicative evidence stays visible but cannot alter ranking. Accessibility observations remain evidence-only and missing map tags are never interpreted as inaccessible. Transit retains the v0.7 Scheduled/Live Mobility fallback model.</div>
+    <div class="notice">XPLORE v0.9.0 adds Multimodal maturity to Transit: selected journeys can render official GTFS source-shape geometry, the bounded browser planner searches up to two transfers including nearby-stop interchanges, and official TFI fare references are shown only where XPLORE can bound the relevant city fare context. Fare references are not ticket quotes and do not affect XPLORE Score. Missing shapes fall back to scheduled stop geometry; v0.7 Live Mobility and v0.8 Decision Intelligence safeguards remain active.</div>
   </aside>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -192,7 +192,7 @@
 <script src="navigation.js"></script>
 <script src="navigation-map.js?v=0.4.6"></script>
 <script src="ireland-network.js?v=0.4.6"></script>
-<script src="eircode-provider.js?v=0.8.0"></script>
+<script src="eircode-provider.js?v=0.9.0"></script>
 <script src="decision-insight.js?v=0.8.0"></script>
 
 </body>

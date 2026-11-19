@@ -1,11 +1,11 @@
-// XPLORE Ireland v0.7.0 — scheduled planner; Live Mobility enrichment is layered by v0.7 adapters.
+// XPLORE Ireland v0.9.0 — scheduled transit base; v0.7 Live Mobility and v0.9 Multimodal are layered adapters.
 // Scheduled data is generated daily from the official NTA GTFS feed by GitHub Actions.
 // NTA GTFS-Realtime requires an API key, so bus realtime is intentionally not exposed
 // from this static GitHub Pages client. The adapter boundary is documented for a later
 // server-side integration. Irish Rail's public realtime endpoint is queried directly
 // when the browser permits it; scheduled GTFS remains the fallback.
 
-const XPLORE_TRANSIT_VERSION='0.7.0';
+const XPLORE_TRANSIT_VERSION='0.9.0';
 const XPLORE_TRANSIT_DATA_ROOT='data/transit';
 const XPLORE_IRISH_RAIL_BASE='https://api.irishrail.ie/realtime/realtime.asmx';
 
@@ -293,7 +293,7 @@ function transitReasons(item,index){
 function renderTransitItineraries(items){
   xploreTransitState.itineraries=items;xploreTransitState.active=0;
   if(!items.length){
-    $('routeList').innerHTML='<div class="notice">No same-day direct or one-transfer public-transport itinerary was found from nearby stops. Try a nearby station/stop or another travel mode.</div>';
+    $('routeList').innerHTML='<div class="notice">No same-day public-transport itinerary was found within the bounded two-transfer search from nearby stops. Try a nearby station/stop or another travel mode.</div>';
     return;
   }
   $('routeList').innerHTML=items.map((item,index)=>{

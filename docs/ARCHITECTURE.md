@@ -89,6 +89,23 @@ Key rules:
 
 The GitHub Actions snapshot is a beta backend adapter, not the final production service. A production XPLORE API should own polling, caching, schema validation, metrics, alert normalisation and provider failover.
 
+### Multimodal transit adapter
+
+v0.9 separates transit source geometry, network search and fare evidence.
+
+```text
+daily NTA GTFS
+  -> compact active schedule
+  -> exact active GTFS shapes -> deterministic shards
+  -> bounded transfer graph / nearby interchange
+  -> scheduled candidate itineraries
+  -> v0.7 live evidence
+  -> fare reference evidence
+  -> transit XPLORE scoring/explanation
+```
+
+Fare evidence is not a score component. GTFS shape failure is isolated per leg. The browser transfer planner is bounded for beta usability; a future production backend can replace it with unrestricted RAPTOR/CSA without changing the client-facing itinerary contract.
+
 ### Evidence-gated Route Intelligence
 
 v0.8 inserts an explicit validation step between sampled route context and the numeric road/path decision model.
