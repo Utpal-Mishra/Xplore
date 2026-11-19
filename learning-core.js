@@ -94,13 +94,31 @@
     };
   }
 
+  function normaliseJourneySnapshot(input={}){
+    if(input&&typeof input==='object'&&'score_band' in input){
+      return {
+        mode:String(input.mode||'unknown').slice(0,24),
+        preference:String(input.preference||'Balanced').slice(0,24),
+        candidate_count:Number.isFinite(+input.candidate_count)?Math.max(0,Math.min(20,+input.candidate_count)):0,
+        selected_rank:Number.isFinite(+input.selected_rank)?Math.max(0,Math.min(20,+input.selected_rank)):0,
+        score_band:String(input.score_band||'unknown').slice(0,16),
+        distance_bucket:String(input.distance_bucket||'unknown').slice(0,16),
+        duration_bucket:String(input.duration_bucket||'unknown').slice(0,16),
+        confidence_band:String(input.confidence_band||'unknown').slice(0,16),
+        transfers:Number.isFinite(+input.transfers)?Math.max(0,Math.min(8,+input.transfers)):null,
+        route_intelligence_confidence:String(input.route_intelligence_confidence||'unknown').slice(0,20)
+      };
+    }
+    return compactJourneySnapshot(input);
+  }
+
   function compactFeedbackForSharing(record={}){
     return {
       rating:['good','okay','poor'].includes(record.rating)?record.rating:null,
       destination_correct:['yes','no','unsure'].includes(record.destinationCorrect)?record.destinationCorrect:null,
       recommend_over_fastest:['yes','no','unsure'].includes(record.recommendOverFastest)?record.recommendOverFastest:null,
       issues:Array.isArray(record.issues)?record.issues.filter(x=>/^[a-z0-9_-]{1,40}$/i.test(String(x))).slice(0,8):[],
-      journey:compactJourneySnapshot(record.journey||{})
+      journey:normaliseJourneySnapshot(record.journey||{})
     };
   }
 
@@ -111,5 +129,5 @@
       .slice(-max);
   }
 
-  return {distanceBucket,durationBucket,scoreBand,providerClass,sanitizeEvent,compactJourneySnapshot,compactFeedbackForSharing,retainRecent};
+  return {distanceBucket,durationBucket,scoreBand,providerClass,sanitizeEvent,compactJourneySnapshot,normaliseJourneySnapshot,compactFeedbackForSharing,retainRecent};
 });
