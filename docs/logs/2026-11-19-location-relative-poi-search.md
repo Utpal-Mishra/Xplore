@@ -59,3 +59,9 @@ Validated:
 ## Change / Release Log — XP-REL-LOC-001
 PR: #16 — Fix location-relative POI search outside Cork.
 Branch: `agent/location-relative-poi-search`.
+
+## System and Release Follow-up — XP-REL-LOC-002
+
+The proximity release changed the URLs of the two search modules, but the HTML still referenced the previous URL of the loader that selects those versions. A cached loader could therefore request the old search modules. Version the loader and the updated routing entry point in the HTML so a reload of the latest page requests the intended assets.
+
+The live autocomplete provider returned Kildare-area candidates for the regional test. A fresh browser session showed Newbridge first at about 8 km. The JavaScript and Python suites and the offline release gate passed with the versioned asset references.
