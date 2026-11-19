@@ -25,8 +25,8 @@ function setup(overrides={}){
   }
   const rawA={duration:600,distance:2000};
   const rawB={duration:660,distance:1800};
-  const a={raw:rawA,providerIndex:0,score:87,carbon:340,confidence:85};
-  const b={raw:rawB,providerIndex:1,score:78,carbon:306,confidence:80};
+  const a={raw:rawA,providerIndex:0,score:80,carbon:340,confidence:85};
+  const b={raw:rawB,providerIndex:1,score:70,carbon:306,confidence:80};
   const state={
     mode:'driving',preference:'Balanced',
     routes:[rawA,rawB],enrichedRoutes:[a,b],
@@ -53,7 +53,7 @@ test('selected route explanation uses real candidate differences and weights',()
   window.renderRouteDecisionInsight(a,0);
   assert.equal(element('decisionInsightBody').hidden,false);
   assert.equal(element('decisionInsightEmpty').hidden,true);
-  assert.equal(element('decisionInsightScore').textContent,'87/100');
+  assert.equal(element('decisionInsightScore').textContent,'80/100');
   assert.match(element('decisionInsightHeading').textContent,/recommended/i);
   assert.equal(element('decisionInsightTime').textContent,'Fastest candidate');
   assert.equal(element('decisionInsightCarbon').textContent,'+34 g vs lowest');
