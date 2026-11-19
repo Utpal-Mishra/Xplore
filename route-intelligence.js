@@ -1,8 +1,9 @@
-// XPLORE Ireland v0.4.0 — sampled Route Segment Intelligence.
+// XPLORE Ireland v0.8.0 — evidence-gated Route Segment Intelligence.
 //
-// This module analyses the selected route against nearby OpenStreetMap tags.
-// Results are deliberately labelled as sampled/indicative and DO NOT change the
-// XPLORE Score yet. We first need real-world validation of the matching quality.
+// This module samples OpenStreetMap route context. v0.8 exposes candidate analysis
+// to the Decision Intelligence layer, which may include the result in XPLORE Score
+// only when explicit route-match/sample thresholds are met. Accessibility remains
+// evidence-only and is not inferred from missing tags.
 
 const routeIntelligenceState={
   requestId:0,
@@ -285,11 +286,22 @@ function riRenderAnalysis(analysis){
   riMetric('riMajor','Major roads',`${analysis.majorRoadPct}%`,'of matched route-road samples');
   riMetric('riLighting','Lighting',analysis.litYesPct==null?'Unknown':`${analysis.litYesPct}%`,`lit tagging available for ${analysis.litKnownPct}% of matched samples`);
   riMetric('riAccess','Access',analysis.accessConcerns?`${analysis.accessConcerns} flag${analysis.accessConcerns===1?'':'s'}`:'0 flags',`${analysis.accessPositive} positive accessibility signal${analysis.accessPositive===1?'':'s'} nearby`);
-  if($('riConfidence'))$('riConfidence').textContent=`${analysis.confidence} data confidence`;
-  if($('riSampleMeta'))$('riSampleMeta').textContent=`${analysis.sampleCount} route samples · ${analysis.routeKm.toFixed(1)} km${analysis.longRoute?' · long-route sample':''}`;
+  const decision=analysis.decisionScore;
+  const evidence=decision?.evidence;
+  if($('riConfidence'))$('riConfidence').textContent=evidence
+    ?`${evidence.tier==='high'?'High':evidence.tier==='medium'?'Medium':'Indicative'} scoring evidence`
+    :`${analysis.confidence} data confidence`;
+  if($('riSampleMeta'))$('riSampleMeta').textContent=`${analysis.sampleCount} route samples · ${analysis.routeKm.toFixed(1)} km · ${Math.round(analysis.roadMatchRate*100)}% road-match coverage${analysis.longRoute?' · long-route sample':''}`;
   if($('riStatus')){
-    $('riStatus').textContent='Sampled OpenStreetMap route intelligence · not yet included in XPLORE Score';
-    $('riStatus').dataset.tone=analysis.confidence==='Indicative'?'warning':'normal';
+    if(decision?.effectiveWeight>0){
+      $('riStatus').textContent=`Included in XPLORE Score · ${Math.round(decision.effectiveWeight*100)}% effective weight · ${decision.routeQuality}/100 route quality`;
+      $('riStatus').dataset.tone=evidence?.tier==='high'?'success':'normal';
+    }else{
+      $('riStatus').textContent=evidence
+        ?`Evidence shown, not scored · ${evidence.reason}`
+        :'Route evidence shown · scoring gate pending';
+      $('riStatus').dataset.tone='warning';
+    }
   }
 }
 
@@ -298,25 +310,30 @@ function riRenderError(message='Route intelligence temporarily unavailable.'){
   if($('riStatus')){$('riStatus').textContent=message;$('riStatus').dataset.tone='error';}
 }
 
+async function riAnalyseRouteForDecision(selected){
+  if(!selected)return null;
+  const key=riRouteKey(selected);
+  const cached=routeIntelligenceState.cache.get(key);
+  if(cached)return cached;
+  const samples=riSampleRoute(selected);
+  if(samples.length<2)throw new Error('Route geometry is too short to analyse');
+  const data=await riFetchOverpass(samples);
+  const analysis=riAnalyseSamples(selected,samples,riUniqueElements(data));
+  routeIntelligenceState.cache.set(key,analysis);
+  return analysis;
+}
+
 async function analyseSelectedRoute(index,enriched){
   const selected=enriched?.[index];
   if(!selected)return;
-  const key=riRouteKey(selected);
-  const cached=routeIntelligenceState.cache.get(key);
-  if(cached){riRenderAnalysis(cached);return;}
-
   const requestId=++routeIntelligenceState.requestId;
   if($('riConfidence'))$('riConfidence').textContent='Analysing route…';
   if($('riSampleMeta'))$('riSampleMeta').textContent='Matching selected route to open map context…';
   if($('riStatus')){$('riStatus').textContent='Analysing route segments…';$('riStatus').dataset.tone='normal';}
 
   try{
-    const samples=riSampleRoute(selected);
-    if(samples.length<2)throw new Error('Route geometry is too short to analyse');
-    const data=await riFetchOverpass(samples);
+    const analysis=await riAnalyseRouteForDecision(selected);
     if(requestId!==routeIntelligenceState.requestId)return;
-    const analysis=riAnalyseSamples(selected,samples,riUniqueElements(data));
-    routeIntelligenceState.cache.set(key,analysis);
     riRenderAnalysis(analysis);
   }catch(error){
     if(requestId!==routeIntelligenceState.requestId)return;
@@ -350,7 +367,7 @@ function riEnsureUI(){
     </div>
     <div class="ri-footer">
       <span id="riSampleMeta">Run a journey to analyse the selected route.</span>
-      <span id="riStatus">Not yet included in XPLORE Score</span>
+      <span id="riStatus">Evidence gate pending</span>
     </div>`;
   right.insertBefore(title,scoreTitle);
   right.insertBefore(card,scoreTitle);
@@ -359,14 +376,12 @@ function riEnsureUI(){
 function riLoadStyles(){
   if(document.querySelector('link[data-xplore-route-intelligence]'))return;
   const link=document.createElement('link');
-  link.rel='stylesheet';link.href='route-intelligence.css?v=0.4.0';link.dataset.xploreRouteIntelligence='true';
+  link.rel='stylesheet';link.href='route-intelligence.css?v=0.8.0';link.dataset.xploreRouteIntelligence='true';
   document.head.appendChild(link);
 }
 
-function activateRouteIntelligenceV040(){
+function activateRouteIntelligenceV080(){
   riLoadStyles();riEnsureUI();riResetUI();
-  const badge=document.querySelector('.header-meta .pill');if(badge)badge.textContent='Ireland v0.4.0';
-  if(typeof IRELAND_NETWORK!=='undefined')IRELAND_NETWORK.version='Ireland v0.4.0';
 
   const baseSelect=selectRoute;
   selectRoute=function(index,enriched){
@@ -377,7 +392,8 @@ function activateRouteIntelligenceV040(){
   const baseDraw=drawRoutes;
   drawRoutes=function(enriched,a,b){
     routeIntelligenceState.requestId++;
-    routeIntelligenceState.cache.clear();
+    if(!state.routeIntelligencePrefetched)routeIntelligenceState.cache.clear();
+    state.routeIntelligencePrefetched=false;
     riResetUI('New journey · route intelligence pending.');
     return baseDraw(enriched,a,b);
   };
@@ -393,5 +409,9 @@ function activateRouteIntelligenceV040(){
   }
 }
 
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',activateRouteIntelligenceV040,{once:true});
-else activateRouteIntelligenceV040();
+globalThis.xploreAnalyseRouteIntelligence=riAnalyseRouteForDecision;
+globalThis.xploreRenderRouteIntelligence=riRenderAnalysis;
+globalThis.xploreRouteIntelligenceState=routeIntelligenceState;
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',activateRouteIntelligenceV080,{once:true});
+else activateRouteIntelligenceV080();
