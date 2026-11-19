@@ -83,6 +83,22 @@ score(route) =
 
 Confidence is deliberately NOT hidden inside this utility score. It is returned separately so the product can communicate uncertainty.
 
+### Learning and evaluation layer
+
+v0.6 adds a privacy-first product-learning adapter around journey planning and guidance.
+
+Responsibilities:
+- record a coarse Search -> Results -> Guidance -> Arrival -> Feedback funnel
+- capture structured route-quality feedback
+- keep free text local by default
+- exclude raw GPS, addresses, Eircodes, search text and place names from analytics events
+- expose local export/clear controls
+- support a future governed collector without embedding privileged credentials in the client
+
+Analytics events use bucketed journey attributes (distance, duration, score and confidence) rather than precise location history. Structured feedback is product evidence only; it must not automatically become a safety/accessibility fact.
+
+A production collector, when introduced, should sit behind the XPLORE API boundary and add schema validation, authentication, rate limiting, deletion controls and aggregate reporting.
+
 ### Explanation engine
 Produces structured reasons, not generated marketing prose.
 
