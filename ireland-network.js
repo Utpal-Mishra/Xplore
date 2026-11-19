@@ -106,6 +106,7 @@ function resetJourneyPresentation(message='Journey changed — find routes again
   if($('healthWhy'))$('healthWhy').textContent='Run a journey to see how travel mode and active time affect this score.';
   if($('xploreWhy'))$('xploreWhy').textContent='The overall route score combines time, carbon, health/activity, comfort and confidence.';
   if($('scoreBreakdown'))$('scoreBreakdown').innerHTML='';
+  if(typeof window.resetRouteDecisionInsight==='function')window.resetRouteDecisionInsight();
   if($('startGuidance'))$('startGuidance').disabled=true;
   if($('mapLayerStatus'))$('mapLayerStatus').textContent='Loads around the selected journey';
   ['layerGreenCount','layerCycleCount','layerAccessibilityCount'].forEach(id=>{if($(id))$(id).textContent='—';});
