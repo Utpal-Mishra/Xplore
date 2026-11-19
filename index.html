@@ -17,7 +17,6 @@
   <link rel="stylesheet" href="mobile.css?v=0.4.6">
   <link rel="stylesheet" href="desktop-polish.css?v=4">
   <link rel="stylesheet" href="cork-place-search.css?v=0.5.3">
-  <link rel="stylesheet" href="motion-green.css?v=20261119">
   <link rel="stylesheet" href="decision-insight.css?v=20261119">
 </head>
 <body>
@@ -30,35 +29,6 @@
     <span class="eyebrow">Context-aware navigation</span>
     <h1 class="hero">Choose the journey, not just the ETA.</h1>
     <p class="sub">XPLORE compares real route candidates across Ireland and explains which one best fits your priorities.</p>
-
-    <section class="workflow-motion" id="workflowMotion" aria-label="How XPLORE turns data into decisions">
-      <div class="workflow-topline">
-        <span class="workflow-kicker">Data to decisions</span>
-        <div class="workflow-controls">
-          <span class="workflow-preview">Illustrative flow</span>
-          <button class="workflow-motion-toggle" data-motion-toggle type="button" aria-label="Pause workflow animation">Pause motion</button>
-        </div>
-      </div>
-      <svg class="workflow-svg" viewBox="0 0 312 72" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-        <defs><linearGradient id="workflowLineGradient" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#36ad6e"/><stop offset="55%" stop-color="#5fd88f"/><stop offset="100%" stop-color="#a3f0b9"/></linearGradient></defs>
-        <path class="workflow-rail" data-workflow-track d="M24 36 H288"/>
-        <path class="workflow-rail-glow" d="M24 36 H288"/>
-        <g class="workflow-node is-active" data-workflow-node="0" transform="translate(24 36)"><circle class="workflow-node-halo" r="13"/><circle class="workflow-node-core" r="4"/></g>
-        <g class="workflow-node" data-workflow-node="1" transform="translate(112 36)"><circle class="workflow-node-halo" r="13"/><circle class="workflow-node-core" r="4"/></g>
-        <g class="workflow-node" data-workflow-node="2" transform="translate(200 36)"><circle class="workflow-node-halo" r="13"/><circle class="workflow-node-core" r="4"/></g>
-        <g class="workflow-node" data-workflow-node="3" transform="translate(288 36)"><circle class="workflow-node-halo" r="13"/><circle class="workflow-node-core" r="4"/></g>
-        <circle class="workflow-packet" data-workflow-packet cx="24" cy="36" r="4"/>
-      </svg>
-      <div class="workflow-steps" aria-hidden="true">
-        <span class="workflow-step is-active" data-workflow-step="0"><strong>Data</strong></span>
-        <span class="workflow-step" data-workflow-step="1"><strong>Workflow</strong></span>
-        <span class="workflow-step" data-workflow-step="2"><strong>Automation</strong></span>
-        <span class="workflow-step" data-workflow-step="3"><strong>Reporting</strong></span>
-      </div>
-      <p class="workflow-caption"><strong>Place and route context</strong> → structured checks → automated ranking → explainable route reporting.</p>
-    </section>
-
-
 
     <div class="card route-form">
       <div class="field"><label for="from">Start</label><input id="from" placeholder="Enter start location" autocomplete="off" enterkeyhint="search" aria-label="Enter start location"></div>
@@ -224,7 +194,6 @@
 <script src="ireland-network.js?v=0.4.6"></script>
 <script src="eircode-provider.js?v=0.6.0"></script>
 <script src="decision-insight.js?v=20261119"></script>
-<script src="ui-workflow.js?v=0.5.4"></script>
 
 </body>
 </html>
