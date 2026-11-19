@@ -2,6 +2,24 @@
 
 This checklist is a release gate, not a marketing claim.
 
+## v1.0 Beta controls already implemented
+
+The following controls exist in the current controlled web Beta. They reduce release risk but **do not make XPLORE enterprise-ready**:
+
+- automated JavaScript/Python regression suite on pull requests and main
+- offline v1.0 release gate covering critical repository invariants
+- public GitHub Pages smoke monitoring hourly and after deployments
+- managed NTA realtime credential boundary: no API key in browser code
+- strict Scheduled fallback when authenticated NTA realtime is unavailable
+- local analytics data minimisation, 30-day capped retention, export and clear controls
+- explicit local analytics opt-out
+- pseudonymous local Founding Tester mode without name/email collection
+- privacy-warning public Beta issue form
+- evidence-gated Route Intelligence with accessibility excluded from numeric scoring
+- exact-match realtime joins and bounded transit/fare evidence claims
+
+The checklist below remains the target for a later production/enterprise architecture. Unchecked items must not be implied as complete merely because v1.0 Beta exists.
+
 ## Product and data
 - [ ] Real routing provider integrated behind an adapter.
 - [ ] Data provenance recorded for every contextual signal.
