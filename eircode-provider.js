@@ -61,7 +61,7 @@ function setXploreReleaseVersion(){
 }
 
 function loadXploreV100Modules(){
-  loadXploreScriptOnce('address-search.js?v=0.5.3','xplore-address-search-script',()=>{
+  loadXploreScriptOnce('address-search.js?v=1.0.1','xplore-address-search-script',()=>{
     loadXploreScriptOnce('transit-bootstrap.js?v=0.7.0','xplore-transit-bootstrap-script',()=>{
       loadXploreScriptOnce('transit.js?v=0.7.0','xplore-transit-script',()=>{
         loadXploreScriptOnce('transit-safety.js?v=0.7.0','xplore-transit-safety-script',()=>{
