@@ -8,31 +8,32 @@ const addressJs=fs.readFileSync('address-search.js','utf8');
 const index=fs.readFileSync('index.html','utf8');
 const loader=fs.readFileSync('eircode-provider.js','utf8');
 
-test('mobile address inputs use readable consumer-navigation typography',()=>{
+test('mobile address inputs stay visually consistent with surrounding controls',()=>{
   assert.match(mobile,/\.field input\{[\s\S]*font-family:"Inter"/);
-  assert.match(mobile,/\.field input\{[\s\S]*font-size:16px/);
+  assert.match(mobile,/\.field input\{[\s\S]*font-size:14px/);
   assert.match(mobile,/\.field input\{[\s\S]*font-weight:500/);
+  assert.match(mobile,/\.field input\{[\s\S]*min-height:48px/);
 });
 
-test('mobile address labels retain compact hierarchy without tiny dashboard text',()=>{
-  assert.match(mobile,/\.route-form \.field label\{[\s\S]*font-size:10\.5px/);
+test('mobile address labels use the compact app hierarchy',()=>{
+  assert.match(mobile,/\.route-form \.field label\{[\s\S]*font-size:9px/);
   assert.match(mobile,/\.route-form \.field label\{[\s\S]*font-weight:700/);
-  assert.match(mobile,/\.route-form \.field label\{[\s\S]*margin-bottom:8px/);
+  assert.match(mobile,/\.route-form \.field label\{[\s\S]*margin-bottom:6px/);
 });
 
-test('address helper copy is at least 10px and uses Inter body font',()=>{
+test('address helper copy stays subordinate to controls',()=>{
   assert.match(addressCss,/\.address-field-status\{[\s\S]*font-family:"Inter"/);
-  assert.match(addressCss,/\.address-field-status\{[\s\S]*font-size:10px/);
-  assert.match(addressCss,/@media\(max-width:760px\)\{[\s\S]*\.address-field-status\{[\s\S]*font-size:10\.5px/);
+  assert.match(addressCss,/\.address-field-status\{[\s\S]*font-size:8\.5px/);
+  assert.match(addressCss,/@media\(max-width:760px\)\{[\s\S]*\.address-field-status\{[\s\S]*font-size:8\.5px/);
 });
 
-test('placeholder remains 16px to avoid iOS input zoom and uses body font',()=>{
-  assert.match(mobile,/\.field input::placeholder\{[\s\S]*font-size:16px/);
+test('placeholder matches the app control scale',()=>{
+  assert.match(mobile,/\.field input::placeholder\{[\s\S]*font-size:14px/);
   assert.match(mobile,/\.field input::placeholder\{[\s\S]*font-family:"Inter"/);
 });
 
-test('typography assets are cache-busted consistently',()=>{
-  assert.match(index,/mobile\.css\?v=1\.0\.1/);
-  assert.match(loader,/address-search\.js\?v=1\.0\.1/);
-  assert.match(addressJs,/address-search\.css\?v=1\.0\.1/);
+test('balanced typography assets are cache-busted consistently',()=>{
+  assert.match(index,/mobile\.css\?v=1\.0\.2/);
+  assert.match(loader,/address-search\.js\?v=1\.0\.2/);
+  assert.match(addressJs,/address-search\.css\?v=1\.0\.2/);
 });

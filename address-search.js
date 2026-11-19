@@ -1,4 +1,4 @@
-// XPLORE Ireland v1.0.1 — dynamic address autocomplete with refined mobile typography.
+// XPLORE Ireland v1.0.2 — dynamic address autocomplete with refined mobile typography.
 //
 // Interaction model:
 //   type -> debounced Photon suggestions -> user explicitly selects -> route
@@ -33,12 +33,12 @@ function addressPrompt(fieldId){
 function ensureAddressStyles(){
   let link=document.querySelector('link[data-xplore-address-search]');
   if(link){
-    if(!link.href.includes('v=1.0.1'))link.href='address-search.css?v=1.0.1';
+    if(!link.href.includes('v=1.0.2'))link.href='address-search.css?v=1.0.2';
     return;
   }
   link=document.createElement('link');
   link.rel='stylesheet';
-  link.href='address-search.css?v=1.0.1';
+  link.href='address-search.css?v=1.0.2';
   link.dataset.xploreAddressSearch='true';
   document.head.appendChild(link);
 }
