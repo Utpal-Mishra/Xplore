@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="XPLORE — context-aware human-centred navigation pilot for Cork, Ireland.">
-  <title>XPLORE — Cork Real-World Pilot</title>
+  <meta name="description" content="XPLORE — location-aware, human-centred navigation for Ireland.">
+  <title>XPLORE — Location-Aware Navigation</title>
   <link rel="preconnect" href="https://unpkg.com">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <link rel="stylesheet" href="styles.css">
@@ -12,7 +12,7 @@
 <body>
 <header class="app-header">
   <div class="brand">XPLORE</div>
-  <div class="header-meta"><span class="pill">Cork v0.2</span><span class="pill dev">Development data adapters</span></div>
+  <div class="header-meta"><span class="pill">Ireland v0.3</span><span class="pill dev">Development data adapters</span></div>
 </header>
 <main class="layout">
   <aside class="left">
@@ -21,8 +21,8 @@
     <p class="sub">XPLORE compares real route candidates and explains which one best fits your priorities.</p>
 
     <div class="card route-form">
-      <div class="field"><label for="from">Start</label><input id="from" value="Cork City Library" autocomplete="off"></div>
-      <div class="field"><label for="to">Destination</label><input id="to" value="University College Cork" autocomplete="off"></div>
+      <div class="field"><label for="from">Start</label><input id="from" placeholder="Enter start location" autocomplete="off"></div>
+      <div class="field"><label for="to">Destination</label><input id="to" placeholder="Search destination or place" autocomplete="off"></div>
       <button class="secondary" id="useLocation" type="button">Use current location</button>
       <h2 class="section-title">Travel mode</h2>
       <div class="mode-row">
@@ -38,7 +38,7 @@
         <button class="choice" data-pref="Calmest">Calmest</button>
       </div>
       <button class="primary" id="find" type="button" style="margin-top:12px">Find real routes</button>
-      <div class="status" id="status">Ready for a Cork journey.</div>
+      <div class="status" id="status">Use current location or enter any Irish start point.</div>
     </div>
 
     <h2 class="section-title">Journey impact</h2>
@@ -62,7 +62,7 @@
     <div class="map-overlay top-left map-card"><div class="pill">OpenStreetMap pilot</div></div>
     <div class="map-overlay bottom-left map-card card">
       <div class="route-summary">
-        <div><span class="eyebrow" id="summaryTitle">No route selected</span><h2 id="summaryMeta">Choose two Cork locations</h2></div>
+        <div><span class="eyebrow" id="summaryTitle">No route selected</span><h2 id="summaryMeta">Choose a start and destination</h2></div>
         <div class="score-badge"><span id="routeScore">—</span><small>XPLORE score</small></div>
       </div>
       <div id="reasons" class="reason-list"><span class="reason">Real route geometry</span><span class="reason">Explainable scoring</span></div>
@@ -81,7 +81,7 @@
     <div class="card explain"><ul id="explainList"><li>XPLORE explanations will appear after routing.</li></ul></div>
 
     <h2 class="section-title">Pilot boundary</h2>
-    <div class="notice">This v0.2 build uses public OpenStreetMap/Nominatim/OSRM services only for low-volume development. Enterprise deployment will move geocoding, tiles and routing behind governed provider adapters or self-hosted infrastructure.</div>
+    <div class="notice">This v0.3 build uses public OpenStreetMap/Nominatim/OSRM services only for low-volume development. Enterprise deployment will move geocoding, tiles and routing behind governed provider adapters or self-hosted infrastructure.</div>
   </aside>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
