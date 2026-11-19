@@ -38,7 +38,7 @@ test('v0.9 modules load after Live Mobility and before road Decision Intelligenc
   const mm=loader.indexOf("multimodal-v09.js?v=0.9.0");
   const route=loader.indexOf("route-intelligence.js?v=0.8.0");
   assert.ok(live>=0&&live<core&&core<mm&&mm<route);
-  assert.ok(loader.includes('Ireland v0.9.0'));
+  assert.ok(loader.includes('Ireland v1.0.0 Beta'));
 });
 
 test('builder preserves v0.7-compatible trip indexes while appending v0.9 metadata',()=>{
