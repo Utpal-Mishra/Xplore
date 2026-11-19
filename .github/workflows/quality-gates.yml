@@ -22,6 +22,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: Check browser JavaScript syntax
+        run: node --check learning-core.js && node --check learning-v06.js
+
       - name: Run JavaScript regression tests
         run: node --test tests/*.test.cjs
 
