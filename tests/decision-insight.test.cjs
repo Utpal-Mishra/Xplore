@@ -36,7 +36,9 @@ function setup(overrides={}){
   const window={};
   const ctx={
     window,document:{getElementById:element},state,
-    scoreWeights:()=>({time:.38,carbon:.18,health:.16,comfort:.16,confidence:.12}),
+    scoreWeights:()=>state.preference==='Greenest'
+      ? {time:.20,carbon:.42,health:.18,comfort:.10,confidence:.10}
+      : {time:.38,carbon:.18,health:.16,comfort:.16,confidence:.12},
     scoreComponents:(_raw,index)=>({
       time:index===0?100:72,carbon:index===0?77:80,
       health:28,comfort:86,confidence:index===0?85:80
@@ -73,14 +75,11 @@ test('preference-specific driver, missing weather, and one available route',()=>
   const {window,element,state,a}=setup({preference:'Greenest',lastContext:{weather:null,air:null}});
   state.enrichedRoutes=[a];
   state.routes=[a.raw];
-  window.buildRouteDecisionInsight;
-  // Mirror the preference-weighted carbon priority from the route model.
-  const secondSetup=setup({preference:'Greenest',lastContext:{weather:null,air:null}});
-  secondSetup.window.renderRouteDecisionInsight(secondSetup.a,0);
-  assert.match(secondSetup.element('decisionInsightContext').textContent,/Weather unavailable/);
-  assert.match(secondSetup.element('decisionInsightContext').textContent,/Air quality unavailable/);
-
   window.renderRouteDecisionInsight(a,0);
+  assert.match(element('decisionInsightContext').textContent,/Weather unavailable/);
+  assert.match(element('decisionInsightContext').textContent,/Air quality unavailable/);
+  assert.equal(element('decisionInsightDriverWeight').textContent,'42% weight · 77/100');
+  assert.match(element('decisionInsightDriverLabel').textContent,/Carbon/);
   assert.equal(element('decisionInsightTime').textContent,'Only route available');
   assert.equal(element('decisionInsightCarbon').textContent,'Only route available');
 });
