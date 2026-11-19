@@ -1,9 +1,9 @@
-const CORK={lat:51.8985,lon:-8.4756};
-const state={map:null,markers:[],layers:[],routes:[],activeRoute:0,mode:'driving',preference:'Balanced',lastContext:null};
+const IRELAND={lat:53.35,lon:-7.8};
+const state={map:null,markers:[],layers:[],routes:[],activeRoute:0,mode:'driving',preference:'Balanced',lastContext:null,userLocation:null,lastPlaceCandidates:[]};
 const $=id=>document.getElementById(id);
 
 function initMap(){
-  state.map=L.map('map',{zoomControl:true}).setView([CORK.lat,CORK.lon],13);
+  state.map=L.map('map',{zoomControl:true}).setView([IRELAND.lat,IRELAND.lon],7);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(state.map);
 }
 
@@ -14,20 +14,99 @@ function parseCoordinates(query){
   const m=query.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
   if(!m)return null;
   const lat=+m[1],lon=+m[2];
-  return Math.abs(lat)<=90&&Math.abs(lon)<=180?{lat,lon,name:'Current location'}:null;
+  return Math.abs(lat)<=90&&Math.abs(lon)<=180?{lat,lon,name:'Coordinates'}:null;
 }
 
-async function geocode(query){
+function distanceKm(a,b){
+  const toRad=v=>v*Math.PI/180;
+  const R=6371;
+  const dLat=toRad(b.lat-a.lat),dLon=toRad(b.lon-a.lon);
+  const lat1=toRad(a.lat),lat2=toRad(b.lat);
+  const h=Math.sin(dLat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+
+function shortPlaceName(name){
+  return (name||'').split(',').slice(0,3).join(',').trim();
+}
+
+async function geocode(query,bias=null){
+  if(/^current location$/i.test(query)&&state.userLocation)return {...state.userLocation};
   const coords=parseCoordinates(query);if(coords)return coords;
-  const q=`${query}, Cork, Ireland`;
-  const url='https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ie&q='+encodeURIComponent(q);
-  const res=await fetch(url,{headers:{Accept:'application/json'}});
+
+  const params=new URLSearchParams({
+    format:'jsonv2',
+    limit:'20',
+    countrycodes:'ie',
+    addressdetails:'1',
+    dedupe:'1',
+    q:query
+  });
+
+  if(bias){
+    const d=1.35;
+    params.set('viewbox',(bias.lon-d)+','+(bias.lat+d)+','+(bias.lon+d)+','+(bias.lat-d));
+    params.set('bounded','0');
+  }
+
+  const res=await fetch('https://nominatim.openstreetmap.org/search?'+params.toString(),{
+    headers:{Accept:'application/json','Accept-Language':'en'}
+  });
   if(!res.ok) throw new Error('Place search failed');
+
   const data=await res.json();
-  if(!data.length) throw new Error(`Could not find: ${query}`);
-  return {lat:+data[0].lat,lon:+data[0].lon,name:data[0].display_name};
+  if(!data.length) throw new Error('Could not find: '+query);
+
+  const candidates=data.map(x=>({
+    lat:+x.lat,
+    lon:+x.lon,
+    name:x.display_name,
+    type:x.type||'place',
+    importance:+x.importance||0
+  }));
+
+  if(bias){
+    candidates.forEach(x=>x.distanceKm=distanceKm(bias,x));
+    candidates.sort((a,b)=>a.distanceKm-b.distanceKm||b.importance-a.importance);
+  }
+
+  state.lastPlaceCandidates=candidates.slice(0,8);
+  return candidates[0];
 }
 
+function captureCurrentLocation({fillInput=true,silent=false}={}){
+  if(!navigator.geolocation){
+    if(!silent)setStatus('Live location is not supported by this browser.',true);
+    return;
+  }
+
+  if(!silent)setStatus('Getting your live location…');
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      state.userLocation={
+        lat:pos.coords.latitude,
+        lon:pos.coords.longitude,
+        name:'Current location',
+        accuracy:pos.coords.accuracy
+      };
+      if(fillInput)$('from').value='Current location';
+      state.map.setView([state.userLocation.lat,state.userLocation.lon],14);
+      if(!silent)setStatus('Live location captured · accuracy about '+Math.round(pos.coords.accuracy)+' m.');
+    },
+    ()=>{
+      if(!silent)setStatus('Location permission was not granted. Enter a start location instead.',true);
+    },
+    {enableHighAccuracy:true,timeout:10000,maximumAge:60000}
+  );
+}
+
+async function restoreGrantedLocation(){
+  if(!navigator.permissions||!navigator.geolocation)return;
+  try{
+    const permission=await navigator.permissions.query({name:'geolocation'});
+    if(permission.state==='granted')captureCurrentLocation({fillInput:true,silent:true});
+  }catch(_){}
+}
 function routingEndpoint(){
   if(state.mode==='cycling')return 'https://routing.openstreetmap.de/routed-bike/route/v1/driving';
   if(state.mode==='walking')return 'https://routing.openstreetmap.de/routed-foot/route/v1/driving';
@@ -104,13 +183,47 @@ function renderContext(ctx){
 }
 
 async function planJourney(){
-  const from=$('from').value.trim(),to=$('to').value.trim();if(!from||!to){setStatus('Enter both start and destination.',true);return;}document.body.classList.add('loading');setStatus('Finding real Cork locations…');
-  try{const [a,b]=await Promise.all([geocode(from),geocode(to)]);setStatus('Requesting routes and live context…');const [routes,ctx]=await Promise.all([fetchRoutes(a,b),fetchContext(a,b)]);state.routes=routes;renderContext(ctx);const enriched=enrichRoutes(routes);drawRoutes(enriched,a,b);renderRoutes(enriched);setStatus(`Found ${routes.length} real ${state.mode} route option${routes.length===1?'':'s'}.`);}catch(e){console.error(e);setStatus(e.message||'Could not calculate route.',true);}finally{document.body.classList.remove('loading');}
+  const from=$('from').value.trim(),to=$('to').value.trim();
+  if(!from||!to){setStatus('Enter both start and destination.',true);return;}
+
+  document.body.classList.add('loading');
+  setStatus('Finding the nearest relevant places…');
+
+  try{
+    const a=await geocode(from,state.userLocation);
+    const searchAnchor=state.userLocation||a;
+    const b=await geocode(to,searchAnchor);
+    const matchDistance=searchAnchor?distanceKm(searchAnchor,b):null;
+    const anchorLabel=state.userLocation?'your live location':'the journey start';
+
+    setStatus('Nearest match: '+shortPlaceName(b.name)+(matchDistance!=null?' · '+matchDistance.toFixed(1)+' km from '+anchorLabel:'')+'.');
+
+    const [routes,ctx]=await Promise.all([fetchRoutes(a,b),fetchContext(a,b)]);
+    state.routes=routes;
+    renderContext(ctx);
+    const enriched=enrichRoutes(routes);
+    drawRoutes(enriched,a,b);
+    renderRoutes(enriched);
+
+    setStatus(
+      'Using '+shortPlaceName(b.name)+' · '+
+      (matchDistance!=null?matchDistance.toFixed(1)+' km from '+anchorLabel:'nearest available match')+
+      ' · '+routes.length+' route option'+(routes.length===1?'':'s')+'.'
+    );
+  }catch(e){
+    console.error(e);
+    setStatus(e.message||'Could not calculate route.',true);
+  }finally{
+    document.body.classList.remove('loading');
+  }
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
-  initMap();$('find').onclick=planJourney;
+  initMap();
+  restoreGrantedLocation();
+  $('find').onclick=planJourney;
   document.querySelectorAll('.mode').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.mode').forEach(x=>x.classList.remove('active'));btn.classList.add('active');state.mode=btn.dataset.mode;});
   document.querySelectorAll('.choice').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.choice').forEach(x=>x.classList.remove('active'));btn.classList.add('active');state.preference=btn.dataset.pref;});
-  $('useLocation').onclick=()=>navigator.geolocation?.getCurrentPosition(pos=>{$('from').value=`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;setStatus('Current location captured locally.');},()=>setStatus('Location permission was not granted.',true),{enableHighAccuracy:true,timeout:8000});
+  $('useLocation').onclick=()=>captureCurrentLocation();
+  ['from','to'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')planJourney();}));
 });
