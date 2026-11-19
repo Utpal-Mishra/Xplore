@@ -35,13 +35,15 @@
     if (!validDurations.length || !validEmissions.length) return null;
 
     const moreThanOne = candidates.length > 1;
-    const timeDelta = raw.duration - Math.min(...validDurations);
-    const carbonDelta = Math.max(0, route.carbon - Math.min(...validEmissions));
+    const timeDelta = Math.max(0,raw.duration - Math.min(...validDurations));
+    const carbonDelta = Math.max(0,route.carbon - Math.min(...validEmissions));
     const timeComparison = !moreThanOne ? 'Only route available'
-      : timeDelta < 30 ? 'Fastest candidate'
-      : '+' + Math.max(1, rounded(timeDelta/60)) + ' min vs fastest';
+      : timeDelta < 1 ? 'Fastest candidate'
+      : timeDelta < 60 ? '+' + rounded(timeDelta) + ' sec vs fastest'
+      : '+' + rounded(timeDelta/60) + ' min vs fastest';
     const carbonComparison = !moreThanOne ? 'Only route available'
-      : carbonDelta < 1 ? 'Lowest estimated CO₂'
+      : carbonDelta < 0.01 ? 'Lowest estimated CO₂'
+      : carbonDelta < 1 ? '<1 g vs lowest'
       : '+' + rounded(carbonDelta) + ' g vs lowest';
 
     const weight = weights[priorityKey];
