@@ -1,6 +1,16 @@
 name: Refresh XPLORE live mobility
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/refresh-live-mobility.yml'
+      - 'scripts/build_realtime_snapshot.py'
+      - 'realtime-core.js'
+      - 'realtime-v07.js'
+      - 'transit-live-patch-v07.js'
+      - 'data/transit/manifest.json'
+      - 'data/transit/realtime_eligible.json'
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
@@ -53,17 +63,17 @@ jobs:
         run: python scripts/build_realtime_snapshot.py
 
       - name: Configure Pages
-        if: steps.config.outputs.enabled == 'true'
+        if: steps.config.outputs.enabled == 'true' && github.event_name != 'push'
         uses: actions/configure-pages@v5
         with:
           enablement: true
 
       - name: Upload current site with realtime snapshot
-        if: steps.config.outputs.enabled == 'true'
+        if: steps.config.outputs.enabled == 'true' && github.event_name != 'push'
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
 
       - name: Deploy refreshed live mobility
-        if: steps.config.outputs.enabled == 'true'
+        if: steps.config.outputs.enabled == 'true' && github.event_name != 'push'
         uses: actions/deploy-pages@v4
