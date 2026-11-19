@@ -19,7 +19,7 @@
   }
 
   function availableLighting(analysis={}){
-    return Number(analysis.litKnownPct)||0>=50 && Number.isFinite(Number(analysis.litYesPct));
+    return (Number(analysis.litKnownPct)||0)>=50 && Number.isFinite(Number(analysis.litYesPct));
   }
 
   function weightedAverage(parts){
@@ -83,7 +83,7 @@
       };
     }
     const requestedWeight=preferredRouteWeight(preference);
-    const effectiveWeight=requestedWeight*evidence.factor;
+    const effectiveWeight=Math.round(requestedWeight*evidence.factor*10000)/10000;
     const blended=clamp(baseScore)*(1-effectiveWeight)+quality*effectiveWeight;
     return {
       score:Math.round(blended),
