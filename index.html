@@ -23,7 +23,7 @@
 <body>
 <header class="app-header">
   <div class="brand">XPLORE</div>
-  <div class="header-meta"><span class="pill">Ireland v0.4.6</span><span class="pill dev">Development Data Adapters</span></div>
+  <div class="header-meta"><span class="pill">Ireland v0.6.0</span><span class="pill dev">Development Data Adapters</span></div>
 </header>
 <main class="layout">
   <aside class="left">
@@ -211,7 +211,7 @@
     </div>
 
     <h2 class="section-title">Pilot Boundary</h2>
-    <div class="notice">XPLORE v0.4.6 introduces dynamic Ireland address autocomplete: Start and Destination suggestions appear while typing using a debounced Photon/OpenStreetMap development adapter, obsolete requests are cancelled, results are biased toward an already-known current/start location, and keyboard selection is supported. Ordinary fuzzy results still require explicit user selection before routing, while exact Eircodes retain their dedicated fail-safe resolver. Route Intelligence remains sampled and is not yet included in the XPLORE Score while validation continues.</div>
+    <div class="notice">XPLORE v0.6.0 adds the Learn layer: journey feedback, route-quality reporting and a privacy-first 30-day local analytics funnel across search, results, guidance, arrival and feedback. Analytics deliberately exclude raw GPS coordinates, typed addresses, Eircodes and destination names. Free-text feedback remains local unless a future governed collector is explicitly configured. Route Intelligence is still sampled and is not yet included in the XPLORE Score while validation continues.</div>
   </aside>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -222,7 +222,7 @@
 <script src="navigation.js"></script>
 <script src="navigation-map.js?v=0.4.6"></script>
 <script src="ireland-network.js?v=0.4.6"></script>
-<script src="eircode-provider.js?v=0.5.3"></script>
+<script src="eircode-provider.js?v=0.6.0"></script>
 <script src="decision-insight.js?v=20261119"></script>
 <script src="ui-workflow.js?v=0.5.4"></script>
 
