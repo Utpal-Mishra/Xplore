@@ -1,0 +1,33 @@
+{
+  "version": "1",
+  "verifiedAt": "2026-11-19",
+  "status": "official-reference-not-universal-quote",
+  "source": "Transport for Ireland",
+  "note": "XPLORE shows these only as official reference fares when all transit boarding/alighting points are within the relevant city region. Operator participation, ticket product, passenger eligibility and transfer conditions must still be verified. Fare evidence does not affect XPLORE Score.",
+  "regions": {
+    "cork_city": {
+      "label": "Cork TFI 90 Minute fare reference",
+      "adultLeap": 1.7,
+      "youngAdultStudent": 0.85,
+      "childLeap": 0.55,
+      "currency": "EUR",
+      "eligibility": "Reference for the TFI 90 Minute fare in Cork City. Verify participating services and Leap eligibility.",
+      "source": "https://www.transportforireland.ie/fares/90-minute-fare/"
+    },
+    "dublin_city": {
+      "label": "Dublin TFI 90 Minute fare reference",
+      "adultLeap": 2,
+      "youngAdultStudent": 1,
+      "childLeap": 0.65,
+      "currency": "EUR",
+      "eligibility": "Reference for the TFI 90 Minute fare in Dublin. Some commuter bus, Xpresso, Nitelink and outer-zone journeys use different fares; verify eligibility.",
+      "source": "https://www.transportforireland.ie/fares/90-minute-fare/"
+    }
+  },
+  "additionalReferences": {
+    "dublinZones": "https://www.transportforireland.ie/fares/fare-zones/",
+    "train": "https://www.transportforireland.ie/fares/train-fares/",
+    "bus": "https://www.transportforireland.ie/fares/bus-fares/",
+    "luas": "https://www.transportforireland.ie/fares/luas-fares/"
+  }
+}
