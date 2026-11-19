@@ -10,7 +10,8 @@
     carbon:'Carbon',
     health:'Health / activity',
     comfort:'Comfort',
-    confidence:'Confidence'
+    confidence:'Confidence',
+    routeIntelligence:'Route Intelligence'
   };
   const safeNumber = value => typeof value === 'number' && Number.isFinite(value);
   const rounded = value => Math.round(value);
@@ -23,8 +24,16 @@
         !safeNumber(route.carbon) || !safeNumber(route.confidence) ||
         !candidates.length || !Array.isArray(state.routes) || !state.routes.length) return null;
 
-    const weights = scoreWeights();
+    const baseWeights = scoreWeights();
     const components = scoreComponents(raw, route.providerIndex);
+    const routeWeight = safeNumber(route.decision?.effectiveWeight) ? route.decision.effectiveWeight : 0;
+    const weights = Object.fromEntries(
+      Object.entries(baseWeights).map(([key,value])=>[key,value*(1-routeWeight)])
+    );
+    if(routeWeight>0 && safeNumber(route.decision?.routeQuality)){
+      weights.routeIntelligence=routeWeight;
+      components.routeIntelligence=route.decision.routeQuality;
+    }
     const priorityKey = Object.keys(names)
       .filter(key => safeNumber(weights[key]) && safeNumber(components[key]))
       .sort((a,b) => weights[b] - weights[a])[0];
@@ -51,12 +60,20 @@
     const confidence = rounded(route.confidence);
     const currentWeather = state.lastContext && state.lastContext.weather;
     const currentAir = state.lastContext && state.lastContext.air;
+    const routeEvidence = route.decision?.effectiveWeight>0
+      ? 'Validated Route Intelligence is included at '+rounded(route.decision.effectiveWeight*100)+'% effective weight ('+
+        route.decision.evidence.tier+' evidence).'
+      : route.routeIntelligence
+        ? 'Route Intelligence is displayed but excluded from scoring because its evidence gate was not met.'
+        : 'Route Intelligence is unavailable for this candidate; the base score is retained.';
     const contextText = (currentWeather
       ? 'Weather informs the pilot comfort estimate.'
       : 'Weather unavailable: comfort uses a pilot default.')
       + ' ' + (currentAir
         ? 'Air quality is displayed separately, not included in scoring.'
-        : 'Air quality unavailable and not included in scoring.');
+        : 'Air quality unavailable and not included in scoring.')
+      + ' ' + routeEvidence
+      + ' Accessibility observations remain evidence-only and are not inferred from missing map tags.';
 
     return {
       heading: selectedIndex === 0 ? 'XPLORE recommended route' : 'Alternative route ' + selectedIndex,
@@ -70,7 +87,7 @@
       driverWeight: rounded(weight * 100) + '% weight · ' + rounded(component) + '/100',
       driverValue: Math.max(0,Math.min(100,component)),
       driverDetail: names[priorityKey] + ' contributes approximately ' +
-        oneDecimal(component * weight) + ' points to this route’s ' +
+        oneDecimal(component * weight) + ' weighted points before final rounding to this route’s ' +
         rounded(route.score) + '/100 score.',
       contextText
     };
