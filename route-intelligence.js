@@ -274,7 +274,7 @@ function riResetUI(message='Run a journey to analyse the selected route.'){
   });
   if($('riConfidence'))$('riConfidence').textContent='Route pending';
   if($('riSampleMeta'))$('riSampleMeta').textContent=message;
-  if($('riStatus')){$('riStatus').textContent='Not yet included in XPLORE Score';$('riStatus').dataset.tone='normal';}
+  if($('riStatus')){$('riStatus').textContent='Evidence gate pending · score unchanged until validation passes';$('riStatus').dataset.tone='normal';}
 }
 
 function riRenderAnalysis(analysis){
