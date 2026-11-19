@@ -185,8 +185,31 @@
   /* More comfortable phone form controls. */
   .card{border-radius:15px}
   .route-form{padding:14px;margin-top:14px}
-  .field{margin-bottom:12px}
-  .field input{min-height:48px;font-size:15px;padding:12px}
+  .field{margin-bottom:14px}
+  .route-form .field label{
+    margin-bottom:8px;
+    color:#74d99c;
+    font-family:"Inter Tight",sans-serif;
+    font-size:10.5px;
+    font-weight:700;
+    line-height:1.2;
+    letter-spacing:.065em;
+  }
+  .field input{
+    min-height:48px;
+    padding:12px;
+    font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-size:16px;
+    font-weight:500;
+    line-height:1.25;
+    letter-spacing:-.01em;
+  }
+  .field input::placeholder{
+    font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-size:16px;
+    font-weight:450!important;
+    letter-spacing:-.01em;
+  }
   .secondary,.choice,.mode,.primary{min-height:44px}
   .location-actions{grid-template-columns:1fr;gap:8px}
   .location-actions .secondary{font-size:12px}
