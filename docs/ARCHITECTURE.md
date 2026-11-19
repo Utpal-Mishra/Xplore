@@ -64,6 +64,31 @@ Normalised observation envelope:
 }
 ```
 
+### Live Mobility adapter
+
+v0.7 adds a freshness-aware transport evidence layer between scheduled transit planning and the decision engine.
+
+```text
+GTFS_All scheduled candidates
+  -> strict compatibility index from current GTFS_Realtime static feed
+  -> server-side GTFS-Realtime snapshot
+  -> freshness + exact-ID validation
+  -> timing / vehicle / alert evidence
+  -> transit reliability + reranking
+```
+
+Key rules:
+- authenticated NTA requests happen server-side only
+- broad scheduled coverage remains available even when realtime is unavailable
+- realtime trip IDs are never fuzzy-matched
+- an eligible join requires exact trip ID plus exact ordered stop sequence
+- stale/unmatched live evidence cannot change the recommendation
+- cancellations and infeasible live transfer gaps receive deterministic penalties/caps
+- vehicle positions are map evidence, not route geometry
+- the decision layer retains whether timing/reliability evidence is scheduled, part-live or live
+
+The GitHub Actions snapshot is a beta backend adapter, not the final production service. A production XPLORE API should own polling, caching, schema validation, metrics, alert normalisation and provider failover.
+
 ### Decision engine
 Consumes candidate routes + route features + contextual observations + user preferences.
 
