@@ -120,10 +120,18 @@ function addressSearchBias(fieldId){
   if(fieldId==='to'){
     const start=xploreAddressState.selections.from;
     if(start)return {lat:start.lat,lon:start.lon,source:'start'};
+    const typedStart=parseCoordinates($('from')?.value||'');
+    if(typedStart&&isInsideIrelandBounds(typedStart)){
+      return {lat:typedStart.lat,lon:typedStart.lon,source:'typed-start-coordinates'};
+    }
   }
   if(fieldId==='from'){
     const destination=xploreAddressState.selections.to;
     if(destination)return {lat:destination.lat,lon:destination.lon,source:'destination'};
+    const typedDestination=parseCoordinates($('to')?.value||'');
+    if(typedDestination&&isInsideIrelandBounds(typedDestination)){
+      return {lat:typedDestination.lat,lon:typedDestination.lon,source:'typed-destination-coordinates'};
+    }
   }
   return {lat:IRELAND_NETWORK?.center?.lat||53.38,lon:IRELAND_NETWORK?.center?.lon||-8.05,source:'ireland'};
 }
@@ -221,7 +229,13 @@ async function fetchPhotonSuggestions(fieldId,query,signal){
     const key=candidateKey(item);
     if(!unique.has(key))unique.set(key,item);
   }
-  return [...unique.values()].slice(0,XPLORE_AUTOCOMPLETE_LIMIT);
+  return [...unique.values()]
+    .sort((a,b)=>{
+      const ad=Number.isFinite(a.distanceKm)?a.distanceKm:Number.POSITIVE_INFINITY;
+      const bd=Number.isFinite(b.distanceKm)?b.distanceKm:Number.POSITIVE_INFINITY;
+      return ad-bd;
+    })
+    .slice(0,XPLORE_AUTOCOMPLETE_LIMIT);
 }
 
 async function fetchDynamicAddressSuggestions(fieldId,query,signal){
