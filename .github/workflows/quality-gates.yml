@@ -23,10 +23,13 @@ jobs:
           node-version: 22
 
       - name: Check browser JavaScript syntax
-        run: node --check learning-core.js && node --check learning-v06.js
+        run: node --check learning-core.js && node --check learning-v06.js && node --check realtime-core.js && node --check realtime-v07.js && node --check transit-live-patch-v07.js && node --check eircode-provider.js
 
       - name: Run JavaScript regression tests
         run: node --test tests/*.test.cjs
 
       - name: Check transit builder syntax
-        run: python -m py_compile scripts/build_transit_data.py
+        run: python -m py_compile scripts/build_transit_data.py scripts/build_realtime_snapshot.py
+
+      - name: Run transit compatibility tests
+        run: python -m unittest discover -s tests -p 'test_*.py'

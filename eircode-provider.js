@@ -1,4 +1,4 @@
-// XPLORE Ireland v0.6.0 — Eircode resolver + product-module loader.
+// XPLORE Ireland v0.7.0 — Eircode resolver + product-module loader.
 // Exact Eircodes should be resolved by an Eircode-aware provider before fuzzy place search.
 // This public endpoint is used only as a low-volume development adapter; production should
 // use an approved/licensed Eircode provider behind an XPLORE-controlled server-side API.
@@ -55,23 +55,29 @@ function loadXploreScriptOnce(src,id,onload){
 }
 
 function setXploreReleaseVersion(){
-  IRELAND_NETWORK.version='Ireland v0.6.0';
+  IRELAND_NETWORK.version='Ireland v0.7.0';
   const versionBadge=document.querySelector('.header-meta .pill');
-  if(versionBadge)versionBadge.textContent='Ireland v0.6.0';
+  if(versionBadge)versionBadge.textContent='Ireland v0.7.0';
 }
 
-function loadXploreV060Modules(){
+function loadXploreV070Modules(){
   loadXploreScriptOnce('address-search.js?v=0.5.3','xplore-address-search-script',()=>{
-    loadXploreScriptOnce('transit-bootstrap.js?v=0.5.0','xplore-transit-bootstrap-script',()=>{
-      loadXploreScriptOnce('transit.js?v=0.5.0','xplore-transit-script',()=>{
-        loadXploreScriptOnce('transit-safety.js?v=0.5.0','xplore-transit-safety-script',()=>{
-          loadXploreScriptOnce('route-intelligence.js?v=0.5.0','xplore-route-intelligence-script',()=>{
+    loadXploreScriptOnce('transit-bootstrap.js?v=0.7.0','xplore-transit-bootstrap-script',()=>{
+      loadXploreScriptOnce('transit.js?v=0.7.0','xplore-transit-script',()=>{
+        loadXploreScriptOnce('transit-safety.js?v=0.7.0','xplore-transit-safety-script',()=>{
+          loadXploreScriptOnce('realtime-core.js?v=0.7.0','xplore-realtime-core-script',()=>{
+            loadXploreScriptOnce('realtime-v07.js?v=0.7.0','xplore-realtime-v07-script',()=>{
+              loadXploreScriptOnce('transit-live-patch-v07.js?v=0.7.0','xplore-transit-live-patch-v07-script',()=>{
+                loadXploreScriptOnce('route-intelligence.js?v=0.5.0','xplore-route-intelligence-script',()=>{
             loadXploreScriptOnce('mobile-ui.js?v=0.5.0','xplore-mobile-ui-script',()=>{
               loadXploreScriptOnce('navigation-session.js?v=0.5.2','xplore-navigation-session-script',()=>{
                 loadXploreScriptOnce('cork-place-search.js?v=0.5.3','xplore-cork-places-script',()=>{
                   loadXploreScriptOnce('learning-core.js?v=0.6.0','xplore-learning-core-script',()=>{
                     loadXploreScriptOnce('learning-v06.js?v=0.6.0','xplore-learning-v06-script',()=>setXploreReleaseVersion());
                   });
+                });
+              });
+            });
                 });
               });
             });
@@ -83,5 +89,5 @@ function loadXploreV060Modules(){
 }
 
 setXploreReleaseVersion();
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadXploreV060Modules,{once:true});
-else loadXploreV060Modules();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadXploreV070Modules,{once:true});
+else loadXploreV070Modules();
