@@ -1,0 +1,96 @@
+/* XPLORE route-specific Decision Intelligence: scoped green-theme UI.
+   Does not style map, navigation, routes, geolocation or other panels. */
+.decision-insight{
+  margin:15px 0 0;padding:14px;border-radius:15px;
+  border:1px solid #2c553b;
+  background:linear-gradient(153deg,#122c1e 0%,#0d2218 72%,#10261b 100%);
+  box-shadow:0 10px 26px rgba(1,15,7,.18);
+  font-family:"Inter",sans-serif;
+}
+.decision-insight-top,
+.decision-insight-heading-row,
+.decision-insight-driver-heading{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.decision-insight-kicker{
+  color:#a9e8c1;text-transform:uppercase;letter-spacing:.105em;
+  font-family:"Inter Tight",sans-serif;font-size:10px;font-weight:750;
+}
+.decision-insight-status{
+  color:#9fceb0;font-size:9px;font-weight:650;
+  border:1px solid #305841;background:rgba(19,59,35,.56);
+  border-radius:999px;padding:5px 8px;white-space:nowrap;
+}
+.decision-insight-empty{
+  margin:12px 0 0;color:#a6bdb0;font-size:11px;line-height:1.6;
+}
+.decision-insight [hidden]{display:none!important}
+.decision-insight-heading-row{align-items:baseline;margin-top:12px}
+.decision-insight-heading-row strong{
+  color:#e6f8ec;font-size:13px;font-family:"Inter Tight",sans-serif;
+  font-weight:700;line-height:1.35;
+}
+.decision-insight-score{
+  flex:none;font:800 18px "Inter Tight",sans-serif;
+  letter-spacing:-.035em;color:#8ef0b5;
+}
+.decision-insight-priority{
+  margin:4px 0 11px;color:#abcdb9;font-size:10px;line-height:1.55;
+}
+.decision-insight-comparisons{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;
+}
+.decision-insight-comparisons>div{
+  background:#0c2116;border:1px solid #284835;border-radius:10px;
+  padding:9px 8px;min-width:0;
+}
+.decision-insight-comparisons span{
+  display:block;font-size:8px;text-transform:uppercase;
+  line-height:1.35;letter-spacing:.04em;color:#8fae99;
+}
+.decision-insight-comparisons strong{
+  display:block;margin-top:5px;font:700 11px "Inter Tight",sans-serif;
+  color:#dbf3e3;line-height:1.4;overflow-wrap:anywhere;
+}
+.decision-insight-driver{
+  margin-top:11px;padding-top:10px;border-top:1px solid #2b4837;
+}
+.decision-insight-driver-heading span{
+  font-size:10px;font-weight:650;color:#c1dfcb;
+}
+.decision-insight-driver-heading strong{
+  font-size:10px;font-weight:700;color:#91e9b4;
+  text-align:right;white-space:nowrap;
+}
+.decision-insight-track{
+  margin-top:8px;height:5px;background:#234232;
+  overflow:hidden;border-radius:999px;
+}
+#decisionInsightDriverFill{
+  display:block;height:100%;width:0;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#2a985d,#77e7a4);
+  transition:width .28s ease;
+}
+#decisionInsightDriverDetail{
+  margin:7px 0 0;font-size:10px;line-height:1.55;color:#aecdb9;
+}
+.decision-insight-context{
+  margin:11px 0 0;font-size:10px;line-height:1.5;color:#c2d9ca;
+}
+.decision-insight-note{
+  margin:10px 0 0;padding-top:8px;border-top:1px solid #263f31;
+  font-size:9px;color:#8ea897;line-height:1.55;
+}
+@media(max-width:760px){
+  .decision-insight{margin-top:13px;padding:13px}
+}
+@media(max-width:390px){
+  .decision-insight-comparisons{gap:5px}
+  .decision-insight-comparisons>div{padding:8px 7px}
+  .decision-insight-driver-heading{align-items:flex-start}
+  .decision-insight-driver-heading strong{white-space:normal}
+}
+@media(prefers-reduced-motion:reduce){
+  #decisionInsightDriverFill{transition:none!important}
+}
