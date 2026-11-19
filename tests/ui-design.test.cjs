@@ -5,15 +5,20 @@ const path=require("node:path");
 const root=path.resolve(__dirname,"..");
 const read=(name)=>fs.readFileSync(path.join(root,name),"utf8");
 const html=read("index.html");
-const css=read("ui-business.css");
+const css=read("motion-green.css");
+const base=read("styles.css");
 const js=read("ui-workflow.js");
 
-test("enterprise visual system loads after existing layout styles",()=>{
-  assert.ok(html.includes("ui-business.css?v=0.5.4"));
-  assert.ok(html.indexOf("ui-business.css")>html.indexOf("desktop-polish.css"));
-  assert.ok(html.indexOf("ui-business.css")>html.indexOf("mobile.css"));
-  assert.ok(css.includes("--bg:#0b1422"));
+test("original green visual system is active and business theme is isolated",()=>{
+  assert.ok(html.includes("motion-green.css?v=20261119"));
+  assert.ok(html.indexOf("motion-green.css")>html.indexOf("desktop-polish.css"));
+  assert.ok(html.indexOf("motion-green.css")>html.indexOf("mobile.css"));
+  assert.ok(!html.includes('href="ui-business.css'));
+  assert.ok(!html.includes('href="brand-theme.css'));
+  assert.ok(base.includes("--bg:#07110d"));
+  assert.ok(base.includes("--green:#52d98d"));
   assert.ok(css.includes("linear-gradient"));
+  assert.ok(css.includes("#5fd88f") || html.includes("#5fd88f"));
 });
 
 test("data-to-decision animation remains separate from navigation map",()=>{
