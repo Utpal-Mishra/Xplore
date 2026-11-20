@@ -182,6 +182,12 @@
 
     <h2 class="section-title">Pilot Boundary</h2>
     <div class="notice">XPLORE v1.0.0 Beta adds operational release gates, explicit local-analytics controls, privacy-safe production monitoring and a pseudonymous Founding Tester programme. Beta does not mean safety certification or enterprise production readiness: public/development adapters remain, browser background GPS is limited, NTA authenticated realtime is still awaiting repository credentials, transit search is bounded to two transfers, fare values are reference evidence, and Route Intelligence is decision-support rather than a safety/accessibility certification.</div>
+    <details class="notice" id="websiteAnalyticsSettings" hidden>
+      <summary>Website analytics privacy</summary>
+      <p id="websiteAnalyticsDescription">If enabled, Google Analytics uses cookies to measure visits and engagement on XPLORE. Route details, GPS, typed addresses and Eircodes are excluded from this integration. You can turn this off at any time here.</p>
+      <label><input id="websiteAnalytics" type="checkbox" aria-describedby="websiteAnalyticsDescription"> Allow Google Analytics</label>
+      <div><a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">How Google uses the data</a></div>
+    </details>
   </aside>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -194,6 +200,7 @@
 <script src="ireland-network.js?v=0.4.6"></script>
 <script src="eircode-provider.js?v=1.0.2"></script>
 <script src="decision-insight.js?v=0.8.0"></script>
+<script src="website-analytics.js?v=1"></script>
 
 </body>
 </html>
