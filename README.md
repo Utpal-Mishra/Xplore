@@ -91,6 +91,12 @@ Analytics deliberately exclude raw GPS, coordinates, typed addresses, Eircodes, 
 
 See [docs/V06_LEARNING.md](docs/V06_LEARNING.md).
 
+### Website analytics
+
+The live GitHub Pages app offers an optional Google Analytics setting under **Website analytics privacy**. It starts off and can be withdrawn in the same panel. Local journey analytics use their own controls.
+
+Keep the XPLORE GA4 web stream limited to standard page views. In Enhanced Measurement, turn off page changes based on browser history and all other optional events, including form interactions and site searches. Keep Google Ads destinations and automatic user-provided data collection disabled. After deployment, verify that opting in records one page view, that Google Analytics requests stop on withdrawal, and that the payload excludes route inputs and full referrer URLs.
+
 ## Transit
 
 The scheduled planner uses the broad official NTA `GTFS_All.zip` feed so XPLORE does not reduce timetable coverage simply to gain realtime compatibility.
@@ -183,3 +189,4 @@ XPLORE maintains structured decision, system, architecture, risk, data, validati
 - [v0.8 Decision Intelligence release log](docs/logs/2026-11-19-v0.8-decision-intelligence.md)
 - [v0.7 Live Mobility release log](docs/logs/2026-11-19-v0.7-live-mobility.md)
 - [v0.6 Learn release log](docs/logs/2026-11-19-v0.6-learning-release.md)
+

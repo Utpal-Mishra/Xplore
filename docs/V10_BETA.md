@@ -64,7 +64,7 @@ User controls:
 - export local learning data
 - clear local learning data
 
-No governed remote analytics collector is configured by default.
+Local journey events have no remote collector configured by default. The GitHub Pages app has a separate opt-in for Google Analytics website visits, described in the [website analytics setup](../README.md#website-analytics).
 
 ## Founding Tester programme
 
