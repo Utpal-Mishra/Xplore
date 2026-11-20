@@ -95,7 +95,7 @@ See [docs/V06_LEARNING.md](docs/V06_LEARNING.md).
 
 The live GitHub Pages app offers an optional Google Analytics setting under **Website analytics privacy**. It starts off and can be withdrawn in the same panel. Local journey analytics use their own controls.
 
-Before deploying, disable Enhanced Measurement in the XPLORE GA4 web stream to keep the tag from automatically measuring forms, site searches, or other app interactions. Keep Google Ads destinations and automatic user-provided data collection disabled. On deployment, use Google Tag Assistant and GA4 Realtime or DebugView to verify one page view after opting in, no Google Analytics requests before opt-in or after withdrawal, and no route inputs, identifiers, or full referrer URLs in the payload.
+Keep the XPLORE GA4 web stream limited to standard page views. In Enhanced Measurement, turn off page changes based on browser history and all other optional events, including form interactions and site searches. Keep Google Ads destinations and automatic user-provided data collection disabled. After deployment, verify that opting in records one page view, that Google Analytics requests stop on withdrawal, and that the payload excludes route inputs and full referrer URLs.
 
 ## Transit
 
@@ -189,3 +189,4 @@ XPLORE maintains structured decision, system, architecture, risk, data, validati
 - [v0.8 Decision Intelligence release log](docs/logs/2026-11-19-v0.8-decision-intelligence.md)
 - [v0.7 Live Mobility release log](docs/logs/2026-11-19-v0.7-live-mobility.md)
 - [v0.6 Learn release log](docs/logs/2026-11-19-v0.6-learning-release.md)
+
