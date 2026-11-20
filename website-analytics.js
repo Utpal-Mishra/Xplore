@@ -11,8 +11,6 @@
   const settings = document.getElementById('websiteAnalyticsSettings');
   const choice = document.getElementById('websiteAnalytics');
   let tag;
-  let loaded = false;
-  let pageViewSent = false;
 
   function readConsent() {
     try {
@@ -20,12 +18,6 @@
     } catch {
       return false;
     }
-  }
-
-  function sendPageView() {
-    if (!loaded || pageViewSent || window[disabledFlag]) return;
-    pageViewSent = true;
-    window.gtag('event', 'page_view', {send_to: measurementId});
   }
 
   function loadTag() {
@@ -43,7 +35,6 @@
       page_location: site + sitePath,
       page_referrer: '',
       page_title: 'XPLORE — Ireland',
-      send_page_view: false,
       allow_google_signals: false,
       allow_ad_personalization_signals: false,
       cookie_domain: 'none',
@@ -57,10 +48,6 @@
     tag.async = true;
     tag.referrerPolicy = 'no-referrer';
     tag.src = 'https://www.googletagmanager.com/gtag/js?id=' + measurementId;
-    tag.addEventListener('load', () => {
-      loaded = true;
-      sendPageView();
-    }, {once: true});
     document.head.appendChild(tag);
   }
 
@@ -69,7 +56,6 @@
     choice.checked = granted;
     if (granted) {
       loadTag();
-      sendPageView();
     } else if (tag) {
       for (const name of ['xplore_ga', 'xplore_ga_' + measurementId.slice(2)]) {
         document.cookie = name + '=; Max-Age=0; Path=' + sitePath + '; Secure; SameSite=Lax';

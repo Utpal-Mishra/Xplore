@@ -18,7 +18,7 @@ function activatePage({saved, url = 'https://utpal-mishra.github.io/Xplore/?q=pr
   const window = {addEventListener(type, handler) { pageEvents[type] = handler; }};
   const document = {
     head: {appendChild: script => scripts.push(script)},
-    createElement: () => ({addEventListener(type, handler) { this[type] = handler; }}),
+    createElement: () => ({}),
     getElementById: id => id === 'websiteAnalytics' ? choice : settings,
     set cookie(value) { cookies.push(value); }
   };
@@ -55,11 +55,9 @@ test('production website requires explicit opt-in before loading the tag', () =>
   const config = app.commands().find(([command]) => command === 'config')[2];
   assert.equal(config.page_location, 'https://utpal-mishra.github.io/Xplore/');
   assert.equal(config.page_referrer, '');
-  assert.equal(config.send_page_view, false);
+  assert.equal(config.send_page_view, undefined);
   assert.equal(config.allow_google_signals, false);
   assert.equal(app.pageViews().length, 0);
-  app.scripts[0].load();
-  assert.equal(app.pageViews().length, 1);
 });
 
 test('withdrawal stops collection across tabs even if a tag is loading', () => {
@@ -68,7 +66,6 @@ test('withdrawal stops collection across tabs even if a tag is loading', () => {
   app.pageEvents.storage({key: consentKey});
   assert.equal(app.isDisabled(), true);
   assert.equal(app.choice.checked, false);
-  app.scripts[0].load();
   assert.equal(app.pageViews().length, 0);
   assert.ok(app.cookies.some(cookie => cookie.startsWith('xplore_ga_L5D33ZK7NE=; Max-Age=0; Path=/Xplore/')));
 
@@ -76,7 +73,7 @@ test('withdrawal stops collection across tabs even if a tag is loading', () => {
   app.setChoice(false);
   app.setChoice(true);
   assert.equal(app.scripts.length, 1);
-  assert.equal(app.pageViews().length, 1);
+  assert.equal(app.commands().filter(([command]) => command === 'config').length, 1);
 });
 
 test('analytics stays disabled on local and other GitHub Pages sites', () => {
